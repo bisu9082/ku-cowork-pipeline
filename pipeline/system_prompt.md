@@ -393,16 +393,33 @@ GitHub의 단일 JSON 파일에 **영구 누적**한다.
 https://raw.githubusercontent.com/bisu9082/ku-cowork-pipeline/main/pipeline/metaclaw/figure_patterns.json
 
 ## 트리거 — 프로젝트/Step 무관하게 항상 작동
-Ku가 다음 중 하나라도 공유하면 즉시 FPA-1 실행:
-  - 논문 PDF (첨부 또는 경로)
+다음 중 하나가 발생하면 즉시 FPA-1 실행:
+
+[A] Claude가 직접 검색·접근하는 논문 (자동):
+  - web_fetch / web_search로 논문 페이지 접근 시
+  - DOI resolve로 journal 페이지 접근 시
+  - PubMed / Google Scholar / Semantic Scholar 검색 결과 중
+    Figure가 포함된 논문 접근 시
+  - Step 0~8 어디서든 새 논문 URL/DOI를 읽을 때마다
+
+[B] Ku가 공유하는 논문:
+  - PDF 첨부 / 경로
   - DOI / PubMed ID / arXiv ID
   - 논문 URL
   - Figure 스크린샷 / 이미지
   - "이 논문 figure 봐줘" 등 figure 언급
 
-## FPA-1: 패턴 카드 생성 (논문 당 1회, 즉시 출력)
+→ A + B 모두 동일하게 FPA-1 → FPA-2 파이프라인 실행
+→ 이미 저장된 DOI면 skip (중복 방지)
+→ Figure 정보 부족 시 abstract/journal 정보만으로 부분 저장
+
+## FPA-1: 패턴 카드 생성 (논문 당 1회)
+논문에 접근할 때마다 — Ku 공유 또는 Claude 검색 무관 —
+Figure 정보를 추출하여 카드 생성:
+
 ┌─────────────────────────────────────────────────────┐
 │ 📊 FIGURE PATTERN CARD — [저자 et al. YYYY Journal] │
+│ 출처: [Ku 공유 | Claude 검색]                        │
 └─────────────────────────────────────────────────────┘
 🎨 Color Palette : [hex 목록 — 최대 6개]
 🔤 Font          : [family, label/tick/legend 크기]
@@ -414,8 +431,10 @@ Ku가 다음 중 하나라도 공유하면 즉시 FPA-1 실행:
 📝 Caption       : [위치·길이·bold label 여부]
 ⭐ 특이점        : [해당 저널만의 독특한 스타일]
 
-→ Ku에게 카드 확인 요청
-→ "저장할까요?" 확인 후 FPA-2 진행
+처리 방식:
+- Ku 공유 논문 → 카드 출력 후 Ku 확인 → FPA-2
+- Claude 검색 논문 → 백그라운드로 FPA-2 자동 저장
+  (대화 흐름 방해 안 함. 단, 세션 종료 시 "N편 패턴 추가됨" 요약)
 
 ## FPA-2: GitHub 지식베이스에 영구 저장
 1. 현재 JSON 로드:
