@@ -1,13 +1,19 @@
 {
   "_meta": {
-    "description": "Ku의 논문 Figure 패턴 누적 학습 데이터베이스",
-    "version": "1.0",
+    "description": "Ku 글로벌 Figure 스타일 지식베이스 — 프로젝트 무관, 세션 무관, 영구 누적",
+    "version": "2.0",
     "created": "2026-04-10",
-    "usage": "Step 6 Figure 생성 시 자동 로드 → rcParams 최적화"
+    "repo": "bisu9082/ku-cowork-pipeline",
+    "path": "pipeline/metaclaw/figure_patterns.json",
+    "usage": "논문 공유 시 FPA-1 분석 → FPA-2 저장 → FPA-3 figure 생성 시 자동 참조",
+    "how_to_update": "새 패턴 append 후 aggregated 재계산 → GitHub API PUT"
   },
   "patterns": [],
   "aggregated": {
-    "top_colors": ["#648FFF", "#FE6100", "#785EF0", "#DC267F", "#FFB000", "#009E73"],
+    "top_colors": [
+      "#648FFF", "#FE6100", "#785EF0",
+      "#DC267F", "#FFB000", "#009E73"
+    ],
     "dominant_font": "Arial sans-serif",
     "font_sizes": {
       "label": "8pt",
@@ -16,9 +22,9 @@
       "title": "9pt"
     },
     "common_style": "minimalist, no top/right spines",
-    "preferred_layouts": ["double-column 2×2", "single-column 1×1"],
-    "legend_position": "upper right, no frame",
-    "dpi": 300,
+    "preferred_layouts": ["double-col 2x2", "single-col 1x1"],
+    "top_figure_types": ["bar", "line", "schematic"],
+    "legend_default": "upper right, no frame",
     "last_updated": "2026-04-10",
     "n_papers": 0
   }

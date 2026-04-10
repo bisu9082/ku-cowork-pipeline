@@ -378,76 +378,103 @@ matplotlib.rcParams.update({
 # 막대 레이블: add_bar_labels() 함수 사용, y_max*1.15
 
 ################################################################
-# [FIGURE PATTERN LEARNING] — 논문 Figure 패턴 누적 학습 시스템
+# [FIGURE PATTERN LEARNING] — 글로벌 Figure 스타일 지식 베이스
+# 프로젝트 무관 · 세션 무관 · GitHub에 영구 누적
 ################################################################
 
-## 트리거: 언제 실행하나?
-Ku가 새 논문을 공유할 때마다 (PDF, URL, DOI, 스크린샷 등) 자동 실행:
-- Step 0 논문 리뷰 시
-- Step 1 문헌 조사 시
-- 대화 중 "이 논문 figure 어때?" 등 figure 언급 시
+## 핵심 개념
+이 시스템은 특정 프로젝트나 파이프라인 Step에 종속되지 않는다.
+Ku가 어떤 논문이든 공유할 때마다 Figure 패턴을 추출하여
+GitHub의 단일 JSON 파일에 **영구 누적**한다.
+시간이 지날수록 Ku의 분야 figure 스타일 지식베이스가 쌓이고,
+모든 미래 논문의 figure 품질이 자동으로 향상된다.
 
-## FPA-1: Figure 패턴 분석 (논문 당 1회)
-논문 Figure를 보거나 PDF를 읽을 때 다음 항목을 추출:
+지식베이스 URL (항상 최신):
+https://raw.githubusercontent.com/bisu9082/ku-cowork-pipeline/main/pipeline/metaclaw/figure_patterns.json
 
+## 트리거 — 프로젝트/Step 무관하게 항상 작동
+Ku가 다음 중 하나라도 공유하면 즉시 FPA-1 실행:
+  - 논문 PDF (첨부 또는 경로)
+  - DOI / PubMed ID / arXiv ID
+  - 논문 URL
+  - Figure 스크린샷 / 이미지
+  - "이 논문 figure 봐줘" 등 figure 언급
+
+## FPA-1: 패턴 카드 생성 (논문 당 1회, 즉시 출력)
 ┌─────────────────────────────────────────────────────┐
 │ 📊 FIGURE PATTERN CARD — [저자 et al. YYYY Journal] │
 └─────────────────────────────────────────────────────┘
-🎨 Color Palette: [hex 코드 목록, e.g. #648FFF, #FE6100]
-🔤 Font: [family + 크기 계층, e.g. Arial 8pt/7pt/6pt]
-📐 Layout: [single/double col, panel 배열 e.g. 2×2]
-📈 Figure Types: [bar, line, scatter, heatmap, schematic 등]
-✂️ Spine Style: [top/right 제거 여부, axis linewidth]
-🏷️ Legend: [위치, frame on/off]
-💡 Design Style: [minimalist / detailed / journal-specific]
-📝 Caption Style: [위치, 길이 패턴, bold label 여부]
+🎨 Color Palette : [hex 목록 — 최대 6개]
+🔤 Font          : [family, label/tick/legend 크기]
+📐 Layout        : [single/double col · panel 배열]
+📈 Figure Types  : [bar·line·scatter·heatmap·schematic 등]
+✂️  Spine Style   : [top·right 제거 여부, linewidth]
+🏷️  Legend        : [위치, frame, bbox]
+💡 Design Style  : [minimalist·detailed·journal-specific]
+📝 Caption       : [위치·길이·bold label 여부]
+⭐ 특이점        : [해당 저널만의 독특한 스타일]
 
-## FPA-2: 패턴 누적 저장
-분석 결과를 GitHub figure_patterns.json에 append:
-web_fetch: https://raw.githubusercontent.com/bisu9082/ku-cowork-pipeline/main/pipeline/metaclaw/figure_patterns.json
-→ 새 항목 추가 후 업데이트 (Ku 확인 후 커밋)
+→ Ku에게 카드 확인 요청
+→ "저장할까요?" 확인 후 FPA-2 진행
 
-JSON 구조:
+## FPA-2: GitHub 지식베이스에 영구 저장
+1. 현재 JSON 로드:
+   web_fetch → figure_patterns.json
+2. 새 패턴 항목 append (중복 DOI 체크)
+3. aggregated 섹션 자동 재계산:
+   - top_colors: 전체 논문 색상 빈도 상위 6개
+   - dominant_font: 최다 사용 폰트
+   - common_style: 최다 스타일
+   - n_papers: 총 논문 수 +1
+4. GitHub API PUT으로 즉시 업데이트
+5. "총 N편 논문 패턴 학습 완료" 확인 메시지
+
+JSON 스키마:
 {
   "patterns": [
     {
-      "paper": "Author et al. YYYY - Journal",
+      "id": "author_YYYY_journal",
+      "paper": "Author et al. YYYY - Journal Name",
       "doi": "10.xxx/xxx",
-      "journal": "Wiley / Elsevier / Nature / ACS",
-      "colors": ["#648FFF", "#FE6100"],
-      "font_family": "Arial",
-      "font_sizes": {"label": "8pt", "tick": "7pt"},
-      "layout": "double-column",
-      "panel": "2x2",
-      "figure_types": ["bar", "heatmap"],
-      "spines": "top/right removed",
-      "legend": "upper right, no frame",
-      "style": "minimalist",
+      "journal": "Wiley|Elsevier|Nature|ACS|Springer",
+      "field": "CBRN|ML|환경|의학 등",
+      "colors": ["#hex1", "#hex2"],
+      "font_family": "Arial|Times|Helvetica",
+      "font_sizes": {"label":"8pt","tick":"7pt","legend":"7pt"},
+      "layout": "single-col|double-col",
+      "panel": "1x1|2x2|1x3|custom",
+      "figure_types": ["bar","line","scatter","heatmap","schematic"],
+      "spines": "top/right removed|all|none",
+      "legend": "upper-right no-frame|inside|outside",
+      "style": "minimalist|detailed|journal-specific",
+      "caption_position": "below|above",
+      "notable": "특이 스타일 메모",
       "date_added": "YYYY-MM-DD"
     }
   ],
   "aggregated": {
-    "top_colors": ["#648FFF", "#FE6100", "#785EF0"],
+    "top_colors": ["#hex1","#hex2","#hex3","#hex4","#hex5","#hex6"],
     "dominant_font": "Arial sans-serif",
     "common_style": "minimalist, no top/right spines",
-    "preferred_layouts": ["2x2 grid", "1x3 horizontal"],
+    "preferred_layouts": ["double-col 2x2","single-col 1x1"],
+    "top_figure_types": ["bar","line","schematic"],
     "last_updated": "YYYY-MM-DD",
     "n_papers": 0
   }
 }
 
-## FPA-3: Figure 생성 강화 (Step 6에서 자동 적용)
-Step 6 진입 시:
+## FPA-3: Figure 생성 시 자동 적용 (언제나, 어느 프로젝트에서나)
+Figure 코드 작성 전:
 1. figure_patterns.json 로드 (web_fetch)
-2. aggregated 섹션에서 현재 저널과 가장 유사한 패턴 추출
-3. matplotlib rcParams를 해당 패턴으로 오버라이드
-4. "이 Figure는 [N]편 논문 패턴 기반입니다" 안내 출력
+2. 현재 저널/분야에 맞는 패턴 필터링
+3. aggregated에서 rcParams 오버라이드값 추출
+4. 코드 상단에 주석으로 출처 명시
 
 ┌─────────────────────────────────────────────────────┐
-│ 🎓 PATTERN BOOST — N편 논문 학습 결과 적용          │
-│  주요 색상: [hex 목록]                               │
-│  폰트: [family + size]                               │
-│  스타일: [minimalist 등]                             │
+│ 🎓 PATTERN BOOST — [N]편 논문 학습 결과 자동 적용   │
+│  분야: [field]  저널 유사도: [journal]               │
+│  색상: [hex 목록]  폰트: [family size]               │
+│  스타일: [style]  근거: [논문 N편 분석]              │
 └─────────────────────────────────────────────────────┘
 
 ################################################################
