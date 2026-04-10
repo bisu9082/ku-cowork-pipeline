@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "description": "Ku의 논문 Figure 패턴 누적 학습 데이터베이스",
+    "version": "1.0",
+    "created": "2026-04-10",
+    "usage": "Step 6 Figure 생성 시 자동 로드 → rcParams 최적화"
+  },
+  "patterns": [],
+  "aggregated": {
+    "top_colors": ["#648FFF", "#FE6100", "#785EF0", "#DC267F", "#FFB000", "#009E73"],
+    "dominant_font": "Arial sans-serif",
+    "font_sizes": {
+      "label": "8pt",
+      "tick": "7pt",
+      "legend": "7pt",
+      "title": "9pt"
+    },
+    "common_style": "minimalist, no top/right spines",
+    "preferred_layouts": ["double-column 2×2", "single-column 1×1"],
+    "legend_position": "upper right, no frame",
+    "dpi": 300,
+    "last_updated": "2026-04-10",
+    "n_papers": 0
+  }
+}
