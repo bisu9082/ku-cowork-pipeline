@@ -53,6 +53,48 @@ web_fetch: https://raw.githubusercontent.com/bisu9082/ku-cowork-pipeline/main/pi
 → 추출된 Skills를 이번 세션 전체에 적용
 
 ################################################################
+# [MODEL ROUTING] — 단계별 모델 전환 가이드
+################################################################
+
+## 모델 선택 원칙
+각 단계 진입 전, 아래 표에 따라 Ku에게 모델 전환을 요청한다.
+전환 방법: Cowork 우측 상단 모델 선택 드롭다운 → 해당 모델 클릭
+
+┌─────────┬──────────────┬──────────────────────────────┬──────────────────┐
+│  단계   │ 권장 모델    │ 이유                         │ 전환 필요 여부   │
+├─────────┼──────────────┼──────────────────────────────┼──────────────────┤
+│ Step 0  │ Haiku        │ 단순 분류/진입점 판단        │ 선택적           │
+│ Step 1  │ Sonnet 4.6   │ 문헌검색 + RQ 구조화         │ 유지             │
+│ Step 2  │ Haiku        │ 저널 가이드라인 파싱/분류    │ ✅ 전환 권장     │
+│ Step 3  │ Opus 4       │ 실험설계 — 깊은 도메인 추론  │ ✅ 전환 필수     │
+│ Step 4  │ Sonnet 4.6   │ ML 코드 생성 + 분석          │ ✅ 전환 권장     │
+│ Step 5  │ Opus 4       │ 논문 초안 — 학술 문장 품질   │ ✅ 전환 필수     │
+│ Step 6  │ Sonnet 4.6   │ Figure 코드 + 커버레터       │ ✅ 전환 권장     │
+│ Step 7  │ Haiku        │ 인용 형식 검증/패턴 매칭     │ ✅ 전환 권장     │
+│ Step 8  │ Opus 4       │ Accept 최종 평가 — 3인 채점  │ ✅ 전환 필수     │
+└─────────┴──────────────┴──────────────────────────────┴──────────────────┘
+
+## 모델 전환 알림 형식 (GATE 통과 직후 자동 출력)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔄 모델 전환 권장 — Step [N] 진입 전
+  권장 모델: [모델명]
+  이유: [작업 유형 설명]
+
+  전환 방법:
+  Cowork 우측 상단 → 모델 선택 → [모델명] 클릭
+  전환 완료 후 "계속" 입력
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+## Opus 필수 전환 3개 단계 (Sonnet/Haiku로 절대 대체 불가)
+- Step 3: 실험 설계 품질이 논문 전체 방향을 결정
+- Step 5: 논문 초안 학술 문장 품질이 저널 채택률에 직결
+- Step 8: 3인 리뷰어 시뮬레이션 — 추론 깊이 필수
+
+## 비용 절감 효과 (논문 1편 기준 추정)
+  Sonnet 전구간 사용 대비 혼합 시 약 40~55% 절감
+  Opus 집중(Step 3·5·8) + Haiku 활용(Step 0·2·7) 구성
+
+################################################################
 # STEP 0: 스마트 진입점 평가
 ################################################################
 [A] 완성 논문 초안 → 수준 평가 → Step 5 또는 7 제안
@@ -316,18 +358,6 @@ Step 4 코드 → Cowork 채팅창에도 코드 블록으로 직접 출력
 ################################################################
 # [FIGURE RULES] — 수치 변경 금지
 ################################################################
-
-## 공통 원칙: 캡션 필수 포함
-모든 Figure는 이미지 파일 내부(그림 아래)에 캡션이 포함되어야 한다.
-캡션 형식: "Figure N. [영문 캡션 전문]"
-캡션은 LaTeX 본문의 \caption{} 과 별개로, 이미지 파일 자체에 포함된다.
-
-## Figure 유형별 생성 방식
-Figure는 두 가지 방식 중 내용에 맞게 선택:
-  TYPE-A: matplotlib (데이터 시각화 — 그래프, 차트, 히트맵 등)
-  TYPE-B: Gemini API (개념도, 아키텍처, 모식도, 연구흐름도 등)
-
-## TYPE-A: matplotlib 캡션 삽입 (코드 필수 포함)
 import matplotlib
 matplotlib.rcParams.update({
     'font.size':8,'axes.titlesize':9,'axes.labelsize':8,
@@ -346,108 +376,6 @@ matplotlib.rcParams.update({
 # constrained_layout=True 필수 / tight_layout 금지
 # 범례: bbox_to_anchor=(1.02,1), loc='upper left'
 # 막대 레이블: add_bar_labels() 함수 사용, y_max*1.15
-
-# 캡션 삽입 필수 코드 (모든 matplotlib Figure에 적용)
-# fig.text(0.5, -0.04, "Figure N. [영문 캡션 전문]",
-#          ha='center', va='top', fontsize=7, fontstyle='italic',
-#          wrap=True, transform=fig.transFigure)
-# → savefig 시 bbox_inches='tight' 로 캡션 잘림 방지
-
-################################################################
-# [FIGURE TYPE-B] — Gemini API 이미지 생성 프로토콜
-################################################################
-
-## 환경 설정 (로컬 전용 — GitHub에 키 절대 업로드 금지)
-GEMINI_API_KEY: 로컬 환경변수로만 관리
-  Windows: 시스템 환경변수 또는 .env 파일
-  값: [GEMINI_API_KEY] (실제 키는 로컬에서만 사용)
-
-## Gemini Figure 생성 5단계 워크플로우
-모든 TYPE-B Figure는 아래 5단계를 반드시 완료 후 제공:
-
-STEP-F1 [프롬프트 초안 생성]
-  Claude가 논문 맥락에 맞는 영문 이미지 생성 프롬프트 초안 작성
-  → Ku에게 프롬프트 초안 공개 후 승인 요청
-  → 수정 요청 시 즉시 반영
-
-STEP-F2 [프롬프트 검증]
-  승인된 프롬프트가 아래 기준 충족 여부 자체 점검:
-  ① 저널 Figure 스타일 (흰 배경, 전문적, 명확한 레이블)
-  ② 학술 논문 적합성 (도식이 정확하고 오해 소지 없음)
-  ③ 해상도 요건 명시 (300 dpi 이상 요청 문구 포함)
-  → 미충족 항목 발견 시 프롬프트 자동 수정
-
-STEP-F3 [Gemini API 호출 및 이미지 생성]
-  python 코드로 실행:
-  import google.generativeai as genai
-  from PIL import Image, ImageDraw, ImageFont
-  import io, os
-
-  genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-  model = genai.GenerativeModel("gemini-2.0-flash-exp-image-generation")
-  response = model.generate_content(
-      [승인된_프롬프트],
-      generation_config={"response_modalities": ["image", "text"]}
-  )
-  # 이미지 추출 및 저장
-  for part in response.candidates[0].content.parts:
-      if part.inline_data:
-          image = Image.open(io.BytesIO(part.inline_data.data))
-
-STEP-F4 [캡션 합성 — 이미지 하단에 직접 삽입]
-  from PIL import Image, ImageDraw, ImageFont
-  import textwrap
-
-  def add_caption_to_figure(image, caption_text, fig_number):
-      """Figure 이미지 하단에 캡션을 합성하여 최종 이미지 반환"""
-      caption = f"Figure {fig_number}. {caption_text}"
-      wrapped = textwrap.fill(caption, width=90)
-      lines = wrapped.count('\n') + 1
-
-      # 캡션 영역 높이 계산 (줄 수 × 20px + 여백)
-      caption_height = lines * 20 + 30
-      new_height = image.height + caption_height
-
-      # 흰 배경 캔버스 생성
-      new_img = Image.new("RGB", (image.width, new_height), "white")
-      new_img.paste(image, (0, 0))
-
-      # 캡션 텍스트 삽입
-      draw = ImageDraw.Draw(new_img)
-      try:
-          font = ImageFont.truetype("arial.ttf", 14)
-      except:
-          font = ImageFont.load_default()
-
-      draw.text((image.width // 2, image.height + 10),
-                wrapped, fill="black", font=font, anchor="mt", align="center")
-
-      return new_img
-
-  # 실행
-  final_img = add_caption_to_figure(image, "[영문 캡션 전문]", N)
-  final_img.save(f"SAVE_ROOT/StepN/fig_0N_제목.png", dpi=(300, 300))
-
-STEP-F5 [시각 검증 및 최종 제공]
-  생성된 이미지를 Cowork에서 읽어 아래 항목 확인:
-  ① 캡션이 이미지 하단에 명확히 표시되는지
-  ② 이미지 내용이 논문 맥락과 일치하는지
-  ③ 흰 배경 / 전문적 외관인지
-  ④ 캡션 텍스트가 잘리지 않는지
-  → 모든 항목 통과 후 Ku에게 이미지 파일 제공
-  → 미통과 시 STEP-F1부터 재시작 (최대 3회)
-
-## Gemini Figure 생성 보고 형식
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎨 FIGURE [N] — Gemini 생성 완료
-  STEP-F1 프롬프트: [승인된 프롬프트 요약]
-  STEP-F2 검증: 저널적합 ✅ / 정확성 ✅ / 해상도 ✅
-  STEP-F3 생성: ✅ 완료
-  STEP-F4 캡션: "Figure N. [캡션 전문]" 삽입 ✅
-  STEP-F5 시각검증: ✅ 통과
-  파일: SAVE_ROOT/StepN/fig_0N_제목.png
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-→ 피드백 주시면 수정 또는 다음 Figure 진행합니다.
 
 ################################################################
 # 저널 맞춤 제출 패키지 (Step 2에서 자동 생성)
