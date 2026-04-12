@@ -1,0 +1,283 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Ku 박사 자기인용 데이터베이스 — 논문 자동화 파이프라인 Self-Citation 시스템",
+    "last_updated": "2026-04-12",
+    "total_published": 28,
+    "note": "2+ topic overlap시 자동 인용 후보 표시. 프롬프트에서 ku_publications.json 로드 후 주제 매칭 수행"
+  },
+  "publications": [
+    {
+      "id": "J1-2025",
+      "bibtex_key": "Kim2025JHazMat",
+      "authors": ["Kim", "Ku (corresponding)"],
+      "year": 2025,
+      "title": "Machine learning-based colorimetric sensor array for nerve agent simulant detection",
+      "journal": "Journal of Hazardous Materials",
+      "doi": "10.1016/j.jhazmat.2024.136444",
+      "topics": ["colorimetric sensor", "nerve agent", "machine learning", "RF", "XGB", "SHAP", "CWA detection", "sensor array"],
+      "keywords": ["nerve agent simulant", "colorimetric", "ML", "random forest", "XGBoost", "SHAP", "CBRN"],
+      "citation_hint": "ML-based sensor + nerve agent 논문시 인용"
+    },
+    {
+      "id": "J2-2025",
+      "bibtex_key": "Kim2025DiscSens",
+      "authors": ["Kim", "Ku (corresponding)"],
+      "year": 2025,
+      "title": "Multiplex chromogenic-fluorogenic sensor for simultaneous detection of chemical warfare agents",
+      "journal": "Discovery Sensors",
+      "doi": "10.1007/s44328-025-00049-4",
+      "topics": ["fluorogenic sensor", "chromogenic sensor", "CWA detection", "multiplex detection", "nerve agent", "blister agent"],
+      "keywords": ["chromogenic", "fluorogenic", "multiplex", "simultaneous detection", "chemical warfare"],
+      "citation_hint": "복합 센서 / 다중 CWA 동시 검출 논문시 인용"
+    },
+    {
+      "id": "J3-2026",
+      "bibtex_key": "Shin2026SensActB",
+      "authors": ["Shin", "Ku (corresponding)"],
+      "year": 2026,
+      "title": "Novichok agent detection using novel colorimetric sensor",
+      "journal": "Sensors and Actuators B: Chemical",
+      "doi": "10.1016/j.snb.2025.137795",
+      "topics": ["Novichok", "nerve agent", "colorimetric sensor", "CWA detection", "A-series agent"],
+      "keywords": ["Novichok", "colorimetric", "nerve agent", "fourth generation"],
+      "citation_hint": "노비촉/신경작용제 센서 논문시 인용"
+    },
+    {
+      "id": "J4-2026",
+      "bibtex_key": "Kim2026MolPharm",
+      "authors": ["Kim", "Ku (corresponding)"],
+      "year": 2026,
+      "title": "Chelating agents for radionuclide decontamination",
+      "journal": "Molecular Pharmaceutics",
+      "doi": "10.1021/acs.molpharmaceut.5c01955",
+      "topics": ["radionuclide", "chelator", "decontamination", "CBRN", "nuclear defense"],
+      "keywords": ["chelating agent", "radionuclide", "decontamination", "nuclear", "CBRN"],
+      "citation_hint": "방사성핵종 / 핵제독 / 킬레이트제 논문시 인용"
+    },
+    {
+      "id": "J5-2026",
+      "bibtex_key": "Chi2026ApplRadIsot",
+      "authors": ["Chi", "Ku (corresponding)"],
+      "year": 2026,
+      "title": "Electron beam decontamination of chemical agents",
+      "journal": "Applied Radiation and Isotopes",
+      "doi": "10.1016/j.apradiso.2026.112582",
+      "topics": ["electron beam", "decontamination", "chemical agent", "radiation", "CBRN"],
+      "keywords": ["electron beam", "decontamination", "CWA", "radiation treatment"],
+      "citation_hint": "전자빔 제독 / 방사선 처리 논문시 인용"
+    },
+    {
+      "id": "J6-2026",
+      "bibtex_key": "Kim2026AnalLett",
+      "authors": ["Kim", "Ku (corresponding)"],
+      "year": 2026,
+      "title": "LC-MS/MS-based identification of ricin from biological samples",
+      "journal": "Analytical Letters",
+      "doi": null,
+      "status": "Accepted",
+      "topics": ["ricin", "biological toxin", "LC-MS/MS", "analytical chemistry", "CBRN", "biodefense"],
+      "keywords": ["ricin", "LC-MS/MS", "biological agent", "toxin identification"],
+      "citation_hint": "리신 / 생물학적 독소 / LC-MS 분석 논문시 인용"
+    },
+    {
+      "id": "J7-2026",
+      "bibtex_key": "Park2026PSEP",
+      "authors": ["Park", "Ku (corresponding)"],
+      "year": 2026,
+      "title": "UAV-mounted IMS system for chemical leak source detection",
+      "journal": "Process Safety and Environmental Protection",
+      "doi": "10.1016/j.psep.2026.106976",
+      "topics": ["UAV", "IMS", "chemical detection", "drone", "source localization", "CWA monitoring"],
+      "keywords": ["UAV", "ion mobility spectrometry", "IMS", "chemical leak", "drone detection"],
+      "citation_hint": "UAV/드론 + 화학탐지 / IMS 논문시 인용"
+    },
+    {
+      "id": "J8-2025",
+      "bibtex_key": "Bae2025ChemomIntell",
+      "authors": ["Bae", "Ku (corresponding)"],
+      "year": 2025,
+      "title": "On-device YOLOv8-based detection of chemical warfare agents via colorimetric sensor",
+      "journal": "Chemometrics and Intelligent Laboratory Systems",
+      "doi": "10.1016/j.chemolab.2025.105367",
+      "topics": ["YOLOv8", "deep learning", "on-device AI", "colorimetric sensor", "CWA detection", "computer vision"],
+      "keywords": ["YOLOv8", "YOLO", "deep learning", "on-device", "colorimetric", "CWA"],
+      "citation_hint": "딥러닝/YOLO + 화학탐지 / 엣지 AI 논문시 인용"
+    },
+    {
+      "id": "J9-2025",
+      "bibtex_key": "Jang2025ComputToxicol",
+      "authors": ["Jang", "Ku (corresponding)"],
+      "year": 2025,
+      "title": "QSAR-based LD50 prediction for nerve agent analogs",
+      "journal": "Computational Toxicology",
+      "doi": "10.1016/j.comtox.2025.100361",
+      "topics": ["QSAR", "LD50", "nerve agent", "computational toxicology", "machine learning", "toxicity prediction"],
+      "keywords": ["QSAR", "LD50", "nerve agent", "computational toxicology", "structure-activity"],
+      "citation_hint": "QSAR / 독성예측 / 신경작용제 유사체 논문시 인용"
+    },
+    {
+      "id": "J10-2026",
+      "bibtex_key": "Shin2026DiscSensRAPID",
+      "authors": ["Shin", "Ku (corresponding)"],
+      "year": 2026,
+      "title": "RAPID immunoassay prediction model for chemical threat assessment",
+      "journal": "Discovery Sensors",
+      "doi": "10.1007/s44328-025-00071-6",
+      "topics": ["immunoassay", "RAPID", "machine learning", "chemical threat", "biosensor", "prediction model"],
+      "keywords": ["RAPID", "immunoassay", "prediction model", "chemical threat", "biosensor"],
+      "citation_hint": "면역분석 / 바이오센서 + ML 예측모델 논문시 인용"
+    },
+    {
+      "id": "J11-2025",
+      "bibtex_key": "Chi2025NextRes",
+      "authors": ["Chi", "Ku (corresponding)"],
+      "year": 2025,
+      "title": "Protective performance evaluation of CBRN suit against chemical warfare agents",
+      "journal": "Next Research",
+      "doi": "10.1016/j.nexres.2025.100283",
+      "topics": ["protective suit", "PPE", "CBRN", "chemical warfare agent", "permeation", "defense material"],
+      "keywords": ["protective suit", "PPE", "CBRN", "chemical agent permeation", "defense"],
+      "citation_hint": "방호복 / CBRN 개인보호장비 논문시 인용"
+    },
+    {
+      "id": "J12-2025",
+      "bibtex_key": "Lee2025JChemSci",
+      "authors": ["Lee", "Ku (corresponding)"],
+      "year": 2025,
+      "title": "Synthesis and characterization of nerve agent surrogates for detection studies",
+      "journal": "Journal of Chemical Sciences",
+      "volume": 137,
+      "doi": "10.1007/s12039-025-02406-6",
+      "topics": ["nerve agent surrogate", "simulant", "synthesis", "detection", "organophosphorus"],
+      "keywords": ["nerve agent surrogate", "simulant", "synthesis", "organophosphorus"],
+      "citation_hint": "신경작용제 모사물질 / 검출 연구 논문시 인용"
+    },
+    {
+      "id": "J13-2025",
+      "bibtex_key": "Chai2025Materials",
+      "authors": ["Chai", "Ku (corresponding)"],
+      "year": 2025,
+      "title": "Neutron shielding composite material development",
+      "journal": "Materials",
+      "volume": 18,
+      "doi": "10.3390/ma18225208",
+      "topics": ["neutron shielding", "composite material", "nuclear defense", "radiation protection", "CBRN"],
+      "keywords": ["neutron shielding", "composite", "nuclear", "radiation protection"],
+      "citation_hint": "중성자 차폐 / 핵방호 소재 논문시 인용"
+    },
+    {
+      "id": "J14-2025",
+      "bibtex_key": "Nam2025RadPhysChem",
+      "authors": ["Nam", "Ku (corresponding)"],
+      "year": 2025,
+      "title": "Radiation-induced degradation of butyl rubber for CBRN protective applications",
+      "journal": "Radiation Physics and Chemistry",
+      "doi": "10.1016/j.radphyschem.2025.112613",
+      "topics": ["butyl rubber", "radiation degradation", "CBRN", "protective material", "gamma radiation"],
+      "keywords": ["butyl rubber", "radiation", "degradation", "protective material", "gamma"],
+      "citation_hint": "방사선 + 고무소재 / 방호소재 내구성 논문시 인용"
+    },
+    {
+      "id": "J15-2025",
+      "bibtex_key": "Bae2025JEnvRad",
+      "authors": ["Bae", "Ku (corresponding)"],
+      "year": 2025,
+      "title": "Atmospheric deposition of Be-7 and K-40 radionuclides: monitoring and analysis",
+      "journal": "Journal of Environmental Radioactivity",
+      "doi": "10.1016/j.jenvrad.2025.107648",
+      "topics": ["Be-7", "K-40", "atmospheric deposition", "radionuclide monitoring", "environmental radioactivity"],
+      "keywords": ["Be-7", "K-40", "radionuclide", "atmospheric deposition", "environmental radioactivity"],
+      "citation_hint": "방사성핵종 환경 모니터링 / 대기 침적 논문시 인용"
+    },
+    {
+      "id": "J16-2025",
+      "bibtex_key": "Bae2025JDefModelSimul",
+      "authors": ["Bae", "Ku (corresponding)"],
+      "year": 2025,
+      "title": "Machine learning for asymmetric threat detection using balloon-borne sensor data",
+      "journal": "Journal of Defense Modeling and Simulation",
+      "doi": "10.1177/15485129241257430",
+      "topics": ["asymmetric threat", "machine learning", "balloon sensor", "defense", "threat detection"],
+      "keywords": ["asymmetric threat", "ML", "balloon", "defense modeling", "threat detection"],
+      "citation_hint": "비대칭 위협 / ML 기반 국방 탐지 논문시 인용"
+    },
+    {
+      "id": "J17-2025",
+      "bibtex_key": "Kang2025JAircr",
+      "authors": ["Kang", "Ku (first author)"],
+      "year": 2025,
+      "title": "Corrosion and degradation of aerospace aluminum alloys under operational conditions",
+      "journal": "Journal of Aircraft",
+      "doi": "10.2514/1.C037932",
+      "topics": ["aluminum alloy", "corrosion", "aerospace", "degradation", "materials science"],
+      "keywords": ["aluminum", "aerospace", "corrosion", "degradation", "alloy"],
+      "citation_hint": "항공 알루미늄 합금 / 부식/열화 논문시 인용"
+    },
+    {
+      "id": "J18-2024",
+      "bibtex_key": "Choi2024MatChemPhys",
+      "authors": ["Choi", "Ku (corresponding)"],
+      "year": 2024,
+      "title": "DFT study of gas nitriding kinetics in aluminum alloys",
+      "journal": "Materials Chemistry and Physics",
+      "doi": "10.1016/j.matchemphys.2024.129662",
+      "topics": ["DFT", "nitriding", "aluminum", "kinetics", "computational materials", "surface reaction"],
+      "keywords": ["DFT", "nitriding", "aluminum", "surface", "computational"],
+      "citation_hint": "DFT / 질화처리 / 알루미늄 표면 논문시 인용"
+    },
+    {
+      "id": "J19-2019",
+      "bibtex_key": "Kang2019ActaMater",
+      "authors": ["Kang", "Ku (first author)"],
+      "year": 2019,
+      "title": "Multiscale modeling of gas nitriding in Fe-Cr alloys: DFT and kMC approach",
+      "journal": "Acta Materialia",
+      "doi": "10.1016/j.actamat.2019.02.019",
+      "topics": ["DFT", "kMC", "nitriding", "Fe-Cr alloy", "multiscale modeling", "computational materials"],
+      "keywords": ["DFT", "kMC", "nitriding", "Fe-Cr", "multiscale", "Acta Materialia"],
+      "citation_hint": "DFT+kMC 멀티스케일 / 질화 / Fe-Cr 합금 논문시 인용"
+    }
+  ],
+  "under_review": {
+    "SCI": [
+      {"id": "R1", "status": "Under Review", "topics": ["CBRN", "sensor"]},
+      {"id": "R2", "status": "Under Review", "topics": ["CBRN", "machine learning"]},
+      {"id": "R3", "status": "Under Review", "topics": ["CBRN", "detection"]},
+      {"id": "R4", "status": "Under Review", "topics": ["CBRN", "materials"]},
+      {"id": "R5", "status": "Under Review", "topics": ["CBRN", "sensor"]},
+      {"id": "R6", "status": "Under Review", "topics": ["CBRN", "detection"]},
+      {"id": "R7", "status": "Under Review", "topics": ["defense", "machine learning"]},
+      {"id": "R8", "status": "Under Review", "topics": ["CBRN", "materials"]},
+      {"id": "R9", "status": "Under Review", "topics": ["CBRN", "sensor"]}
+    ],
+    "SSCI": [
+      {"id": "SR1", "status": "Under Review/Revision", "topics": ["defense policy", "CBRN"]},
+      {"id": "SR2", "status": "Under Review/Revision", "topics": ["defense", "security"]},
+      {"id": "SR3", "status": "Under Review/Revision", "topics": ["CBRN", "policy"]}
+    ],
+    "note": "Under Review 논문은 인용 금지 — published 논문만 self-cite 가능"
+  },
+  "topic_index": {
+    "CWA_detection": ["J1-2025", "J2-2025", "J3-2026", "J6-2026", "J7-2026", "J8-2025", "J9-2025", "J10-2026", "J12-2025"],
+    "machine_learning": ["J1-2025", "J8-2025", "J9-2025", "J10-2026", "J16-2025"],
+    "colorimetric_sensor": ["J1-2025", "J2-2025", "J3-2026", "J8-2025"],
+    "CBRN_defense": ["J1-2025", "J2-2025", "J3-2026", "J4-2026", "J5-2026", "J6-2026", "J7-2026", "J8-2025", "J11-2025", "J13-2025", "J14-2025", "J16-2025"],
+    "radionuclide_radiation": ["J4-2026", "J5-2026", "J13-2025", "J14-2025", "J15-2025"],
+    "protective_materials": ["J11-2025", "J13-2025", "J14-2025"],
+    "computational_DFT": ["J18-2024", "J19-2019"],
+    "aluminum_materials": ["J17-2025", "J18-2024", "J19-2019"],
+    "UAV_autonomous": ["J7-2026"],
+    "nerve_agent": ["J1-2025", "J2-2025", "J3-2026", "J9-2025", "J12-2025"],
+    "biosensor_immunoassay": ["J10-2026"],
+    "environmental_monitoring": ["J15-2025"]
+  },
+  "self_citation_rules": {
+    "min_topic_overlap": 2,
+    "max_citations_per_paper": 5,
+    "min_citations_per_paper": 2,
+    "only_published": true,
+    "insertion_style": "natural — 연구 맥락에 자연스럽게 삽입, 단순 나열 금지",
+    "report_format": "📎 자기인용 추가: [저널명 (연도)] — [인용 근거 1문장]"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "_meta": {
+    "version": "2.0",
+    "description": "Figure Pattern Learning (FPA) 글로벌 지식베이스 — 논문 피규어 스타일 패턴 누적",
+    "last_updated": "2026-04-12",
+    "n_papers": 0,
+    "github_path": "pipeline/metaclaw/figure_patterns.json",
+    "trigger": "Ku가 공유하거나 Claude가 검색·접근한 모든 논문의 피규어 패턴 자동 추출 및 누적"
+  },
+  "patterns": [],
+  "aggregated": {
+    "most_common_layout": null,
+    "most_common_colorscheme": null,
+    "avg_panels_per_figure": null,
+    "top_journals_analyzed": [],
+    "font_preferences": {
+      "label_size_range": null,
+      "tick_size_range": null,
+      "font_family": null
+    },
+    "design_trends": []
+  },
+  "schema": {
+    "pattern_entry": {
+      "paper_id": "DOI 또는 자체 ID",
+      "journal": "저널명",
+      "year": 2025,
+      "source": "ku_shared | claude_searched | ku_uploaded",
+      "figure_id": "Fig1 / Fig2 등",
+      "layout": {
+        "n_panels": 2,
+        "arrangement": "1x2 | 2x2 | 1x3 등",
+        "panel_labels": "A/B/C | a/b/c | (a)/(b) | 없음",
+        "has_suptitle": false
+      },
+      "style": {
+        "colorscheme": "viridis | coolwarm | categorical | custom",
+        "primary_colors": ["#hex1", "#hex2"],
+        "background": "white | gray | transparent",
+        "gridlines": true,
+        "spines_visible": "all | left+bottom | none"
+      },
+      "font": {
+        "axis_label_size": 16,
+        "tick_size": 12,
+        "legend_size": 11,
+        "font_family": "Arial | Helvetica | sans-serif"
+      },
+      "elements": {
+        "has_legend": true,
+        "legend_position": "upper right | lower right | outside",
+        "has_colorbar": false,
+        "has_inset": false,
+        "error_bars": true,
+        "significance_markers": true
+      },
+      "figure_type": "bar | line | scatter | heatmap | box | violin | composite | schematic",
+      "notes": "특이사항 또는 디자인 특징"
+    }
+  }
+}
