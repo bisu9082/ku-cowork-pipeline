@@ -1,8 +1,11 @@
 ################################################################
-# Claude Cowork × AutoResearchClaw 논문 자동화 파이프라인 v5.0
+# Claude Cowork × AutoResearchClaw 논문 자동화 파이프라인 v5.7
 # 기반: github.com/aiming-lab/AutoResearchClaw v0.3.1
 # 저장소: github.com/bisu9082/ku-cowork-pipeline
-# 업데이트: 2026-03-28
+# 업데이트: 2026-04-20
+# v5.5 추가: 에디터·독자 공감 설계 절대 지침 (Audience Profile 시스템)
+# v5.6 추가: 탑티어 저널 Figure 규격화 DB (9개 저널 Guidelines 실측 기반)
+# v5.7 추가: 그래프 유형별 세부 규격 완전판 (bar/line/scatter/heatmap/box/pie/SHAP/histogram 등)
 ################################################################
 
 ## 정체성
@@ -375,8 +378,12 @@ Step 4 analysis_main.py → SI.tex 또는 Annex에 자동 삽입
 Step 4 코드 → Cowork 채팅창에도 코드 블록으로 직접 출력
 
 ################################################################
-# [FIGURE RULES] — 수치 변경 금지
+# [FIGURE RULES] — 탑티어 저널 규격화 + Ku 승인 설정
+# 출처: 9개 탑티어 저널 Author Guidelines 실제 검색 기반 (2026-04-20)
+# 세부 스펙: figure_patterns.json → journal_specs 섹션 참조
 ################################################################
+
+## ★ Ku 표준 설정 (모든 Figure 공통 — 변경 금지)
 import matplotlib
 matplotlib.rcParams.update({
     'font.size':8,'axes.titlesize':9,'axes.labelsize':8,
@@ -385,16 +392,72 @@ matplotlib.rcParams.update({
     'font.sans-serif':['Arial','DejaVu Sans'],
     'axes.spines.top':False,'axes.spines.right':False,
     'axes.linewidth':0.8,'axes.axisbelow':True,
-    'axes.grid':True,'grid.linewidth':0.5,'grid.alpha':0.4,
+    'axes.grid':False,'grid.linewidth':0.5,'grid.alpha':0.4,
     'legend.frameon':False,
     'savefig.dpi':300,'savefig.bbox':'tight','savefig.pad_inches':0.05,
     'axes.prop_cycle':matplotlib.cycler('color',
-      ['#648FFF','#FE6100','#785EF0','#DC267F','#FFB000','#009E73']),
+      ['#E69F00','#56B4E9','#009E73','#0072B2','#D55E00','#CC79A7']),
+    # Okabe-Ito palette — colorblind-safe (Nature Methods 권장)
 })
+figsize=(20,10), dpi=200  # Ku 승인 고해상도 설정
+# FS_LABEL=26, FS_AXIS=16, FS_TICK=15, FS_BAR≤10
+# subplots_adjust(hspace=0.55, wspace=0.38)
+# 패널 레이블: 28pt bold, y=1.18, ha=left (모든 레이블 동일 y축)
 # single col: figsize=(3.5,2.8) / double col: figsize=(7.2,2.8)
 # constrained_layout=True 필수 / tight_layout 금지
 # 범례: bbox_to_anchor=(1.02,1), loc='upper left'
 # 막대 레이블: add_bar_labels() 함수 사용, y_max*1.15
+
+## ★ 저널별 패널 레이블 형식 (절대 준수)
+# Nature/Nature Sensors/Nature Comms → 소문자 a, b, c (8pt bold)
+# ACS Nano/ACS Sensors/JACS          → 소문자 (a), (b), (c)
+# Cell Press                          → 대문자 A, B, C
+# Science                             → 대문자 A, B, C (Times New Roman)
+# Ku 기본값 (타깃 미정)               → 대문자 A, B, C (28pt bold, y=1.18)
+
+## ★ 저널별 Figure 크기 (실제 인쇄 규격)
+# Nature family:  single=89mm / 1.5col=120-136mm / double=183mm / maxH=247mm
+# ACS family:     single=82.5mm(3.25in) / double=177.8mm(7in)
+# Cell Press:     single=85mm / double=174mm / maxH=225mm
+# Science:        single=58mm(2.3in) / double=117mm(4.6in)
+# Advanced Mater: single≈85mm / double≈174mm (Wiley)
+
+## ★ 색상 규칙 (탑티어 저널 공통 의무)
+# 1. RGB 모드 필수 (CMYK 금지 — 저널에서 자동 변환)
+# 2. Colorblind-safe 팔레트 MANDATORY (Nature, ACS, Cell 공식 요구)
+# 3. Red-Green 조합 절대 금지 (deuteranopia/protanopia)
+# 4. Rainbow/Jet colormap 사용 금지
+# 5. 색만으로 구분하는 경우 symbol/pattern 병용 필수
+# 6. 범주형: Okabe-Ito (#E69F00/#56B4E9/#009E73/#0072B2/#D55E00/#CC79A7)
+# 7. 연속형: viridis, cividis, magma (jet/rainbow 절대 금지)
+# 8. Ku 4색 팔레트: #C94F4A / #E8943A / #4AACB0 / #5B8DB8 (핵종/그룹)
+
+## ★ DPI 규격
+# Nature: 300(최소) / 450(권장) / 1000+(line art) → PDF/EPS preferred
+# ACS:    300(photo) / 600(line art) / 1000(combined)
+# Elsevier: 300(halftone) / 500(combined) / 1000(bitmapped line)
+# Wiley:  300(halftone) / 500(combined) / 1000(bitmapped)
+
+## ★ 절대 금지 (모든 저널 공통)
+# ❌ 패널 겹침 / ❌ Drop shadow / ❌ 3D bar chart
+# ❌ suptitle 사용 / ❌ 텍스트 아웃라인 처리
+# ❌ GenAI 생성 이미지 삽입 (Elsevier 명시적 금지)
+# ❌ 배율 표기 (scale bar로 대체 필수)
+
+## ★ 그래프 유형별 핵심 규칙 (세부 스펙: figure_patterns.json → chart_type_specs)
+# [Bar]   y_min=0 필수 / capsize=5 error bar / y_max=data*1.2 / 유의성 bracket+star
+# [Line]  linewidth=2.0 / calibration: R² 내부표기 / LOD 점선+텍스트 / marker=6pt
+# [Scatter] marker alpha=0.7 / PCA→explained variance % 축레이블 / 클래스 경계선
+# [Heatmap] confusion→Blues / correlation→RdBu_r center=0 / annot 11pt bold / colorbar 우측
+# [Box/Violin] patch_artist=True / median linewidth=2 / strip overlay 권장
+# [SHAP]  horizontal bar / 내림차순 / beeswarm→RdBu_r colormap / x=0 기준선
+# [Pie]   최대 5슬라이스 / 12시 방향 시작 / 5% 미만 → 'Other' 통합 / 3D 금지
+# [Time-series] linewidth=2 / 농도 step → 수직점선+텍스트 / 응답시간 화살표 annotation
+#
+# ★ 패널 구성 표준:
+#   sensor paper → 4패널 2×2: (A)메커니즘 (B)선택성bar (C)검량선 (D)실시료
+#   ML paper     → 4패널 2×2: (A)성능비교bar (B)confusion matrix (C)ROC (D)SHAP
+#   materials    → 6패널 2×3: (A)SEM (B)spectra (C)histogram (D)EDS (E)성능 (F)비교
 
 ################################################################
 # [FIGURE PATTERN LEARNING] — 글로벌 Figure 스타일 지식 베이스
@@ -607,6 +670,73 @@ Figure 코드 작성 전 반드시:
 │  - FR-002: [규칙 요약] (2회 발생)                │
 │ 유사 수정 이력: [M]건 참조                       │
 └─────────────────────────────────────────────────┘
+
+################################################################
+# [ABSOLUTE RULE] 에디터·독자 공감 설계 원칙 (절대 지침)
+# 모든 논문 구성·작성 시 단계 무관 항상 적용
+################################################################
+
+## 핵심 원칙
+
+Ku의 연구 분야는 다학제적(CBRN, 센서, 재료, 방사선, 보건 등)으로 넓다.
+**타깃 저널의 Aims & Scope 충족은 기본이며, 그것만으로는 부족하다.**
+
+논문을 구성·작성할 때 반드시 다음 두 축을 동시에 고려한다:
+
+### 축 1 — 저널 Aims & Scope (기존 기준, 유지)
+- 투고 저널의 범위 내 주제인지 확인
+- 저널 메인 독자층의 전공·관심 분야 파악
+- 해당 저널의 최근 게재 논문 스타일·논거 구조 참조
+
+### 축 2 — 에디터·독자 공감 설계 (신규 절대 지침)
+**에디터와 예상 독자의 직군·전공·관심사를 명확히 설정하고,
+그들의 언어와 관심사 프레임으로 논문을 설계한다.**
+
+| 항목 | 확인 사항 |
+|------|-----------|
+| 에디터 전공 | 저널 Editorial Board의 주요 전공 파악 |
+| 독자 직군 | 해당 저널 주독자층 (화학자? 방위연구자? 임상가? 환경학자?) |
+| 독자 관심사 | 그들이 "왜 이 연구가 중요한가"에 공감할 맥락 |
+| 노블티 언어 | 독자 전공 맥락에서 기여가 명확히 보이는 언어로 서술 |
+| 배경 지식 수준 | 독자가 당연히 아는 것 vs. 설명 필요한 것 구분 |
+
+## 실행 시점 및 방법
+
+### Step 1 (문헌 조사·RQ 설계) 시
+- 타깃 저널 결정 직후 **에디터/독자 프로파일 카드** 작성 (아래 형식)
+- RQ 프레이밍을 독자 관심사 언어로 조정
+
+### Step 5 (논문 초안 작성) 시
+- Introduction: 독자 전공 맥락에서 갭을 설명 (Ku 전공 용어 단독 사용 금지)
+- Novelty 문장: 독자가 "이게 왜 새로운가"를 즉시 이해할 프레임으로 작성
+- Discussion: 독자 분야의 선행연구와 연결하여 기여 명확화
+- 분야 간 교량 표현 사용: "From the perspective of [독자 분야]..."
+
+### Step 6 (리비전·리뷰 대응) 시
+- 리뷰어 전공 추정 → 반박/보완 논거를 그 전공 언어로 구성
+
+## 에디터·독자 프로파일 카드 (Step 1 필수 생성)
+
+┌──────────────────────────────────────────────────────────────┐
+│ 👥 AUDIENCE PROFILE — [저널명]                               │
+│                                                              │
+│ 에디터 전공: [추정 전공 분야]                                 │
+│ 주요 독자층: [직군/전공 2~3개]                                │
+│ 독자 관심사: [핵심 관심 키워드 3~5개]                         │
+│                                                              │
+│ 노블티 프레임:                                                │
+│  "이 논문은 [독자 분야]에서 [기존 한계]를 [우리 접근법]으로  │
+│   해결하여 [독자에게 의미있는 결과]를 제시한다"               │
+│                                                              │
+│ 주의: [Ku 전공에서만 자명한 용어 — 독자에게 설명 필요]        │
+│ 교량 표현: [분야 간 연결 표현 예시]                           │
+└──────────────────────────────────────────────────────────────┘
+
+## 위반 금지 사항
+- ❌ Ku의 전공 언어로만 작성된 Introduction (독자가 배경 이해 불가)
+- ❌ 노블티를 Ku 분야 내부 기준으로만 서술 (독자 분야에서 기여 불투명)
+- ❌ 타깃 저널 독자와 무관한 응용·비교 사례 나열
+- ❌ 에디터가 생소한 전문용어 무설명 사용
 
 ################################################################
 # 저널 맞춤 제출 패키지 (Step 2에서 자동 생성)
