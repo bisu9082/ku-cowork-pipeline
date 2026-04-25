@@ -1,0 +1,93 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "Figure Revision Tracker — Cowork 세션 중 피규어 수정 이력 글로벌 누적 저장소",
+    "last_updated": "2026-04-12",
+    "total_sessions": 0,
+    "total_revisions": 0,
+    "purpose": "반복적 수정 방지 — 새 피규어 생성 전 반드시 이 로그를 참조하여 과거 지적사항을 사전 반영",
+    "github_path": "pipeline/metaclaw/figure_revision_log.json"
+  },
+  "rules_derived": [],
+  "revision_log": [],
+  "schema": {
+    "revision_entry": {
+      "session_id": "YYYYMMDD-프로젝트명",
+      "figure_id": "Fig1A / Fig2 등 명칭",
+      "project": "프로젝트명",
+      "timestamp": "YYYY-MM-DD",
+      "original_description": "초기 피규어 설명",
+      "corrections": [
+        {
+          "type": "layout | font | color | overlap | legend | panel_label | axis | other",
+          "issue": "Ku가 지적한 문제 (구체적 설명)",
+          "fix_applied": "적용한 수정 내용",
+          "ku_feedback_verbatim": "Ku의 실제 발언 (가능한 경우)"
+        }
+      ],
+      "final_approved": true,
+      "rules_extracted": [
+        "이 수정에서 추출된 전역 규칙 (예: 범례는 항상 upper-right에 배치)"
+      ]
+    },
+    "rule_entry": {
+      "rule_id": "R-001",
+      "derived_from": "session_id / figure_id",
+      "date_derived": "YYYY-MM-DD",
+      "category": "layout | font | color | overlap | legend | panel_label | axis | general",
+      "rule": "전역 규칙 내용 — 모든 미래 피규어에 자동 적용",
+      "priority": "high | medium | low",
+      "applies_to": "all | TYPE-A | TYPE-B | specific_journal"
+    }
+  },
+  "pre_generation_checklist": {
+    "description": "새 피규어 생성 전 반드시 확인할 체크리스트",
+    "items": [
+      "rules_derived의 모든 전역 규칙 확인 및 적용",
+      "동일 프로젝트 이전 피규어 수정 이력 확인",
+      "figsize/dpi/fontsize 표준 설정 적용 (figsize=20x10, dpi=200, FS_LABEL=26, FS_AXIS=16, FS_TICK=15)",
+      "패널 간 겹침 없음 확인 (tight_layout 또는 subplots_adjust)",
+      "패널 레이블 동일선상 배치",
+      "범례 코너 배치 (upper-right 또는 lower-right)",
+      "suptitle 사용 금지",
+      "컬러팔레트 일관성 확인"
+    ]
+  },
+  "known_rules_from_memory": [
+    {
+      "rule_id": "R-MEM-01",
+      "source": "auto-memory/feedback_figure_design.md",
+      "category": "overlap",
+      "rule": "패널 간 겹침 절대 금지 — tight_layout() 또는 subplots_adjust() 필수",
+      "priority": "high"
+    },
+    {
+      "rule_id": "R-MEM-02",
+      "source": "auto-memory/feedback_figure_design.md",
+      "category": "layout",
+      "rule": "suptitle 사용 금지 — 전체 제목은 패널 내부 title로 처리",
+      "priority": "high"
+    },
+    {
+      "rule_id": "R-MEM-03",
+      "source": "auto-memory/feedback_figure_design.md",
+      "category": "panel_label",
+      "rule": "패널 레이블(A, B, C...) 동일선상 배치 — y좌표 통일",
+      "priority": "high"
+    },
+    {
+      "rule_id": "R-MEM-04",
+      "source": "auto-memory/feedback_figure_design.md",
+      "category": "legend",
+      "rule": "범례는 항상 코너 배치 (upper-right 또는 lower-right) — 그래프 중앙 침범 금지",
+      "priority": "high"
+    },
+    {
+      "rule_id": "R-MEM-05",
+      "source": "auto-memory/feedback_figure_font_scale.md",
+      "category": "font",
+      "rule": "표준 폰트/크기: figsize=(20,10), dpi=200, FS_LABEL=26, FS_AXIS=16, FS_TICK=15, FS_BAR≤10",
+      "priority": "high"
+    }
+  ]
+}

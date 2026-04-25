@@ -1,31 +1,1007 @@
 {
   "_meta": {
-    "description": "Ku 글로벌 Figure 스타일 지식베이스 — 프로젝트 무관, 세션 무관, 영구 누적",
-    "version": "2.0",
-    "created": "2026-04-10",
-    "repo": "bisu9082/ku-cowork-pipeline",
-    "path": "pipeline/metaclaw/figure_patterns.json",
-    "usage": "논문 공유 시 FPA-1 분석 → FPA-2 저장 → FPA-3 figure 생성 시 자동 참조",
-    "how_to_update": "새 패턴 append 후 aggregated 재계산 → GitHub API PUT"
+    "version": "4.0",
+    "description": "탑티어 저널 Figure Pattern 규격화 DB — 저널 가이드라인 + 그래프유형별 세부규격 완전판 (2026-04-20)",
+    "last_updated": "2026-04-20",
+    "n_journals_analyzed": 9,
+    "chart_types_specified": ["bar_chart", "line_plot", "scatter_plot", "heatmap", "box_violin_plot", "pie_donut_chart", "feature_importance_shap", "histogram", "time_series_sensor_response"],
+    "journals": ["Nature", "Nature Sensors", "Nature Communications", "Science", "Cell", "ACS Nano", "ACS Sensors", "Advanced Materials", "Sensors and Actuators B", "J. Hazardous Materials"],
+    "github_path": "pipeline/metaclaw/figure_patterns.json",
+    "trigger": "새 Figure 생성 전 반드시 로드 — 타깃 저널 스펙 자동 적용",
+    "sources": [
+      "https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/",
+      "https://www.nature.com/natsensors/submission-guidelines/aip-and-formatting",
+      "https://pubs.acs.org/page/4authors/submission/graphics_prep.html",
+      "https://advanced.onlinelibrary.wiley.com/hub/journal/15214095/author-guidelines",
+      "https://www.sciencedirect.com/journal/sensors-and-actuators-b-chemical/publish/guide-for-authors"
+    ]
   },
-  "patterns": [],
-  "aggregated": {
-    "top_colors": [
-      "#648FFF", "#FE6100", "#785EF0",
-      "#DC267F", "#FFB000", "#009E73"
-    ],
-    "dominant_font": "Arial sans-serif",
-    "font_sizes": {
-      "label": "8pt",
-      "tick": "7pt",
-      "legend": "7pt",
-      "title": "9pt"
+
+  "journal_specs": {
+
+    "nature_family": {
+      "applies_to": ["Nature", "Nature Sensors", "Nature Materials", "Nature Chemistry", "Nature Communications", "Nature Methods", "npj"],
+      "figure_dimensions_mm": {
+        "single_col": 89,
+        "one_half_col": 120,
+        "double_col": 183,
+        "max_height": 247,
+        "note": "max height 170mm if legend included below figure"
+      },
+      "typography": {
+        "font_family": ["Arial", "Helvetica"],
+        "font_type": "sans-serif only",
+        "body_text_pt": {"min": 5, "max": 7},
+        "axis_label_pt": {"min": 5, "max": 7},
+        "tick_label_pt": {"min": 5, "max": 7},
+        "panel_label_pt": 8,
+        "panel_label_weight": "bold",
+        "panel_label_style": "upright (not italic)",
+        "panel_label_case": "lowercase",
+        "panel_label_format": "a, b, c (NOT A, B, C)",
+        "panel_label_position": "upper-left corner"
+      },
+      "resolution_dpi": {
+        "minimum": 300,
+        "optimal_online": 450,
+        "line_art": 1000,
+        "preferred": "vector (PDF/EPS)"
+      },
+      "file_formats": {
+        "preferred": ["PDF", "EPS"],
+        "acceptable": ["TIFF", "JPEG"],
+        "note": "All text must remain editable — no outlined text"
+      },
+      "color": {
+        "color_space": "RGB",
+        "accessibility": "MANDATORY — colorblind-safe",
+        "avoid": ["red-green combinations", "rainbow/jet colormap", "colored text labels"],
+        "recommended_categorical": "Okabe-Ito / Wong palette",
+        "recommended_sequential": "viridis, magma, cividis",
+        "text_contrast_ratio_min": 4.5
+      },
+      "axes_style": {
+        "include_tick_marks": true,
+        "unit_format": "Data (unit)",
+        "gridlines": false,
+        "drop_shadows": false,
+        "spines": "all 4 sides (or left+bottom)",
+        "overlapping_text": "forbidden"
+      },
+      "panels": {
+        "layout": "minimize white space, alphabetical order",
+        "spacing": "tight, space-efficient",
+        "label_in_text": "bold (a) style e.g. Fig. 1a"
+      },
+      "legend": {
+        "style": "verbal cues preferred — e.g. 'open red triangles'",
+        "avoid": "visual-only symbols without text description"
+      },
+      "scale_bars": {
+        "required_for": "microscopy images",
+        "placement": "separate editable layer — do NOT flatten",
+        "use_scale_bar_not_magnification": true
+      }
     },
-    "common_style": "minimalist, no top/right spines",
-    "preferred_layouts": ["double-col 2x2", "single-col 1x1"],
-    "top_figure_types": ["bar", "line", "schematic"],
-    "legend_default": "upper right, no frame",
-    "last_updated": "2026-04-10",
-    "n_papers": 0
+
+    "acs_family": {
+      "applies_to": ["JACS", "ACS Nano", "ACS Sensors", "Analytical Chemistry", "ACS Applied Materials"],
+      "figure_dimensions_in": {
+        "single_col": 3.25,
+        "double_col": 7.0,
+        "single_col_mm": 82.5,
+        "double_col_mm": 177.8
+      },
+      "toc_graphic": {
+        "width_in": 3.25,
+        "height_in": 1.75,
+        "note": "Required for ACS Nano and most ACS journals"
+      },
+      "typography": {
+        "font_family": ["Arial", "Helvetica"],
+        "font_size_pt": {"min": 6, "max": 10, "absolute_min": 8},
+        "line_weight_pt_min": 0.5,
+        "panel_label_format": "(a), (b), (c) — lowercase with parentheses",
+        "panel_label_position": "upper-left, outside axes"
+      },
+      "resolution_dpi": {
+        "photographs": 300,
+        "line_art": 600,
+        "combined": 1000
+      },
+      "file_formats": ["TIFF", "EPS", "PDF", "JPEG (high-res)"],
+      "color": {
+        "color_space": "RGB",
+        "online_color": "free — no charge",
+        "print_color": "extra charge (unless open access)",
+        "accessibility": "required — avoid color-only encoding",
+        "add_symbols_or_patterns": true,
+        "avoid": ["color-only differentiation", "red-green for categorical"]
+      },
+      "scale_bars": {
+        "required_for": "TEM, SEM, AFM, optical microscopy",
+        "placement": "embedded in image, NOT in caption"
+      },
+      "special_notes": {
+        "chemical_structures": "ACS format, use ACS ChemDraw template",
+        "variables": "italics; subscripts in upright type"
+      }
+    },
+
+    "wiley_advanced_family": {
+      "applies_to": ["Advanced Materials", "Advanced Functional Materials", "Advanced Science", "Small", "ChemComm", "Angewandte Chemie"],
+      "figure_dimensions_cm": {
+        "single_col_approx": 8.5,
+        "note": "8.5 cm width at intended reproduction size"
+      },
+      "typography": {
+        "font_size_at_print_pt": {"min": 10, "max": 12},
+        "axis_label_pt": {"min": 10, "max": 12},
+        "text_height_at_print_cm": 0.5,
+        "variables": "italics",
+        "subscripts_of_variables": "upright"
+      },
+      "resolution_dpi": {
+        "vector_preferred": "EPS or PDF with embedded fonts",
+        "halftone_color_gray": 300,
+        "bitmapped_line_art": 1000,
+        "combined": 500
+      },
+      "file_formats": {
+        "vector": ["EPS", "PDF"],
+        "bitmap": ["TIFF", "PNG"],
+        "note": "Each figure part must meet resolution individually"
+      },
+      "color": {
+        "toc_color": "free",
+        "online_color": "free — encouraged to submit in color"
+      },
+      "pixels_at_dpi": {
+        "single_col_px": 1063,
+        "full_page_px": 7480
+      }
+    },
+
+    "elsevier_family": {
+      "applies_to": ["Sensors and Actuators B", "Journal of Hazardous Materials", "Chemosphere", "Environment International", "Process Safety"],
+      "resolution_dpi": {
+        "halftone_color": 300,
+        "bitmapped_line_art": 1000,
+        "combined": 500
+      },
+      "pixels": {
+        "single_col": 1063,
+        "full_page": 2244
+      },
+      "file_formats": ["TIFF", "JPG", "PNG", "EPS", "PDF"],
+      "color": {
+        "online": "free",
+        "accessibility": "encouraged — colorblind inclusive"
+      },
+      "ai_policy": "Generative AI PROHIBITED for creating/altering figures",
+      "submission": {
+        "separate_files": true,
+        "naming": "Figure_1, Figure_2, ...",
+        "caption_required": true,
+        "cite_in_text": true
+      }
+    },
+
+    "cell_press": {
+      "applies_to": ["Cell", "Cell Chemical Biology", "Cell Reports", "iScience"],
+      "figure_dimensions_mm": {
+        "single_col": 85,
+        "double_col": 174,
+        "max_height": 225
+      },
+      "typography": {
+        "font_family": ["Avenir", "Arial"],
+        "font_size_pt": {"min": 6, "max": 8},
+        "panel_label_format": "Capital letters — A, B, C (NOT a, b, c)",
+        "note": "OPPOSITE of Nature — use UPPERCASE"
+      },
+      "resolution_dpi": {
+        "photographs": 300,
+        "line_art": 500
+      },
+      "file_formats": ["TIFF", "EPS", "PDF"],
+      "mandatory": ["scale bars on all microscopy", "molecular weight markers on blots", "statistical annotations"]
+    },
+
+    "science_family": {
+      "applies_to": ["Science", "Science Advances", "Science Translational Medicine"],
+      "figure_dimensions_in": {
+        "single_col": 2.3,
+        "double_col": 4.6
+      },
+      "figure_dimensions_cm": {
+        "single_col": 8.5,
+        "double_col": 17.5
+      },
+      "typography": {
+        "font_family": "Times New Roman (different from other journals!)",
+        "font_size_pt": {"min": 6, "max": 8},
+        "panel_label_format": "Capital letters — A, B, C",
+        "panel_label_weight": "bold"
+      },
+      "resolution_dpi": {
+        "submission": "300-600",
+        "line_art": 300,
+        "preferred": "editable text, vector formats"
+      },
+      "file_formats": ["EPS", "PDF", "AI"],
+      "color_space": "RGB preferred"
+    }
+  },
+
+  "colorblind_safe_palettes": {
+
+    "okabe_ito": {
+      "type": "categorical",
+      "recommended_by": ["Nature Methods", "Nature Journals", "Science"],
+      "alias": "Wong palette",
+      "n_colors": 8,
+      "hex": {
+        "orange": "#E69F00",
+        "sky_blue": "#56B4E9",
+        "bluish_green": "#009E73",
+        "yellow": "#F0E442",
+        "blue": "#0072B2",
+        "vermillion": "#D55E00",
+        "reddish_purple": "#CC79A7",
+        "black": "#000000"
+      },
+      "best_for": "comparing 3-8 categorical groups",
+      "ku_note": "Ku 기존 팔레트(#C94F4A/#E8943A/#4AACB0/#5B8DB8)와 유사 계열 — 연속성 유지 가능"
+    },
+
+    "viridis_family": {
+      "type": "sequential / continuous",
+      "recommended_by": "All major journals",
+      "options": {
+        "viridis": "blue → green → yellow (default, most used)",
+        "magma": "black → purple → orange → white",
+        "inferno": "black → purple → orange → yellow",
+        "plasma": "purple → pink → orange → yellow",
+        "cividis": "blue → yellow (optimized for CVD — most accessible)"
+      },
+      "best_for": "heatmaps, intensity maps, continuous data, confusion matrices",
+      "matplotlib_call": "plt.cm.viridis or cmap='viridis'"
+    },
+
+    "paul_tol": {
+      "type": "multi-purpose",
+      "sets": {
+        "bright": "6-color high-contrast categorical",
+        "vibrant": "7-color vivid categorical",
+        "muted": "10-color soft categorical (recommended for many groups)",
+        "sunset": "diverging (warm)",
+        "burd": "Blue-Red diverging"
+      },
+      "best_for": "10+ category papers, diverging data (positive/negative)"
+    },
+
+    "ku_standard_palette": {
+      "note": "Ku 승인 기존 팔레트 — 핵종/그룹 4색 구분시 사용",
+      "hex": {
+        "red_muted": "#C94F4A",
+        "orange_muted": "#E8943A",
+        "teal": "#4AACB0",
+        "steel_blue": "#5B8DB8"
+      },
+      "avoid": "cold blue (#4472C4, #2196F3 등 포화 청색)",
+      "style": "Warming muted earth tones"
+    },
+
+    "safe_combinations": [
+      {"pair": "Blue + Orange", "safety": "universal — works for all CVD types"},
+      {"pair": "Blue + Red", "safety": "safe for most"},
+      {"pair": "Blue + Yellow", "safety": "safe for most"},
+      {"pair": "Purple + Yellow", "safety": "high contrast"},
+      {"pair": "Red + Green", "safety": "⛔ AVOID — deuteranopia/protanopia blind"}
+    ]
+  },
+
+  "matplotlib_standard_settings": {
+
+    "ku_approved_base": {
+      "note": "Ku 승인 기본 설정 — 모든 Figure에 적용",
+      "figsize": [20, 10],
+      "dpi": 200,
+      "fontsize": {
+        "FS_LABEL": 26,
+        "FS_AXIS": 16,
+        "FS_TICK": 15,
+        "FS_BAR": 10,
+        "FS_LEGEND": 13
+      },
+      "panel_label": {
+        "fontsize": 28,
+        "fontweight": "bold",
+        "y_position": 1.18,
+        "ha": "left",
+        "va": "top",
+        "gap_from_figure": "minimum 1 character height"
+      },
+      "subplots_adjust": {
+        "hspace": 0.55,
+        "wspace": 0.38
+      }
+    },
+
+    "nature_compatible": {
+      "note": "Nature 투고용 — 저널 단위 변환 필요 (pt 기준)",
+      "font_family": "Arial",
+      "body_fontsize_pt": 6,
+      "axis_label_fontsize_pt": 7,
+      "panel_label_fontsize_pt": 8,
+      "panel_label_weight": "bold",
+      "panel_label_case": "lowercase (a, b, c)",
+      "rcParams": {
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Arial", "Helvetica"],
+        "axes.spines.top": false,
+        "axes.spines.right": false,
+        "axes.grid": false,
+        "figure.dpi": 300,
+        "savefig.dpi": 450,
+        "savefig.format": "pdf"
+      }
+    },
+
+    "acs_compatible": {
+      "note": "ACS 투고용",
+      "font_family": "Arial",
+      "body_fontsize_pt": 8,
+      "axis_label_fontsize_pt": 9,
+      "panel_label_format": "(a), (b), (c)",
+      "figure_width_single_in": 3.25,
+      "figure_width_double_in": 7.0,
+      "rcParams": {
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Arial"],
+        "axes.spines.top": false,
+        "axes.spines.right": false,
+        "figure.dpi": 300,
+        "savefig.dpi": 600
+      }
+    }
+  },
+
+  "common_figure_patterns_by_type": {
+
+    "sensor_performance": {
+      "typical_panels": 4,
+      "arrangement": "2x2",
+      "panel_content": [
+        "A: 감응 곡선/응답 신호 (line plot)",
+        "B: 선택성 평가 (bar chart)",
+        "C: 검량선/calibration curve (scatter+line)",
+        "D: 실제 시료 검출 or 재현성 (bar chart)"
+      ],
+      "color_recommendation": "Okabe-Ito categorical 또는 Ku 표준 팔레트",
+      "seen_in": ["ACS Sensors", "Sensors and Actuators B", "Analytical Chemistry"]
+    },
+
+    "ml_classification": {
+      "typical_panels": 4,
+      "arrangement": "2x2",
+      "panel_content": [
+        "A: Confusion matrix (heatmap, viridis/Blues)",
+        "B: ROC curve (multiple class, colorblind-safe lines)",
+        "C: Feature importance/SHAP (horizontal bar)",
+        "D: PCA/t-SNE 클러스터 (scatter, Okabe-Ito)"
+      ],
+      "color_recommendation": "viridis for heatmap, Okabe-Ito for scatter groups",
+      "seen_in": ["Chemometrics", "J. Hazardous Materials", "ACS Sensors"]
+    },
+
+    "materials_characterization": {
+      "typical_panels": "4-6",
+      "arrangement": "2x3 or 3x2",
+      "panel_content": [
+        "A: SEM/TEM image (grayscale + scale bar)",
+        "B: XRD/FTIR spectrum (line plot)",
+        "C: Size distribution histogram",
+        "D: EDS/elemental mapping (false-color)",
+        "E: Property measurement (bar/line)",
+        "F: Comparison or mechanism schematic"
+      ],
+      "color_recommendation": "grayscale for SEM, viridis for EDS, Okabe-Ito for spectra comparison",
+      "seen_in": ["Advanced Materials", "ACS Nano", "Sensors and Actuators B"]
+    },
+
+    "environmental_monitoring": {
+      "typical_panels": 3,
+      "arrangement": "1x3 or 2+1",
+      "panel_content": [
+        "A: Time series or spatial map",
+        "B: Correlation analysis (scatter with regression)",
+        "C: Comparison across sites/conditions (bar or box)"
+      ],
+      "color_recommendation": "viridis for maps, Okabe-Ito for group comparison",
+      "seen_in": ["Environmental Science & Technology", "J. Environmental Radioactivity"]
+    },
+
+    "schematic_mechanism": {
+      "note": "TYPE-B — Gemini API 또는 전문 일러스트 도구 사용",
+      "style": "Clean vector illustration, minimal text, consistent icon style",
+      "background": "white",
+      "color_max": 4,
+      "seen_in": "모든 탑티어 저널 (TOC graphic, graphical abstract)"
+    }
+  },
+
+  "universal_rules": {
+    "absolute_prohibitions": [
+      "❌ 패널 간 겹침 (overlapping panels) — tight_layout() 또는 constrained_layout=True 필수",
+      "❌ red-green 색상 조합 — 색맹 차별",
+      "❌ rainbow/jet colormap — perceptually non-uniform",
+      "❌ 텍스트 레이블 color만으로 구분 — 반드시 symbol/pattern 병용",
+      "❌ drop shadow, 3D bar, decorative borders",
+      "❌ 폰트 아웃라인 처리 (outlined text) — 편집 불가능해짐",
+      "❌ 피규어에 GenAI 생성 이미지 삽입 (Elsevier 정책 위반)"
+    ],
+    "always_required": [
+      "✅ 배율 대신 scale bar 사용 (현미경 이미지)",
+      "✅ 오차 막대 (error bars) — 정의 (SD/SE/95%CI) 캡션에 명시",
+      "✅ 통계적 유의성 표기 (** p<0.01 등)",
+      "✅ 색맹-safe 팔레트",
+      "✅ 축 레이블에 단위 명시 — 형식: Data (unit)",
+      "✅ RGB 모드로 저장 (CMYK 금지 — 저널에서 자동 변환)"
+    ],
+    "panel_label_rules": {
+      "Nature_family": "소문자 a, b, c — 8pt bold — upper-left",
+      "ACS_family": "소문자 (a), (b), (c) — 괄호 포함 — upper-left",
+      "Cell_family": "대문자 A, B, C — 8pt bold",
+      "Science_family": "대문자 A, B, C — Times New Roman",
+      "Ku_standard": "대문자 A, B, C — 28pt bold — y=1.18 — ha=left"
+    }
+  },
+
+  "patterns": [],
+
+  "aggregated": {
+    "most_common_layout": "2x2 (4 panels)",
+    "most_common_colorscheme": "Okabe-Ito for categorical; viridis for continuous",
+    "avg_panels_per_figure": 4,
+    "top_journals_analyzed": [
+      "Nature Sensors", "ACS Sensors", "Sensors and Actuators B",
+      "J. Hazardous Materials", "ACS Nano", "Advanced Materials",
+      "Nature Communications", "Analytical Chemistry"
+    ],
+    "font_preferences": {
+      "label_size_range": "5-10pt (journal-dependent)",
+      "tick_size_range": "5-9pt",
+      "font_family": "Arial/Helvetica (sans-serif)"
+    },
+    "design_trends_2025_2026": [
+      "Colorblind accessibility now MANDATORY (not optional) across all top journals",
+      "White background dominates — dark mode figures rare in print",
+      "Minimal spines (left+bottom only) increasingly common",
+      "AI-generated figures explicitly prohibited by Elsevier; discouraged elsewhere",
+      "Vector formats (PDF/EPS) required or strongly preferred",
+      "Statistical annotations mandatory — effect size reporting increasing"
+    ]
+  },
+
+  "chart_type_specs": {
+
+    "_note": "그래프 유형별 세부 규격 — 실제 탑티어 저널 논문 분석 + Author Guidelines 기반 (2026-04-20)",
+
+    "bar_chart": {
+      "subtypes": ["single", "grouped", "stacked", "horizontal"],
+      "typical_panel_count": "1~2 (선택성/비교 단독) / 4패널 내 1~2패널로 사용",
+      "recommended_figsize": {
+        "single_bar_panel": [6, 5],
+        "2panel_bar": [12, 5],
+        "4panel_composite": [14, 10],
+        "ku_standard": [20, 10]
+      },
+
+      "bar_geometry": {
+        "bar_width_single": 0.5,
+        "bar_width_grouped": "0.8 / n_groups (n=2→0.35, n=3→0.25, n=4→0.2)",
+        "group_spacing": "bar_width * 0.15 (그룹 내 간격)",
+        "between_group_gap": "1.0 (그룹 간격, x축 단위)",
+        "edge_color": "black 또는 white (배경대비)",
+        "edge_linewidth": 0.8,
+        "bar_alpha": 1.0,
+        "note": "3D bar chart 절대 금지"
+      },
+
+      "error_bars": {
+        "style": "capsize bar (T자형)",
+        "capsize": 5,
+        "elinewidth": 1.5,
+        "ecolor": "black (bar 색과 대비)",
+        "representation": "SD (표준편차) 또는 SEM — 반드시 캡션에 명시",
+        "mandatory": true,
+        "n_labeling": "캡션 또는 x축 레이블에 n= 표기 필수"
+      },
+
+      "significance_annotation": {
+        "position": "bar 상단 + 여백 (y_max * 1.05 ~ 1.15)",
+        "style": "bracket line + 별표 (** p<0.01 / * p<0.05 / ns)",
+        "font_size_pt": 10,
+        "font_weight": "bold",
+        "bracket_linewidth": 1.2,
+        "bracket_color": "black",
+        "star_symbols": {"p<0.001": "***", "p<0.01": "**", "p<0.05": "*", "p≥0.05": "ns"},
+        "package": "statannotations 또는 수동 ax.annotate()",
+        "placement_rule": "유의한 비교쌍만 표시 — 모든 쌍 표시 금지"
+      },
+
+      "value_labels": {
+        "position": "bar 상단 center",
+        "offset_from_top": "0.02 * y_range",
+        "font_size": "FS_BAR (≤10pt)",
+        "ha": "center",
+        "va": "bottom",
+        "format": "소수점 1~2자리 또는 정수 (데이터에 따라)",
+        "show_when": "n이 적거나 절대값 비교가 중요할 때",
+        "ku_rule": "FS_BAR ≤ 10pt 준수"
+      },
+
+      "axes": {
+        "y_min": 0,
+        "y_max": "data_max * 1.2 (유의성 표기 공간 확보)",
+        "x_tick_rotation": "0 (짧은 레이블) / 30~45 (긴 레이블)",
+        "x_tick_ha": "right (45° 회전시) / center (0°)",
+        "spine": "left + bottom only (top, right 제거)",
+        "grid": "y축 thin grid (alpha=0.3) 또는 없음",
+        "axis_label_pad": 8
+      },
+
+      "color_rules": {
+        "single_group": "단색 (Ku 팔레트 첫 번째 색)",
+        "multi_group": "Okabe-Ito 또는 Ku 4색 팔레트",
+        "gradient_within_group": "같은 계열 명도 조정 (Ku 팔레트 권장)",
+        "avoid": "그룹마다 무관한 색상 나열 / rainbow"
+      },
+
+      "legend": {
+        "position": "upper right 또는 outside right (bbox_to_anchor=(1.02,1))",
+        "show_when": "그룹이 2개 이상일 때",
+        "frameon": false,
+        "fontsize": 13
+      },
+
+      "common_errors": [
+        "y축 0에서 시작 안 함 → 차이 과장",
+        "error bar 없음 → 리뷰어 지적 필수",
+        "너무 많은 bar (>8) → 가독성 저하, grouped 권장",
+        "유의성 표기 없이 Discussion에서 차이 주장"
+      ],
+
+      "journal_examples": {
+        "ACS_Sensors_selectivity": "grouped bar (8-10 interferents) + error bar + * annotation, figsize≈(10,6)",
+        "Sensors_Actuators_B": "single bar per analyte + LOD horizontal dashed line",
+        "J_Hazardous_Materials": "grouped bar (before/after treatment) + SEM error"
+      }
+    },
+
+    "line_plot": {
+      "subtypes": ["sensor_response", "calibration_curve", "time_series", "spectra", "ROC_curve"],
+      "typical_panel_count": "1 (단독) / 4패널 내 1~2패널",
+      "recommended_figsize": {
+        "single_line_panel": [6, 5],
+        "calibration_curve": [6, 5],
+        "spectra_overlay": [8, 5],
+        "time_series": [10, 4],
+        "ku_standard": [20, 10]
+      },
+
+      "line_geometry": {
+        "linewidth_main": 2.0,
+        "linewidth_reference": 1.0,
+        "linestyle_main": "solid",
+        "linestyle_secondary": "dashed (--) 또는 dotted (:)",
+        "marker_size": 6,
+        "marker_style": "o (circle) 우선 / s, ^, D 보조",
+        "marker_edge_color": "same as line or white",
+        "marker_edge_width": 0.8
+      },
+
+      "calibration_curve_specific": {
+        "scatter_data": "marker only (no line)",
+        "fit_line": "solid line (no marker)",
+        "regression_display": {
+          "equation": "ax.text() — plot 내부 빈 공간 (상단 좌측 권장)",
+          "R2_format": "R² = 0.9998",
+          "font_size": "FS_AXIS (16pt) 또는 12pt",
+          "position": "axes 내부 — 데이터와 겹치지 않는 위치"
+        },
+        "LOD_LOQ_annotation": {
+          "style": "수직 점선 또는 텍스트 화살표",
+          "text": "LOD = X nM",
+          "position": "x축 하단 또는 그래프 내부",
+          "font_size": 11
+        },
+        "confidence_band": "shaded area (alpha=0.15) 선택적 표시",
+        "axis_labels": {
+          "x": "Concentration (nM 또는 μM)",
+          "y": "Response (ΔAbsorbance / Signal / RFU)"
+        }
+      },
+
+      "ROC_curve_specific": {
+        "diagonal_reference": "gray dashed, linewidth=1.0, label='Random (AUC=0.5)'",
+        "AUC_in_legend": "각 class: 'Class A (AUC = 0.98)'",
+        "fill_under_curve": "alpha=0.1 선택적",
+        "axes": {"x": "False Positive Rate", "y": "True Positive Rate"},
+        "aspect": "equal 또는 1:1 비율 권장"
+      },
+
+      "spectra_specific": {
+        "vertical_offset": "개별 스펙트럼 구분 시 offset 추가 (waterfall plot)",
+        "peak_annotation": "화살표 + 파장/파수 텍스트 (font_size 10~12)",
+        "shaded_region": "관심 영역 highlight (alpha=0.2)"
+      },
+
+      "axes": {
+        "spine": "left + bottom only",
+        "tick_direction": "out (inward 금지)",
+        "minor_ticks": "필요시 추가 (LinearLocator)",
+        "x_axis_buffer": "data_range * 0.05 양쪽"
+      },
+
+      "legend": {
+        "position": "upper right 또는 lower right (ROC curve)",
+        "max_items": 8,
+        "frameon": false,
+        "font_size": 13
+      },
+
+      "color_rules": {
+        "multi_line": "Okabe-Ito 순서대로",
+        "single_highlight": "Ku red (#C94F4A) 또는 Ku teal (#4AACB0)",
+        "reference_line": "gray (#888888)"
+      }
+    },
+
+    "scatter_plot": {
+      "subtypes": ["PCA", "tSNE", "UMAP", "correlation", "regression"],
+      "typical_panel_count": "1 (단독) / 4패널 내 1패널",
+      "recommended_figsize": {
+        "single_cluster": [6, 6],
+        "2panel_PCA_tSNE": [12, 5],
+        "ku_standard": [20, 10]
+      },
+
+      "marker_settings": {
+        "size_default": 60,
+        "size_range": "20 (많은 점) ~ 100 (적은 점)",
+        "alpha": "0.7 (점 겹침 많을 때 0.5)",
+        "edge_color": "white (dark background) 또는 'none'",
+        "edge_width": 0.3
+      },
+
+      "clustering_specific": {
+        "color_per_class": "Okabe-Ito / Ku 4색 팔레트",
+        "convex_hull_or_ellipse": "클래스 경계 표시 권장 (alpha=0.15)",
+        "centroid_marker": "star (*) 또는 X, size=150, zorder=5",
+        "explained_variance": {
+          "x_label": "PC1 (XX.X%)",
+          "y_label": "PC2 (XX.X%)"
+        },
+        "legend": "upper right, 클래스명 표기"
+      },
+
+      "regression_specific": {
+        "fit_line": "solid, linewidth=2, color='red' 또는 'black'",
+        "confidence_interval": "shaded band, alpha=0.15",
+        "pearson_r_display": "plot 내부 텍스트 (r = X.XX, p < 0.001)",
+        "1to1_reference": "gray dashed diagonal (y=x)"
+      },
+
+      "axes": {
+        "aspect": "equal (PCA, clustering) 또는 auto (correlation)",
+        "spine": "left + bottom only",
+        "grid": "light gray, alpha=0.3, zorder=0"
+      }
+    },
+
+    "heatmap": {
+      "subtypes": ["confusion_matrix", "correlation_matrix", "sensor_response_array", "expression_matrix"],
+      "typical_panel_count": "1 (주요 결과 단독) / 4패널 내 1패널",
+      "recommended_figsize": {
+        "confusion_matrix_small": [5, 4],
+        "confusion_matrix_large": [8, 7],
+        "correlation_matrix": [8, 7],
+        "sensor_array_heatmap": [9, 6],
+        "ku_standard": [20, 10]
+      },
+
+      "colormap_rules": {
+        "confusion_matrix": "Blues (단색 순차) 또는 viridis — 절대값 클수록 진함",
+        "correlation_matrix": "RdBu_r 또는 coolwarm (diverging, -1~1) — center=0 필수",
+        "sensor_array": "viridis / YlOrRd / 'hot' (고신호=밝음 직관적)",
+        "avoid": ["jet", "rainbow", "red-green (RdGn)"]
+      },
+
+      "colorbar": {
+        "position": "right side (default) 또는 bottom",
+        "width_fraction": 0.03,
+        "pad": 0.04,
+        "label": "텍스트 레이블 필수 (예: 'Response intensity')",
+        "label_fontsize": "FS_AXIS (16pt)",
+        "tick_fontsize": "FS_TICK (15pt)",
+        "orientation": "vertical (right) 또는 horizontal (bottom)"
+      },
+
+      "cell_annotations": {
+        "show_values": true,
+        "format_confusion": ".0f (정수)",
+        "format_confusion_pct": "'.1f%' (퍼센트 병기 권장)",
+        "format_correlation": ".2f (소수점 2자리)",
+        "font_size": "annot_kws={'size': 11, 'weight': 'bold'}",
+        "color_rule": "배경이 어두우면 white, 밝으면 black (임계값 기준 자동)",
+        "threshold_for_white": "colormap 중간값 이상이면 white text"
+      },
+
+      "cell_geometry": {
+        "square_cells": true,
+        "linewidths": 0.5,
+        "linecolor": "white"
+      },
+
+      "axes": {
+        "x_tick_rotation": "45° (긴 레이블) / 0° (짧은 클래스명)",
+        "x_tick_ha": "right (45°시)",
+        "y_tick_rotation": 0,
+        "tick_fontsize": "FS_TICK (15pt)",
+        "label_fontsize": "FS_AXIS (16pt)"
+      },
+
+      "confusion_matrix_specific": {
+        "normalization": "row-normalized (recall per class) 또는 raw counts 병기",
+        "diagonal_emphasis": "대각선 강조 (색 진함 = 올바른 분류)",
+        "title": "패널 레이블 위에만 (suptitle 금지)",
+        "per_class_accuracy": "각 셀 'N (XX%)' 형식 권장"
+      },
+
+      "correlation_matrix_specific": {
+        "vmin": -1,
+        "vmax": 1,
+        "center": 0,
+        "mask_upper_triangle": "선택적 (하삼각만 표시로 중복 제거)",
+        "significance_mask": "p>0.05 셀에 'X' 또는 빈칸 표시 권장"
+      }
+    },
+
+    "box_violin_plot": {
+      "subtypes": ["box_plot", "violin_plot", "strip_plot_overlay"],
+      "typical_panel_count": "1 (분포 비교 단독) / 4패널 내 1패널",
+      "recommended_figsize": {
+        "few_groups": [7, 5],
+        "many_groups": [12, 5],
+        "ku_standard": [20, 10]
+      },
+
+      "box_plot_settings": {
+        "patch_artist": true,
+        "box_facecolor": "Okabe-Ito 팔레트 (그룹별)",
+        "box_edge_color": "black",
+        "box_linewidth": 1.2,
+        "whisker_linewidth": 1.2,
+        "whisker_linestyle": "solid",
+        "cap_linewidth": 1.2,
+        "median_color": "black 또는 white",
+        "median_linewidth": 2.0,
+        "flier_marker": "o",
+        "flier_size": 4,
+        "flier_alpha": 0.5,
+        "flier_edge": "none",
+        "notch": false
+      },
+
+      "violin_plot_settings": {
+        "inner": "'box' (내부 box) 또는 'quartile'",
+        "cut": 0,
+        "scale": "width (동일 너비) 또는 area",
+        "linewidth": 1.0,
+        "alpha": 0.8,
+        "overlay_strip": "sns.stripplot() 위에 겹쳐서 개별 점 표시 (alpha=0.4, size=3)"
+      },
+
+      "strip_overlay": {
+        "recommended": true,
+        "rationale": "분포 + 개별 데이터 포인트 동시 표시 → 리뷰어 선호",
+        "jitter": 0.2,
+        "size": 3,
+        "alpha": 0.5,
+        "color": "black 또는 darker shade of box color"
+      },
+
+      "SHAP_violin_specific": {
+        "feature_order": "mean |SHAP value| 내림차순 (중요도 높을수록 위)",
+        "color": "feature value (low → blue, high → red, RdBu 분기 팔레트)",
+        "x_label": "SHAP value (impact on model output)",
+        "x_zero_line": "gray vertical dashed line at x=0",
+        "n_features_show": "top 10~15 (너무 많으면 하단 잘라냄)",
+        "figsize": [8, 7]
+      },
+
+      "significance_annotation": "bar chart와 동일 규칙 (bracket + stars)"
+    },
+
+    "pie_donut_chart": {
+      "usage_recommendation": "⚠️ 제한적 사용 — 비율(part-whole) 표현에만 사용",
+      "when_to_use": "카테고리 합이 100%이고 비율 관계만 보여줄 때 (2~5개 슬라이스)",
+      "when_NOT_to_use": [
+        "그룹 간 크기 비교 → bar chart 사용",
+        "시계열 비율 변화 → stacked area chart",
+        "6개 이상 카테고리 → bar chart",
+        "정밀한 값 비교 → bar chart"
+      ],
+
+      "pie_design_rules": {
+        "max_slices": 5,
+        "start_angle": 90,
+        "order": "내림차순 정렬, 12시 방향부터 시계 방향",
+        "label_style": "외부 텍스트 레이블 (퍼센트 + 이름)",
+        "avoid_3d": true,
+        "avoid_explode": "강조 목적이 아니면 금지",
+        "avoid_legend_only": "범례만으로 색 구분 금지 — 직접 레이블 필수",
+        "small_slice_threshold": "5% 미만 슬라이스 → 'Other' 통합",
+        "color": "Okabe-Ito 또는 sequential 단색 계열"
+      },
+
+      "donut_design_rules": {
+        "hole_size": "0.4 ~ 0.6 (너무 작으면 pie와 구별 없음)",
+        "center_text": "총합 또는 주요 통계값 표기 (선택)",
+        "preferred_over_pie": "중앙 텍스트 공간 활용시",
+        "same_rules_as_pie": true
+      },
+
+      "figsize": [6, 6],
+      "journal_note": "탑티어 SCI 저널에서 드물게 사용 — 리뷰어가 bar chart 요구하는 경우 많음"
+    },
+
+    "feature_importance_shap": {
+      "subtypes": ["bar_importance", "beeswarm", "violin_summary", "waterfall", "dependence"],
+      "typical_panel_count": "1 (단독) / 4패널 내 1패널 (ML 섹션)",
+      "recommended_figsize": {
+        "bar_importance": [7, 5],
+        "beeswarm_violin": [8, 7],
+        "ku_standard": [20, 10]
+      },
+
+      "bar_importance_settings": {
+        "orientation": "horizontal (긴 feature 이름 표시 적합)",
+        "order": "mean |SHAP| 내림차순",
+        "color": "Ku teal (#4AACB0) 단색 또는 Ku steel blue (#5B8DB8)",
+        "n_features": "top 10~15",
+        "x_label": "Mean |SHAP value|",
+        "y_label": "Feature",
+        "bar_width": 0.6
+      },
+
+      "beeswarm_settings": {
+        "colormap": "RdBu_r (feature value: blue=low, red=high)",
+        "colorbar_label": "Feature value",
+        "dot_size": 5,
+        "alpha": 0.7,
+        "x_zero_line": "gray dashed, linewidth=0.8",
+        "feature_order": "mean |SHAP| 내림차순"
+      },
+
+      "random_forest_xgb_note": "RF/XGB + SHAP 결합 → beeswarm 또는 violin 권장 (단순 bar보다 정보량 多)"
+    },
+
+    "panel_composition_rules": {
+      "_note": "탑티어 저널 다패널 Figure 구성 실제 패턴 분석",
+
+      "n_panels_by_paper_type": {
+        "sensor_performance_paper": {
+          "typical": 4,
+          "arrangement": "2×2",
+          "contents": ["(A) 개념도/메커니즘", "(B) 선택성 bar", "(C) 검량선 scatter", "(D) 실시료 검증 bar"],
+          "note": "A는 TYPE-B(Gemini), B-D는 TYPE-A(matplotlib)"
+        },
+        "ML_classification_paper": {
+          "typical": 4,
+          "arrangement": "2×2",
+          "contents": ["(A) 모델 성능 비교 bar", "(B) Confusion matrix heatmap", "(C) ROC curve", "(D) SHAP feature importance"],
+          "note": "모두 TYPE-A(matplotlib)"
+        },
+        "environmental_monitoring_paper": {
+          "typical": 3,
+          "arrangement": "1×3 또는 2+1",
+          "contents": ["(A) 시계열 line plot", "(B) 공간 분포 map", "(C) 상관분석 scatter"],
+          "note": "map은 TYPE-B(Gemini) 또는 folium/cartopy"
+        },
+        "materials_characterization_paper": {
+          "typical": 6,
+          "arrangement": "2×3 또는 3×2",
+          "contents": ["(A) SEM/TEM", "(B) XRD/FTIR spectra", "(C) 입도분포 histogram", "(D) EDS mapping", "(E) 특성 측정 bar/line", "(F) 비교 요약 bar"],
+          "note": "A/D는 이미지, B/C/E/F는 matplotlib"
+        },
+        "clinical_epidemiology_paper": {
+          "typical": 3,
+          "arrangement": "1×3",
+          "contents": ["(A) 연구 대상 특성 (table → figure 변환)", "(B) 주요 결과 bar/box", "(C) 시간적 추이 line"],
+          "note": "SSCI/임상 저널"
+        }
+      },
+
+      "panel_sizing_ratio": {
+        "equal_panels": "동일 크기 기본",
+        "featured_panel": "주요 결과 패널 1.5배 크기 (gridspec 사용)",
+        "schematic_panel": "메커니즘 도식 패널 = 나머지 공간의 40~50%"
+      },
+
+      "text_placement_in_panels": {
+        "statistics_in_plot": {
+          "r2_regression": "upper left 또는 lower right (데이터 없는 공간)",
+          "n_samples": "axis 제목 또는 캡션",
+          "p_value": "significance star 형식으로 표시 (숫자 직접 표기보다)",
+          "AUC": "legend 내부"
+        },
+        "annotations": {
+          "arrow_style": "FancyArrowPatch, arrowstyle='->', color='black'",
+          "text_box": "bbox=dict(boxstyle='round', fc='white', alpha=0.8, pad=0.3)",
+          "font_size": "10~12pt"
+        }
+      },
+
+      "spacing_standards": {
+        "hspace": 0.55,
+        "wspace": 0.38,
+        "tight_layout_pad": 1.5,
+        "panel_label_to_figure_gap": "최소 1 character height",
+        "figure_border_pad": "0.05~0.1 inch"
+      }
+    },
+
+    "histogram": {
+      "typical_panel_count": "1 (단독) / 다패널 내 보조",
+      "recommended_figsize": [6, 5],
+
+      "settings": {
+        "bins": "Sturges rule (k = 1+log2(n)) 또는 'auto'",
+        "edgecolor": "white (bins 구분) 또는 'none'",
+        "linewidth": 0.5,
+        "alpha": 0.8,
+        "density": false,
+        "cumulative": false
+      },
+      "overlay_KDE": {
+        "style": "solid line, linewidth=2, same color (darker shade)",
+        "y_axis_secondary": "ax2 = ax.twinx() → density 표시"
+      },
+      "normal_distribution_overlay": {
+        "color": "red dashed",
+        "linewidth": 1.5
+      },
+      "axes": {
+        "x_label": "Variable name (unit)",
+        "y_label": "Count 또는 Frequency",
+        "spine": "left + bottom"
+      }
+    },
+
+    "time_series_sensor_response": {
+      "note": "센서 실시간 응답 곡선 — Ku 논문 핵심 그래프",
+      "typical_panel_count": "1 (단독 크게) 또는 2×2 내 패널",
+      "recommended_figsize": [10, 4],
+
+      "settings": {
+        "linewidth": 2.0,
+        "color_baseline": "gray (#AAAAAA)",
+        "color_response": "Ku teal (#4AACB0) 또는 Ku red (#C94F4A)",
+        "concentration_steps": "수직 점선 + 농도 텍스트 annotation",
+        "recovery_region": "shaded area (alpha=0.1)",
+        "baseline_line": "horizontal dashed gray"
+      },
+
+      "annotation_rules": {
+        "concentration_label": "각 step 위 텍스트 (rotation=0, fontsize=10)",
+        "response_time_arrow": "→ 화살표 + 'τ = Xs' 텍스트",
+        "recovery_time_arrow": "← 화살표 + 'τ_rec = Xs' 텍스트",
+        "signal_change_annotation": "ΔR/R₀ 또는 ΔA 표기"
+      }
+    }
   }
 }
