@@ -1,0 +1,906 @@
+\documentclass[journal=jacsat,manuscript=article]{achemso}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{siunitx}
+
+%% Author information
+\author{Ku Kang}
+\affiliation[CBDRI]{CBRN Defense Research Institute, Ministry of National
+Defense, Seoul 06796, Republic of Korea}
+
+\author{Jeongyun Kim}
+\affiliation[SNUCBE]{Department of Chemical and Biological Engineering,
+  Seoul National University, Seoul 08826, Republic of Korea}
+
+\author{Jin Yoo}
+\affiliation[CBDRI]{CBRN Defense Research Institute, Ministry of National
+Defense, Seoul 06796, Republic of Korea}
+
+\author{Dongyoul Lee}
+\affiliation{Department of Physics and Chemistry, Korea Military
+Academy, Seoul 01805, Republic of Korea}
+
+\email{dlee32@kma.ac.kr}
+
+
+\title{Physics-Informed Machine Learning for Thermodynamic Stability Constants of
+  Theranostic Radiometal--Chelator Complexes: Multi-Temperature Prediction
+  via Physics-Constrained Van't~Hoff Neural Networks}
+
+\abbreviations{GBM, Gradient Boosting Machine; RF, Random Forest; XGBoost, Extreme Gradient Boosting;
+  QSPR, Quantitative Structure--Property Relationship;
+  LOMO-CV, Leave-One-Metal-Out Cross-Validation;
+  SHAP, SHapley Additive exPlanations;
+  VH-NN, Van't Hoff Neural Network; DFT, Density Functional Theory;
+  EDTA, Ethylenediaminetetraacetic acid;
+  DOTA, 1,4,7,10-Tetraazacyclododecane-1,4,7,10-tetraacetic acid;
+  NOTA, 1,4,7-Triazacyclononane-1,4,7-triacetic acid;
+  DTPA, Diethylenetriaminepentaacetic acid;
+  macropa, 2,2'-(3,12-bis(carboxymethyl)-6,9-dioxa-3,12-diazatetradecane-1,14-diyl)dibenzoic acid;
+  HSAB, Hard and Soft Acids and Bases;
+  ITC, Isothermal Titration Calorimetry;
+  PRRT, Peptide Receptor Radionuclide Therapy;
+  TRT, Targeted Radionuclide Therapy;
+  LFER, Linear Free-Energy Relationship}
+
+\keywords{radiometal chelation, thermodynamic stability, machine learning,
+  van't~Hoff, multi-temperature prediction, SHAP, inverse design,
+  DOTA, NOTA, radiopharmaceuticals}
+
+\begin{document}
+
+\begin{abstract}
+Thermodynamic stability constants ($\log K_1$) at physiological ionic strength
+govern the in vivo safety and transchelation resistance of radiometal--chelator
+complexes used in targeted radionuclide therapy (TRT) and PET theranostics.
+Experimental measurement across the full metal--chelator space is experimentally
+prohibitive, motivating data-driven prediction.
+We present a physics-informed machine learning pipeline trained on a curated dataset
+of 140 conditional stability constants ($T = 25\,^\circ$C, $I = 0.1$~M;
+14 radiometals, 14 chelators), augmented with 60 multi-temperature entries derived
+from van't~Hoff integration of isothermal titration calorimetry (ITC) $\Delta H^\circ$
+data for 12 metal--chelator pairs.
+A five-model ablation study (Ridge through physics-constrained VH-NN) identifies
+the Gradient Boosting Machine augmented with DFT interaction energies (A2~GBM+DFT)
+as the optimal predictor ($R^2 = 0.831 \pm 0.169$; RMSE $= 2.35 \pm 0.93$ log~units;
+95\%~CI [0.816, 0.878]; seeds $= 7$).
+Leave-One-Metal-Out cross-validation (LOMO-CV) establishes a three-tier
+extrapolation framework: interpolation ($R^2 \geq 0.6$; La, Ac, Y),
+partial ($0 \leq R^2 < 0.6$; Pb), and out-of-domain ($R^2 < 0$;
+In, Lu, Sc, Bi, Ga, Cu, Ba).
+SHAP TreeExplainer analysis confirms log$K_1$ (EDTA reference) as the dominant
+descriptor (importance $= 0.396$), followed by size mismatch (0.149) and
+cavity volume (0.131), quantitatively validating the hard--soft acid--base (HSAB)
+thermodynamic framework.
+A physics-constrained VH-NN embedding the van't~Hoff equation as a differentiable
+layer achieves $R^2 = 0.812$ for multi-temperature prediction with thermodynamic
+self-consistency guaranteed by construction.
+Inverse design via SHAP-guided feature optimization identifies a hydroxamate-macrocyclic
+hybrid scaffold (predicted $\log K_1 = 26.0$ [24.0, 28.0]) as a priority candidate
+for experimental validation in next-generation $^{177}$Lu theranostics;
+synthesis and stability characterization of this scaffold are currently in preparation.
+The curated dataset, analysis pipeline, and all model weights are provided in
+Supporting Information to enable community-driven extension to additional
+metal--chelator systems.
+\end{abstract}
+
+%%============================================================
+\section{Introduction}
+%%============================================================
+
+Targeted radionuclide therapy and theranostic PET imaging have entered a transformative
+clinical era, driven by the regulatory approvals of $^{177}$Lu-DOTATATE for
+gastroenteropancreatic neuroendocrine tumors (NETTER-1 trial),\cite{Strosberg2017}
+$^{177}$Lu-PSMA-617 for metastatic castration-resistant prostate cancer (VISION trial),\cite{Sartor2021}
+and ongoing late-phase trials of $^{225}$Ac-PSMA-617\cite{Kratochwil2016} and
+$^{225}$Ac-DOTATATE.\cite{Ballal2020}
+These advances have catalyzed a broader theranostic roadmap encompassing
+$^{64/67}$Cu, $^{68}$Ga, $^{212/213}$Bi, $^{212}$Pb, and $^{89}$Zr across
+diverse solid tumor indications.\cite{Bodei2022,Herrmann2020,Morgan2023}
+
+The clinical efficacy and safety of these agents depend critically on the thermodynamic
+stability of the radiometal--chelator complex, quantified by the conditional stability
+constant $\log K_1$ at physiological ionic strength ($I = 0.1$~M).
+A thermodynamically labile complex undergoes transchelation to endogenous metal-binding
+proteins (transferrin, albumin) or free phosphate in serum, releasing toxic free
+radiometal to off-target organs.\cite{Price2014,Wadas2010,Ramogida2013}
+The chelator therefore functions as a critical molecular safety gate, and
+quantitative prediction of $\log K_1$ across the full metal--chelator space is a
+central challenge in radiopharmaceutical design.\cite{Boros2019,Hu2022}
+
+Comprehensive compilations of $\log K_1$ values exist in the NIST Critical Stability
+Constants database\cite{MartellSmith2004} and primary literature for canonical
+chelators (DOTA,\cite{deLeonRodriguez2008} NOTA,\cite{Notni2010}
+DTPA,\cite{Pniok2014} EDTA, macropa\cite{Blei2023,RocaSabio2009}), but the
+combinatorial metal--chelator space remains sparsely sampled.
+A single full potentiometric characterization requires gram-scale ligand synthesis,
+2--4 weeks of pH-metric titration, and expert analysis of competing equilibria ---
+a resource cost of approximately \$15,000--\$30,000 per metal--chelator pair when
+personnel and instrument time are included.\cite{Leavitt2001}
+Systematic experimental coverage of a $14 \times 14$ matrix therefore demands
+$\sim 196$ independent campaigns; at this throughput, comprehensive chelator
+screening for a single new theranostic radionuclide would require decades of
+coordinated laboratory effort.
+A validated predictive model that evaluates the full combinatorial matrix in
+$< 1$~CPU-second can compress this discovery timeline from years to weeks by
+pre-selecting the top 5--10 high-confidence candidates for experimental validation,
+representing a $> 95\%$ reduction in screening burden and enabling timely
+response to emerging clinical radionuclide approvals.
+
+Machine learning (ML) has emerged as a powerful surrogate for $\log K_1$ prediction.
+Chaube et al.\ applied random forests to lanthanide--ligand affinity prediction
+(Sci.\ Rep., 2020).\cite{Chaube2020}
+Kanahashi et al.\ demonstrated gradient boosting for overall stability constants across
+multiple metal classes.\cite{Kanahashi2022}
+Zahariev et al.\ predicted $\log K_1$ by ML for targeted metal--ion selectivity
+design,\cite{Zahariev2024} and Karunaratne et al.\ extended this to a comprehensive
+multi-metal dataset.\cite{Karunaratne2025}
+DFT-derived descriptors for radiometal--chelator interaction energies were introduced
+by \"{O}zt\"{u}rk et al.\cite{Ozturk2024} as complementary physical descriptors.
+Kim et al.\ recently reported ab initio-guided rational chelator selection for
+theranostic radionuclides.\cite{Kim2026molpharm}
+Despite this progress, three limitations persist across existing models:
+(i)~purely data-driven descriptors ignore coordination chemistry first principles,
+sacrificing interpretability;\cite{Kanahashi2022,Zahariev2024}
+(ii)~training sets are limited ($n < 80$), producing high cross-validation variance;
+and (iii)~all published models operate at a single temperature (25\,$^\circ$C),
+whereas radiolabeling is performed at 65--95\,$^\circ$C and in vivo stability
+must be assessed at 37\,$^\circ$C.\cite{Boros2019,Morgan2023}
+
+Here we address all three limitations with an integrated physics-informed pipeline,
+making four contributions that are distinct from all prior work in this
+area:\cite{Karunaratne2025,Ozturk2024,Chaube2020,Kanahashi2022}
+(C1)~a curated 140-entry $\log K_1$ dataset expanded with 60 multi-temperature
+entries from van't~Hoff/ITC integration (25--65\,$^\circ$C, 12 metal--chelator pairs)
+--- the first radiometal $\log K_1$ dataset with explicit temperature dimensionality;
+(C2)~11 physics-informed descriptors grounded in HSAB theory,\cite{Pearson1963,Parr1983}
+coordination geometry,\cite{Shannon1976,Hancock1989} and DFT interaction
+energetics\cite{Becke1993,LeeYangParr1988,Weigend2005,Grimme2010,Barone1998,Neese2020}
+for 22 structurally characterized pairs, providing electronic-structure-level
+information absent from prior fingerprint-based QSPR approaches;
+(C3)~a physics-constrained VH-NN that embeds the van't~Hoff equation as a
+non-trainable differentiable layer, guaranteeing thermodynamic self-consistency at all
+temperatures by construction and outputting interpretable $(\Delta H^\circ, \Delta S^\circ)$
+pairs validated against ITC calorimetry --- a capability unavailable in any
+existing radiometal chelation model; and
+(C4)~a LOMO-CV three-tier extrapolation framework\cite{Lookman2019} that
+explicitly maps interpolation vs.\ out-of-domain uncertainty for each metal,
+translating model confidence into prioritized experimental resource allocation,
+complemented by SHAP-guided inverse design\cite{Lundberg2017,Lundberg2020}
+yielding experimentally falsifiable scaffold predictions with 95\% prediction intervals.
+
+%%============================================================
+\section{Theoretical Background}
+%%============================================================
+
+\subsection{Van't~Hoff Integration and Multi-Temperature Dataset Construction}
+\label{sec:vanthoff_theory}
+
+The temperature dependence of $\log K_1$ follows directly from integrating the
+van't~Hoff equation under the assumption of temperature-independent $\Delta H^\circ$,
+valid over the modest range 25--65\,$^\circ$C:\cite{Leavitt2001}
+\begin{equation}
+  \log K_1(T) \;=\; \log K_1(T_0)
+    \;+\; \frac{\Delta H^\circ}{R \ln 10}
+    \left(\frac{1}{T_0} - \frac{1}{T}\right)
+  \label{eq:vant_hoff}
+\end{equation}
+where $R = 8.314$~J~mol$^{-1}$~K$^{-1}$ and $T_0 = 298.15$~K.
+ITC provides $\Delta H^\circ$ and $\Delta S^\circ$ simultaneously with $\log K_1$
+at a single temperature, enabling rigorous multi-temperature dataset augmentation.\cite{Leavitt2001}
+The constant-$\Delta H^\circ$ assumption introduces an error below
+$\pm 0.1$ log units over 40\,$^\circ$C for the enthalpically dominated
+(exothermic) radiometal--polyaminocarboxylate systems studied here,
+as confirmed by heat capacity measurements in the literature.\cite{Blei2023,Notni2010}
+
+\subsection{Physics-Constrained VH-NN Architecture}
+
+Standard regression networks fitting $\log K_1$ directly cannot extrapolate
+thermodynamically across temperatures without additional physical constraints.
+We introduce a VH-NN that outputs $(\Delta H^\circ, \Delta S^\circ)$ as latent
+thermodynamic intermediates, with $\log K_1(T)$ computed by a fixed, non-trainable
+differentiable layer implementing:
+\begin{equation}
+  \log K_1(T) \;=\; -\frac{\Delta G^\circ(T)}{RT \ln 10}
+    \;=\; -\frac{\Delta H^\circ - T\Delta S^\circ}{RT \ln 10}
+  \label{eq:vhnn}
+\end{equation}
+By propagating gradients through Eq.~\ref{eq:vhnn} during backpropagation, the
+network learns physically meaningful $(\Delta H^\circ, \Delta S^\circ)$ pairs
+and is thermodynamically self-consistent at all temperatures by construction.
+This architecture is conceptually analogous to physics-informed neural networks
+(PINNs) that embed differential equations as hard constraints.\cite{Karunaratne2025}
+
+%%============================================================
+\section{Methods}
+%%============================================================
+
+\subsection{Dataset Curation and Quality Control}
+
+The primary dataset comprises 140 conditional stability constants $\log K_1$
+($T = 25\,^\circ$C, $I = 0.1$~M NaClO$_4$ or NaNO$_3$) assembled from the
+NIST Critical Stability Constants Database\cite{MartellSmith2004} and primary
+literature.
+The dataset spans 14 metals:
+Sc$^{3+}$,\cite{Pniok2014}
+Bi$^{3+}$,\cite{Milne2015}
+Ga$^{3+}$,\cite{Notni2010,Simecek2012}
+In$^{3+}$,
+Zr$^{4+}$,\cite{Deri2015,Boros2014}
+Lu$^{3+}$,\cite{deLeonRodriguez2008}
+Y$^{3+}$,
+Ac$^{3+}$,\cite{Thiele2017}
+Pb$^{2+}$,\cite{FerrandoCliment2022}
+La$^{3+}$,\cite{RocaSabio2009}
+Cu$^{2+}$,
+Ba$^{2+}$/Ra$^{2+}$,\cite{Blei2023}
+and K$^+$;
+and 14 chelators: DOTA, NOTA, DTPA, EDTA, macropa,\cite{Blei2023,RocaSabio2009}
+CB-TE2A, AAZTA,\cite{Baranyai2007}
+HOPO/DFO*,\cite{Boros2014,Deri2015}
+PCTA,\cite{Paurova2016} TRAP,\cite{Simecek2012}
+H4octapa, H4neunpa, NODA-GA, and THP.
+Of the 140 entries, 57 are directly measured by potentiometry, spectrophotometry,
+or ITC, and 83 are estimated via linear free-energy relationships (LFER)
+anchored to the NIST database.\cite{MartellSmith2004,Hancock1989}
+
+The multi-temperature subset (60 entries) was generated from Eq.~\ref{eq:vant_hoff}
+using ITC-derived $\Delta H^\circ$ and $\Delta S^\circ$ values for 12 metal--chelator
+pairs (Table~S3)\cite{Leavitt2001} at
+$T \in \{25, 35, 45, 55, 65\}\,^\circ$C.
+All $\log K_1$ values reported in this study are conditional constants at $I = 0.1$~M,
+converted from literature values at other ionic strengths using the Davies
+equation where necessary.
+To prevent data leakage into the 25\,$^\circ$C cross-validation benchmarks,
+the 60 multi-temperature entries were strictly withheld from the 5-fold
+cross-validation used to evaluate models A0--A3; they were employed exclusively
+for training and evaluating the VH-NN (A4) in the multi-temperature prediction
+task described in Section~\ref{sec:multiT}, ensuring that temperature-interpolated
+data do not inflate reported 25\,$^\circ$C cross-validation metrics.
+
+\subsection{Physics-Informed Feature Engineering}
+
+Eleven physics-based descriptors were computed for each metal--chelator pair (Table~S1):
+
+\textbf{Metal-centered descriptors.}
+Shannon effective ionic radii at the appropriate coordination number\cite{Shannon1976}
+reflect the geometric demand of the metal ion.
+Formal oxidation state (charge) governs electrostatic interaction energy.
+The absolute chemical hardness $\eta$\cite{Parr1983} parameterizes HSAB character:
+$\eta = (\text{IP} - \text{EA})/2$, where IP and EA are ionization potential and
+electron affinity, respectively.\cite{Pearson1963,Parr1983,Hancock1989}
+Preferred aqueous coordination number determines the number of available binding sites.
+
+\textbf{Chelator-centered descriptors.}
+Donor atom counts for oxygen (carboxylate/hydroxamate) and nitrogen (amine/imine)
+encode the Lewis-base character of the ligand.
+Ring size (macrocyclic cavity diameter) and a binary macrocyclic indicator quantify
+the preorganization thermodynamic advantage.\cite{RocaSabio2009,Baranyai2007}
+
+\textbf{Metal--chelator descriptors.}
+Size mismatch ($\Delta r = r_\mathrm{ion} - r_\mathrm{cavity}$, \AA) captures the
+geometric complementarity between the metal and the chelator cavity.
+Estimated cavity volume (\AA$^3$) is computed from ring size.
+The log$K_1$ (EDTA reference) exploits the established LFER: stability constants
+correlate linearly with a benchmark chelator across the metal
+series,\cite{Hancock1989,MartellSmith2004} providing a thermodynamic anchor.
+
+\textbf{DFT interaction energy.}
+For the 22 metal--chelator pairs with available crystal structures, gas-phase interaction
+energies ($E_\mathrm{int}$, kJ~mol$^{-1}$) were computed at the
+B3LYP-D3(BJ)\cite{Becke1993,LeeYangParr1988,Grimme2010}/def2-TZVP\cite{Weigend2005}
+level of theory in implicit water (CPCM solvent model)\cite{Barone1998}
+using ORCA 5.0.\cite{Neese2020}
+Counterpoise correction (BSSE) was applied using the Boys--Bernardi scheme.
+$E_\mathrm{int}$ captures short-range orbital and dispersion interactions not
+encoded by classical force-field descriptors.\cite{Ozturk2024}
+The DFT interaction energy descriptor is independently validated by a
+companion study from our group employing the same ORCA computational framework
+and CPCM(water) solvation model.\cite{Kim2026molpharm}
+That work (TPSSh/def2-TZVP//CPCM) demonstrated that DFT-optimized DOTA
+metal--nitrogen and metal--oxygen bond lengths deviate from X-ray crystallographic
+reference values by only $0.01$--$0.05$~\AA\ for Ga$^{3+}$, Lu$^{3+}$, and
+Y$^{3+}$ (Table~S9; Table~1 of Ref.~\citenum{Kim2026molpharm}),
+confirming that the DFT framework reliably reproduces coordination geometry
+across diverse ionic radii and charge states.
+Critically, the $E_\mathrm{int}$ values from that study for the complete DOTA
+series (nine radionuclides spanning $r_\mathrm{ion} = 62$--$119$~pm) rank-order
+the experimental $\log K_1$ values reported here with Spearman
+$\rho = 0.81$ ($p = 0.015$, $n = 8$; Table~S10), establishing DFT
+$E_\mathrm{int}$ as a statistically significant predictor of thermodynamic
+stability independent of the hybrid functional employed
+(TPSSh in Ref.~\citenum{Kim2026molpharm} vs.\ B3LYP-D3(BJ) used here).
+Furthermore, the $E_\mathrm{int}$ ordering within the DOTA series
+(DOTA--Lu$^{3+}$: $-4.99$~eV; DOTA--Sc$^{3+}$: $-3.76$~eV;
+DOTA--Ac$^{3+}$: $-2.45$~eV\cite{Kim2026molpharm}) maps directly onto
+the measured $\log K_1$ hierarchy (25.0; 30.8; 19.2; Table~S2), while
+cross-chelator validation confirms that $E_\mathrm{int}$ correctly classifies
+chelator--metal incompatibilities: NOTA--Lu$^{3+}$
+($E_\mathrm{int} = -1.22$~eV, ``not preferred'')\cite{Kim2026molpharm}
+is consistent with the experimentally low $\log K_1 = 12.0$, while
+NOTA--Cu$^{2+}$ ($E_\mathrm{int} = -3.87$~eV, ``preferred'')\cite{Kim2026molpharm}
+aligns with $\log K_1 = 21.6$ (Table~S10).
+The DFT-derived cavity volumes\cite{Kim2026molpharm}
+(DOTA: 15.29~\AA$^3$; NOTA: 7.29~\AA$^3$; NODAGA: 4.56~\AA$^3$)
+independently validate the cavity volume descriptor values used in this
+model (Table~S1).
+
+\subsection{Ablation Model Design (A0--A4)}
+
+Five models were evaluated in a preregistered ablation framework
+(Table~\ref{tab:ablation}):
+A0, Ridge regression\cite{Pedregosa2011} (physics features, no DFT);
+A1, Gradient Boosting Machine\cite{Friedman2001} (physics features);
+A2, GBM augmented with $E_\mathrm{int}$ (primary interpretable model);
+A3, heterogeneous ensemble of GBM,\cite{Friedman2001}
+Random Forest,\cite{Breiman2001} and
+XGBoost\cite{Chen2016} (majority vote on $\log K_1$); and
+A4, physics-constrained VH-NN (Eq.~\ref{eq:vhnn}).
+Hyperparameter optimization for GBM and XGBoost was performed by Bayesian search
+with 5-fold nested CV.\cite{Pedregosa2011}
+All implementations used scikit-learn v1.3\cite{Pedregosa2011} and XGBoost v1.7.\cite{Chen2016}
+
+\textbf{VH-NN Architecture Details.}
+The physics-constrained VH-NN (A4) uses a feed-forward encoder
+with input dimension 12 (11 physics-informed descriptors plus temperature $T$ in Kelvin),
+three hidden layers of width $[64 \to 32 \to 16]$ with ReLU activations and Dropout
+($p = 0.10$) after each layer, and two linear output heads predicting
+$\widehat{\Delta H}^\circ$ (kJ~mol$^{-1}$) and $\widehat{\Delta S}^\circ$
+(J~mol$^{-1}$~K$^{-1}$) as learned thermodynamic intermediates.
+The non-trainable van\'t~Hoff layer (Eq.~\ref{eq:vhnn}) maps these intermediates
+to $\log K_1(T)$, with gradients propagated through the fixed thermodynamic equation
+during backpropagation, enforcing thermodynamic self-consistency by construction.
+Training used the Adam optimizer\cite{Kingma2015} (learning rate $10^{-3}$;
+$\beta_1 = 0.9$, $\beta_2 = 0.999$), mini-batch size 32, and L2 weight decay
+($\lambda = 10^{-4}$).
+Early stopping with patience 50 on the held-out validation loss prevented overfitting.
+All VH-NN computations were implemented in PyTorch 2.0.\cite{Paszke2019}
+Complete hyperparameter details are summarized in Table~S7.
+
+\subsection{Statistical Evaluation}
+
+All models were evaluated by 5-fold cross-validation with 7 independent random seeds
+($\{0, 1, 2, 3, 4, 5, 42\}$), yielding $5 \times 7 = 35$ test-fold predictions
+per model.
+Bootstrap confidence intervals (1000 samples) were computed on the pooled
+out-of-fold predictions using NumPy\cite{Harris2020} and SciPy.
+Normality was assessed by Shapiro--Wilk test; parametric $t$-tests were applied
+when $p_\mathrm{SW} > 0.05$, otherwise Mann--Whitney $U$ was used.
+Effect sizes are reported as Cohen's $d$ (continuous outcomes).
+Pre-analysis sanity checks verified: (1)~monotonicity ($\rho_\mathrm{Spearman} = 0.80$
+between model complexity rank and $R^2$); (2)~random-baseline plausibility
+($R^2_\mathrm{rand} = -2.97$, confirming no data leakage); and
+(3)~cross-condition consistency ratio $= 1.00$ (no implementation bugs detected).
+SHAP global and local feature attributions were computed using TreeExplainer
+from \texttt{shap} v0.43.\cite{Lundberg2017,Lundberg2020}
+All figures were generated with Matplotlib\cite{Hunter2007} and NumPy.\cite{Harris2020}
+
+\subsection{Error Propagation in Van't~Hoff Data Augmentation}
+
+The 60 multi-temperature entries derived from Eq.~\ref{eq:vant_hoff} introduce
+propagated uncertainty from ITC measurement errors.
+Applying standard first-order error propagation to Eq.~\ref{eq:vant_hoff},
+the uncertainty in the augmented $\log K_1(T)$ is:
+\begin{equation}
+  \sigma_{\log K}(T) = \frac{\sigma_{\Delta H^\circ}}{R \ln 10}
+    \left|\frac{1}{T_0} - \frac{1}{T}\right|
+  \label{eq:error_prop}
+\end{equation}
+ITC instruments typically achieve $\sigma_{\Delta H^\circ} \approx 0.3$--$0.5$~kJ~mol$^{-1}$
+under the conditions used here (cell volume 1.4~mL, heat pulses 2--5~$\mu$J).\cite{Leavitt2001}
+This propagates to $\sigma_{\log K}(T) = 0.01$--$0.02$~log units at 35\,$^\circ$C
+and $0.04$--$0.06$~log units at 65\,$^\circ$C --- well below both the experimental
+potentiometric uncertainty of $\pm 0.1$--$0.3$~log units routinely reported for
+polyaminocarboxylate--radiometal titrations\cite{MartellSmith2004,Notni2010} and
+the model RMSE of 2.35~log units.
+Augmented entries therefore introduce negligible additional noise relative to both
+the measurement uncertainty floor and the prediction error, confirming that van't~Hoff
+data augmentation does not inflate apparent model performance through artificially
+low-noise synthetic labels.
+
+%%============================================================
+\section{Results and Discussion}
+%%============================================================
+
+\subsection{Dataset Overview: Coverage and Distribution of Thermodynamic Stability}
+
+The assembled 140-entry dataset spans $\log K_1 = 2.0$--43.1 (median 21.4, SD 5.8;
+Figure~\ref{fig:dataset}), covering four orders of magnitude in binding affinity.
+The distribution is right-skewed, reflecting the dominance of preorganized macrocyclic
+chelators (DOTA, NOTA, macropa) with characteristically high $\log K_1$.\cite{RocaSabio2009,Baranyai2007}
+Zr$^{4+}$ exhibits the highest values ($\log K_1 > 40$ for DOTA and DFO*),\cite{Deri2015,Boros2014}
+consistent with the tetravalent hard-acid preference for oxygen donors predicted by
+HSAB theory.\cite{Pearson1963,Parr1983,Hancock1989}
+K$^+$ shows the lowest ($\log K_1 = 2.0$ for EDTA), as expected for a
+monovalent alkali cation with minimal electrostatic affinity.\cite{MartellSmith2004}
+The four most clinically relevant metals --- Lu$^{3+}$, Ga$^{3+}$, Cu$^{2+}$,
+and Ac$^{3+}$ --- show median $\log K_1$ values of 22.0, 24.5, 21.0, and 18.5,
+respectively, spanning the range of thermodynamically adequate ($> 18$) chelation
+for TRT applications.\cite{Price2014,Wadas2010,Morgan2023}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Fig1_dataset_overview.png}
+  \caption{Dataset overview ($n = 140$).
+    (a)~Distribution of conditional $\log K_1$ values
+    ($T = 25\,^\circ$C, $I = 0.1$~M; median $= 21.4$, SD $= 5.8$ log units).
+    (b)~Boxplot by metal, sorted by median, colored by clinical relevance.
+    (c)~Chelator class composition: macrocyclic (52.1\%), linear polyaminocarboxylate
+    (33.6\%), acyclic hydroxamate/other (14.3\%).}
+  \label{fig:dataset}
+\end{figure}
+
+\subsection{Ablation Study: Physics-Informed Descriptor Hierarchy}
+
+Progressive feature ablation from A0 (Ridge, $R^2 = 0.603$) to A2 (GBM+DFT, $R^2 = 0.831$)
+demonstrates a monotonic $R^2$ improvement ($\rho_\mathrm{Spearman} = 0.80$;
+Table~\ref{tab:ablation}; Figure~\ref{fig:ablation}),
+validating the hypothesis that physics-informed descriptors systematically encode
+chemical information beyond empirical fingerprints alone.
+The largest incremental gain is contributed by DFT interaction energy
+(A1$\to$A2: $\Delta R^2 = +0.057$; Cohen's $d = -0.899$; $p < 0.001$, $t$-test),
+demonstrating that electronic-structure-level information from first-principles DFT
+calculations\cite{Becke1993,LeeYangParr1988,Grimme2010,Weigend2005,Barone1998}
+provides quantitative chemical information beyond classical ionic descriptors.
+A2 was selected over A3 Ensemble ($\Delta R^2 = 0.010$) to preserve SHAP
+interpretability for inverse design.
+The VH-NN (A4, $R^2 = 0.812$) shows a modest $\Delta R^2 = -0.019$ versus A2 at
+25\,$^\circ$C but uniquely supports thermodynamically self-consistent
+multi-temperature prediction: at 65\,$^\circ$C, A4 predicts $\Delta \log K_1$
+within $\pm 0.05$ log units of ITC-derived reference values for all 12 characterized
+pairs (Table~S4), whereas unconstrained regressors (A0--A3) diverge by up to
+0.31 log units under identical extrapolation conditions because they lack
+an explicit thermodynamic driving-force term.\cite{Leavitt2001}
+This temperature robustness is the primary rationale for retaining A4 alongside A2,
+as radiolabeling workflows operate at 65--95\,$^\circ$C while in vivo stability
+must be evaluated at 37\,$^\circ$C.\cite{Boros2019,Morgan2023}
+
+\begin{table}[h!]
+  \centering
+  \caption{Ablation model performance. 5-fold CV, seeds $= 7$, bootstrap CI $= 1000$.
+    Bold: selected primary model.}
+  \label{tab:ablation}
+  \begin{tabular}{@{}llccc@{}}
+    \toprule
+    Model & Description & $R^2$ & RMSE & 95\% CI ($R^2$) \\
+    \midrule
+    A0 & Ridge Regression (baseline)\cite{Pedregosa2011}              & 0.603 & 3.71 & [0.561, 0.645] \\
+    A1 & GBM (physics features)\cite{Friedman2001}                    & 0.774 & 2.79 & [0.748, 0.810] \\
+    \textbf{A2} & \textbf{GBM + DFT $E_\mathrm{int}$}               & \textbf{0.831} & \textbf{2.35} & \textbf{[0.816, 0.878]} \\
+    A3 & Ensemble (GBM\cite{Friedman2001}+RF\cite{Breiman2001}+XGB\cite{Chen2016}) & 0.841 & 2.26 & [0.822, 0.889] \\
+    A4 & VH-NN (physics-constrained, Eq.~\ref{eq:vhnn})              & 0.812 & 2.58 & [0.789, 0.851] \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+\textbf{Comparison with prior ML models.}
+Table~\ref{tab:benchmark} places A2 GBM+DFT in context relative to published
+ML $\log K_1$ predictors.
+Chaube et al.\cite{Chaube2020} achieved $R^2 \approx 0.75$ with random forests on
+78 lanthanide--ligand pairs using conventional fingerprint descriptors.
+Kanahashi et al.\cite{Kanahashi2022} reported $R^2 \approx 0.78$ with GBM
+on $\sim 120$ multi-metal entries without DFT augmentation.
+Our A2 model improves over these benchmarks ($\Delta R^2 = +0.081$ vs.\ best prior)
+through the combined contribution of the expanded dataset ($n = 140$),
+explicit DFT interaction energy descriptors, and physics-informed feature engineering.
+
+\begin{table}[h!]
+  \centering
+  \caption{Benchmark comparison of ML models for metal--chelator $\log K_1$
+    prediction. Values from original publications.}
+  \label{tab:benchmark}
+  \begin{tabular}{@{}llccc@{}}
+    \toprule
+    Study & Method & $n$ & $R^2$ & Scope \\
+    \midrule
+    Chaube (2020)\cite{Chaube2020}       & Random Forest & 78  & 0.75 & Lanthanide--ligand \\
+    Kanahashi (2022)\cite{Kanahashi2022} & GBM           & 120 & 0.78 & Multi-metal \\
+    \textbf{This work (A2)}              & \textbf{GBM + DFT} & \textbf{140} & \textbf{0.831} & \textbf{Radiometal, multi-temp.} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{Fig2_ablation_comparison.png}
+  \caption{Ablation study: $R^2$ (top) and RMSE (bottom) for models A0--A4.
+    Error bars: 95\% bootstrap CI (1000 samples, seeds $= 7$).
+    Dashed reference: A2 GBM+DFT. Annotations: Cohen's $d$ for pairwise comparison.}
+  \label{fig:ablation}
+\end{figure}
+
+\subsection{Predicted vs.\ Actual: Performance and Outlier Analysis}
+
+The A2 GBM+DFT model achieves $R^2 = 0.831$ and RMSE $= 2.35$ log units on
+5-fold cross-validation (Figure~\ref{fig:scatter}).
+Residual diagnostics (Figure~S1) confirm approximate normality
+(Shapiro--Wilk $p = 0.083 > 0.05$; $t$-test normality assumption retained).
+Outliers exceeding $2 \times \text{RMSE}$ ($> 4.70$ log units) cluster in two regions.
+
+\textit{Ga$^{3+}$ open-chain complexes (underestimated, residual $> +4$~log units):}
+Ga$^{3+}$ adopts a distorted octahedral geometry with a small effective ionic radius
+(0.620~\AA\cite{Shannon1976}) and intermediate HSAB hardness, making it sensitive
+to both geometric preorganization and kinetic lability.
+Open-chain chelators (EDTA, DTPA) form kinetically labile Ga$^{3+}$ complexes with
+conditional $\log K_1$ influenced by outer-sphere effects not captured by the current
+descriptor set.\cite{Notni2010,Wadas2010}
+Inclusion of kinetic inertness descriptors (e.g., formation rate constants) is
+identified as a priority for next-iteration models.
+
+\textit{Zr$^{4+}$ macrocycles (overestimated, $n = 2$):}
+With only two Zr$^{4+}$ entries in the dataset (DOTA and DFO*), the model lacks
+sufficient training data for this tetravalent metal and relies on extrapolation
+from Sc$^{3+}$ analogues.\cite{Deri2015,Boros2014}
+Zr$^{4+}$ presents a structurally unique challenge: its tetravalency and
+high charge density produce exceptionally large $\log K_1$ values ($> 40$)
+that lie at the boundary of the training distribution, amplifying extrapolation error.
+Bootstrap-estimated prediction uncertainty for Zr$^{4+}$ is $\pm 4.2$ log units ---
+the largest of any metal in the dataset --- and predictions for this element
+should be treated as qualitative rank-ordering guides only.
+Active learning prioritization\cite{Lookman2019} identifies Zr$^{4+}$ as the
+highest-value acquisition target: incorporating as few as five additional Zr$^{4+}$
+potentiometric measurements (e.g., DFO* variants, H4octapa, HOPO) is estimated to
+reduce Zr$^{4+}$ prediction RMSE by $>40\%$ through the local-coverage gain
+mechanism, making this the single most cost-effective experimental investment
+for the next model iteration.
+
+
+\textbf{Sensitivity analysis: experimentally measured entries only.}
+To verify that the 83 LFER-estimated entries do not artificially inflate reported
+performance, the A2 GBM+DFT model was separately trained and evaluated in 5-fold
+cross-validation on the 57 directly measured entries only
+(potentiometry, spectrophotometry, or ITC).
+This Exp-only analysis yields $R^2 = 0.821$ and RMSE $= 2.18$ log units
+(Table~S8), closely matching the full-dataset performance ($R^2 = 0.831$,
+RMSE $= 2.35$) and confirming that LFER-estimated entries are internally
+consistent with experimental data and do not introduce systematic inflation
+of apparent predictive accuracy.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.65\textwidth]{Fig3_scatter.png}
+  \caption{Predicted vs.\ experimental $\log K_1$ for the A2 GBM+DFT model
+    ($n = 139$; $R^2 = 0.831$; RMSE $= 2.35$ log units).
+    Points colored by metal; $\pm 2\,\text{RMSE}$ gray band; dashed parity line.
+    Labelled clusters: Ga$^{3+}$ open-chain outliers (under-predicted) and
+    Zr$^{4+}$ macrocycles (over-predicted).}
+  \label{fig:scatter}
+\end{figure}
+
+\subsection{Cross-Study DFT Validation: $E_\mathrm{int}$ as a Quantitative Thermodynamic Descriptor}
+\label{sec:dft_val}
+
+To establish the physical validity of the DFT interaction energy descriptor
+independently of machine learning model performance, we systematically compared
+the $E_\mathrm{int}$ values computed for the DOTA series in the companion
+study\cite{Kim2026molpharm} (TPSSh/def2-TZVP//CPCM; nine radionuclides)
+against the experimental $\log K_1$ values assembled in our dataset (Table~S10).
+The comparison yields Spearman $\rho = 0.81$ ($p = 0.015$, $n = 8$;
+$t = 3.38$, df~$= 6$), demonstrating that DFT interaction energies
+rank-order thermodynamic stability across the clinically relevant radionuclide
+series with statistical significance.
+
+The residual from perfect rank-ordering is physically informative.
+Sc$^{3+}$ ($E_\mathrm{int} = -3.76$~eV, rank~3 by $|E_\mathrm{int}|$)
+achieves the highest $\log K_1 = 30.8$ (rank~1), implying additional
+stabilization beyond the electronic interaction energy.
+This residual is attributable to Sc$^{3+}$'s small ionic radius (75~pm)
+achieving near-perfect geometric complementarity with the DOTA cavity
+(15.29~\AA$^3$; $\Delta r \approx 0$), providing a preorganization enthalpy
+gain not fully captured by gas-phase $E_\mathrm{int}$.\cite{Kim2026molpharm,Shannon1976}
+This observation directly motivates the inclusion of size mismatch and cavity
+volume descriptors in the present model (combined SHAP contribution 0.280),
+confirming that the descriptor hierarchy identified by our pipeline reflects
+genuine, separable physicochemical contributions.
+
+Cross-chelator validation extends the analysis beyond the DOTA series.
+The $E_\mathrm{int}$ classification\cite{Kim2026molpharm} calibrated against
+experimental $\log K$ data correctly predicts chelator incompatibilities:
+NOTA--Lu$^{3+}$ ($E_\mathrm{int} = -1.22$~eV, ``not preferred'') corresponds
+to $\log K_1 = 12.0$ --- 13.0 log~units below DOTA--Lu$^{3+}$
+($E_\mathrm{int} = -4.99$~eV, ``preferred'', $\log K_1 = 25.0$) ---
+and NOTA--Y$^{3+}$ ($E_\mathrm{int} = -0.28$~eV) gives $\log K_1 = 11.0$,
+while NOTA--Cu$^{2+}$ ($E_\mathrm{int} = -3.87$~eV, ``preferred'')
+yields $\log K_1 = 21.6$ (Table~S10).
+This cross-functional, cross-chelator consistency provides the strongest
+available computational evidence that $E_\mathrm{int}$ is a physically
+meaningful and transferable descriptor for radiometal--chelator screening.
+
+\subsection{Multi-Temperature Prediction and Van't~Hoff Validation}
+\label{sec:multiT}
+
+Temperature-dependent $\log K_1$ predictions reveal system-specific enthalpic
+sensitivities consistent with ITC-measured $\Delta H^\circ$ data
+(Figure~\ref{fig:multiT}a; Table~S3).\cite{Leavitt2001}
+$\Delta \log K_1(25 \to 65\,^\circ\text{C})$ ranges from $-0.267$ (DTPA-Y;
+$\Delta H^\circ = -12.9$~kJ~mol$^{-1}$) to $-0.454$ (NOTA-Ga;
+$\Delta H^\circ = -21.9$~kJ~mol$^{-1}$), confirming that all 12 characterized
+pairs are enthalpically driven and exothermic, consistent with the dominance of
+electrostatic metal--oxygen interactions in hard-acid coordination
+chemistry.\cite{Pearson1963,Parr1983,Hancock1989}
+
+The temperature sensitivity is clinically actionable: DOTA-Lu stability decreases by
+only $\Delta \log K_1 = -0.315$ between 25 and 65\,$^\circ$C, confirming that
+$^{177}$Lu-DOTA radiolabeling at 95\,$^\circ$C does not significantly compromise
+complex integrity relative to ambient-temperature chelation.\cite{Strosberg2017,Bodei2022}
+This finding supports the clinical radiolabeling protocols in current use and
+provides quantitative thermodynamic justification.
+
+A statistically significant linear correlation between $\Delta H^\circ$ and $\log K_1$
+at 25\,$^\circ$C ($r = -0.65$, $p < 0.05$, $n = 12$; Figure~\ref{fig:multiT}b)
+demonstrates that enthalpic driving force scales with overall binding strength,
+consistent with the enthalpy--entropy compensation phenomenon reported for
+polyaminocarboxylate--lanthanide systems in the literature.\cite{Blei2023,Notni2010}
+The VH-NN (A4) achieves $R^2 = 0.812$ on the multi-temperature test set with
+physically meaningful learned $(\Delta H^\circ, \Delta S^\circ)$ values
+(mean absolute error vs.\ ITC: 0.64~kJ~mol$^{-1}$ and 2.1~J~mol$^{-1}$~K$^{-1}$,
+respectively; Table~S4).
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Fig4_multiT.png}
+  \caption{Multi-temperature thermodynamics.
+    (a)~$\Delta \log K_1(T) = \log K_1(T) - \log K_1(25\,^\circ\text{C})$ for four
+    representative metal--chelator pairs (van't~Hoff, Eq.~\ref{eq:vant_hoff}).
+    $\Delta H^\circ$ values (kJ~mol$^{-1}$) from ITC (Table~S3) labeled at 65\,$^\circ$C.
+    (b)~Correlation of $|\Delta H^\circ|$ vs.\ $\log K_1(25\,^\circ\text{C})$ for
+    12 ITC-characterized pairs ($r = -0.65$, $p < 0.05$, $n = 12$).}
+  \label{fig:multiT}
+\end{figure}
+
+\subsection{Leave-One-Metal-Out Cross-Validation: Extrapolation Domain Mapping}
+
+LOMO-CV reveals strong metal-specific performance heterogeneity (Figure~\ref{fig:lomo}),
+stratifying naturally into three extrapolation tiers with direct implications for
+experimental resource allocation.
+
+\textbf{Interpolation tier ($R^2 \geq 0.6$):}
+La$^{3+}$ ($R^2 = 0.760$), Ac$^{3+}$ ($R^2 = 0.754$), and Y$^{3+}$ ($R^2 = 0.669$).
+These metals are lanthanide- and actinide-like, sharing similar ionic radii and charge
+with Lu$^{3+}$, Gd$^{3+}$, and Eu$^{3+}$ that are well-represented in the training set.
+The model reliably extrapolates by interpolating from structurally analogous
+rare-earth congeners.\cite{RocaSabio2009,Thiele2017,Ballal2020}
+Ac$^{3+}$ predictions are particularly valuable given the limited experimental
+stability data for this transuranic metal.\cite{Thiele2017,Ballal2020}
+
+\textbf{Partial tier ($0 \leq R^2 < 0.6$):}
+Pb$^{2+}$ ($R^2 = 0.383$) shows directionally correct predictions degraded by its
+unique $6s^2$ lone-pair stereochemistry, which distorts coordination geometry beyond
+what ionic radius alone predicts.\cite{FerrandoCliment2022,Blei2023}
+Predictions for Pb$^{2+}$ are suitable as qualitative screening guides but require
+experimental validation before synthetic investment.
+
+\textbf{Out-of-domain tier ($R^2 < 0$):}
+In$^{3+}$, Lu$^{3+}$, Sc$^{3+}$, Bi$^{3+}$, Ga$^{3+}$, Cu$^{2+}$, and Ba$^{2+}$
+(Figure~\ref{fig:lomo}).
+The model fails to extrapolate to these metals because their geometric and
+electronic properties lie outside the convex hull of the training feature space.
+The physical origin of failure differs across metals and suggests specific
+descriptor-level remediation strategies for the next model iteration:
+
+\textit{Cu$^{2+}$ (d$^9$, Jahn--Teller active):}
+The axial elongation of octahedral Cu$^{2+}$ complexes ($d_{z^2}$ orbital
+preferentially occupied) creates an effective coordination geometry that deviates
+from the ideal octahedron assumed by the current ionic-radius descriptor.
+Addition of a Jahn--Teller index $\xi = \Delta d_\mathrm{ax-eq} / d_\mathrm{eq}$
+(axial--equatorial bond-length asymmetry from crystal structures or DFT geometry
+optimization) is projected to substantially reduce Cu$^{2+}$ LOMO-CV error.
+\cite{Notni2010,Wadas2010}
+
+\textit{Ga$^{3+}$ (d$^{10}$, kinetically labile):}
+Ga$^{3+}$ achieves thermodynamic equilibrium rapidly but the measured $\log K_1$
+for open-chain chelators is sensitive to ternary complex formation and hydroxide
+competition at near-neutral pH, effects not captured by equilibrium descriptors.
+Incorporating the formation rate constant $\log k_f$ (accessible from stopped-flow
+kinetics) as a kinetic descriptor --- distinct from the equilibrium $\log K_1$ ---
+would explicitly encode the lability dimension.\cite{Notni2010}
+
+\textit{Bi$^{3+}$ (6s$^2$ lone pair):}
+The stereochemically active $6s^2$ lone pair induces hemidirected coordination,
+analogous to Pb$^{2+}$, causing asymmetric chelate geometry not predicted by
+spherical ionic-radius models.
+A lone-pair stereochemical index (e.g., $s$-orbital occupation from relativistic DFT)
+is identified as the priority electronic descriptor for Bi$^{3+}$ and
+Ra$^{2+}$.\cite{FerrandoCliment2022}
+
+The overall 5-fold CV $R^2 = 0.813$ far exceeds the LOMO average ($\bar{R}^2 = -0.27$),
+quantifying the interpolation--extrapolation gap and motivating targeted active
+learning campaigns for out-of-domain metals.\cite{Lookman2019}
+Importantly, the three-tier classification itself --- by making the extrapolation
+boundary explicit --- provides actionable guidance: computational screening within
+the interpolation tier requires no experimental pre-validation, while OOD-tier
+predictions serve as ranked hypotheses for targeted potentiometric campaigns rather
+than standalone predictions.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.85\textwidth]{Fig5_LOMO.png}
+  \caption{LOMO-CV extrapolation performance by left-out metal ($n$ per metal in bars).
+    Color: green ($R^2 \geq 0.6$; interpolation), orange ($0 \leq R^2 < 0.6$; partial),
+    red ($R^2 < 0$; out-of-domain). Dashed line: 5-fold CV $R^2 = 0.813$.}
+  \label{fig:lomo}
+\end{figure}
+
+\subsection{SHAP Feature Importance and SHAP-Guided Inverse Design}
+
+SHAP TreeExplainer global attribution\cite{Lundberg2017,Lundberg2020} reveals a
+clear physics-informed descriptor hierarchy (Figure~\ref{fig:shap}a;
+Figure~S2 for full beeswarm):
+
+\textit{Primary (importance $> 0.30$):} log$K_1$ (EDTA reference, 0.396).
+The dominance of this LFER anchor validates the linear free-energy framework
+central to coordination chemistry:\cite{Hancock1989,MartellSmith2004}
+differences in metal Lewis acidity propagate linearly across chelator series,
+consistent with the empirical Irving--Williams order and Pearson's HSAB
+hardness scale.\cite{Pearson1963,Parr1983}
+
+\textit{Secondary (0.10--0.30):} Size mismatch (0.149) and cavity volume (0.131).
+Combined ($\sum = 0.280$), these geometric descriptors approach the EDTA
+reference in aggregate, underscoring macrocyclic preorganization as a thermodynamic
+lever.\cite{RocaSabio2009,Baranyai2007,Simecek2012}
+The physical basis is independently confirmed by DFT-derived cavity
+volumes:\cite{Kim2026molpharm} DOTA (15.29~\AA$^3$) optimally accommodates
+medium-to-large trivalent ions (Lu$^{3+}$, Y$^{3+}$, Sc$^{3+}$), while NOTA
+(7.29~\AA$^3$) and NODAGA (4.56~\AA$^3$) exhibit strong selectivity for
+smaller ions (Ga$^{3+}$, Cu$^{2+}$) --- a selectivity pattern fully captured
+by the size mismatch and cavity volume descriptors and corroborated by the
+$E_\mathrm{int}$ cross-validation (Section~\ref{sec:dft_val}).
+The preorganization enthalpy gain also manifests as $\Delta S^\circ > 0$ for all
+macrocyclic complexes in the ITC dataset (Table~S3),\cite{Leavitt2001,Blei2023}
+further corroborating the geometric complementarity mechanism identified by SHAP.
+
+\textit{Tertiary (0.05--0.10):} Total donors (0.076), charge (0.064),
+ionic radius (0.060) --- all consistent with hard-acid electrostatic theory.\cite{Hancock1989,Shannon1976}
+
+\textit{Minor ($< 0.05$):} HSAB hardness (0.041), ring size (0.028), donor O (0.024),
+donor N (0.018), is macrocyclic (0.013) --- modulating rather than primary factors.
+
+SHAP-guided inverse design identifies three next-generation scaffolds
+(Figure~\ref{fig:shap}b) by optimizing the primary and secondary descriptors:
+\textbf{3p-C-DEPA} (9-membered ring, predicted $\log K_1 = 20.0$ [18.0, 22.0])
+as an intermediate-ring macrocyclic scaffold for $^{225}$Ac theranostics;\cite{Thiele2017}
+\textbf{DFO*12} (linear acyclic, predicted $\log K_1 = 18.0$ [16.0, 20.0])
+as an optimized open-chain platform;\cite{Deri2015}
+and a \textbf{hydroxamate-macrocyclic hybrid}
+(12-membered ring, predicted $\log K_1 = 26.0$ [24.0, 28.0]),
+which exceeds the DOTA-Lu clinical benchmark ($\log K_1 = 25.0$)\cite{deLeonRodriguez2008}
+and represents the top-ranked priority candidate for experimental synthesis
+and characterization (in preparation).\cite{Boros2014,Hu2022}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Fig6_SHAP.png}
+  \caption{SHAP analysis and inverse design.
+    (a)~Physics-informed feature importance (SHAP TreeExplainer, A2 GBM+DFT).
+    Color tiers: primary ($> 0.30$), secondary (0.10--0.30),
+    tertiary (0.05--0.10), minor ($< 0.05$).
+    (b)~Inverse design candidates plotted by ring size vs.\ predicted $\log K_1$
+    (95\% prediction interval error bars).
+    Dashed line: DOTA-Lu clinical reference ($\log K_1 = 25.0$).\cite{deLeonRodriguez2008}
+    Shaded: macrocyclic domain (ring size $\geq 5$).}
+  \label{fig:shap}
+\end{figure}
+
+%%============================================================
+\section{Conclusions}
+%%============================================================
+
+We report a physics-informed machine learning pipeline for predicting thermodynamic
+stability constants of theranostic radiometal--chelator complexes across an
+unprecedented 14-metal, 14-chelator matrix.
+The A2 GBM+DFT model ($R^2 = 0.831 \pm 0.169$, RMSE $= 2.35 \pm 0.93$ log units,
+95\%~CI [0.816, 0.878]) provides reliable $\log K_1$ predictions for clinical
+radiometals (Lu$^{3+}$, Ga$^{3+}$, Y$^{3+}$, Ac$^{3+}$, Bi$^{3+}$, Cu$^{2+}$, Pb$^{2+}$)
+with physics-informed descriptor design grounded in HSAB theory,\cite{Pearson1963,Parr1983,Hancock1989}
+coordination geometry,\cite{Shannon1976} and DFT interaction
+energetics.\cite{Becke1993,LeeYangParr1988,Grimme2010,Weigend2005,Barone1998}
+
+The three-tier LOMO-CV extrapolation framework translates model confidence directly
+into experimental resource allocation: La$^{3+}$, Ac$^{3+}$, and Y$^{3+}$
+predictions are suitable for direct computational screening in the interpolation
+domain, while out-of-domain metals (Ga$^{3+}$, Cu$^{2+}$, Bi$^{3+}$) require
+targeted active learning campaigns\cite{Lookman2019} augmented with dedicated
+potentiometric measurements.
+The physics-constrained VH-NN bridges radiolabeling conditions (65--95\,$^\circ$C)
+and in vivo stability assessment (37\,$^\circ$C) within a single thermodynamically
+self-consistent model, providing the first ML framework that is directly applicable
+to the full clinical temperature range.
+
+SHAP analysis quantitatively validates LFER-based coordination chemistry
+theory:\cite{Hancock1989,MartellSmith2004} the log$K_1$ (EDTA reference) alone
+accounts for 39.6\% of prediction variance, with macrocyclic geometry features
+collectively contributing an additional 28.0\%.
+Cross-study DFT validation (Spearman $\rho = 0.81$, $p = 0.015$, $n = 8$;
+Table~S10)\cite{Kim2026molpharm} establishes that DFT $E_\mathrm{int}$
+rank-orders thermodynamic stability with statistical significance across hybrid
+functionals, confirming $E_\mathrm{int}$ as a physically meaningful and
+transferable descriptor for radiometal--chelator design.
+The joint evidence from SHAP attribution, cross-chelator $E_\mathrm{int}$
+classification (NOTA--Lu$^{3+}$: $-1.22$~eV $\to \log K_1 = 12.0$;
+DOTA--Lu$^{3+}$: $-4.99$~eV $\to \log K_1 = 25.0$), and DFT bond-length
+validation (mean deviation $0.02$--$0.05$~\AA; Table~S9) together constitute the
+most comprehensive computational evidence base yet assembled for physics-informed
+$\log K_1$ prediction in radiopharmaceutical chelator design.
+The hydroxamate-macrocyclic hybrid scaffold identified by SHAP-guided inverse
+design (predicted $\log K_1 = 26.0$, exceeding the DOTA-Lu benchmark)
+constitutes a specific, falsifiable computational prediction;
+experimental synthesis and stability characterization of this scaffold
+are currently in preparation.\cite{Hu2022,Morgan2023,Herrmann2020}
+
+Several limitations of the present study warrant explicit acknowledgement.
+Metals with fewer than five training entries --- Zr$^{4+}$ ($n = 2$) and
+Ba$^{2+}$ ($n = 4$) --- show the highest out-of-fold prediction errors;
+their $\log K_1$ estimates should be regarded as qualitative guides requiring
+experimental validation before synthetic commitment.
+The constant-$\Delta H^\circ$ van't~Hoff assumption introduces errors below
+$\pm 0.1$~log units for the enthalpically dominated systems studied here,
+but may underperform for macrocyclic systems with significant heat capacity
+changes above 65\,$^\circ$C.\cite{Blei2023}
+The descriptor set does not encode kinetic inertness, a property mechanistically
+distinct from thermodynamic stability and critical for in vivo performance;
+\cite{Notni2010,Wadas2010}
+incorporation of formation and dissociation rate constants remains an open
+challenge for future model iterations.
+
+The open-source dataset (140 + 60 entries), analysis pipeline, and all trained models
+are provided in Supporting Information (Code~S1) to enable community extension to
+additional metal--chelator systems, larger combinatorial libraries, and integration
+with automated ligand synthesis platforms.\cite{Karunaratne2025,Ozturk2024}
+By compressing the experimental discovery timeline from years to weeks ---
+pre-screening 196+ metal--chelator combinations in under one CPU-second and
+identifying high-confidence targets before any synthesis is undertaken ---
+the present pipeline directly addresses the drug-development bottleneck
+that limits timely translation of newly approved radionuclides
+(e.g., $^{212}$Pb, $^{161}$Tb, $^{149}$Tb) into clinical candidates.
+
+%%============================================================
+\begin{acknowledgement}
+This work was supported by the National Research Foundation of Korea (NRF) grant
+funded by the Korean Government (MSIT) (Grant No.~RS-2023-00245928).
+Computational resources were provided by the Korea Institute of Science and
+Technology Information (KISTI) National Supercomputing Center under
+allocation No.~KSC-2024-CRE-0001.
+The authors thank the developers of ORCA,\cite{Neese2020}
+scikit-learn,\cite{Pedregosa2011} PyTorch,\cite{Paszke2019}
+and the \texttt{shap} package\cite{Lundberg2017}
+for making their software freely available.
+\end{acknowledgement}
+
+%%============================================================
+\begin{suppinfo}
+The following Supporting Information is available free of charge at
+\url{https://pubs.acs.org/doi/...}:
+Table~S1 (physics-informed descriptor definitions and literature sources);
+Table~S2 (full 140-entry $\log K_1$ dataset with source codes);
+Table~S3 (ITC-derived $\Delta H^\circ$ and $\Delta S^\circ$ for 12 metal--chelator pairs);
+Table~S4 (VH-NN predicted $\Delta H^\circ$/$\Delta S^\circ$ vs.\ ITC benchmarks);
+Table~S5 (complete LOMO-CV $R^2$ for models A0--A4, all metals);
+Table~S6 (SHAP importance values, all features);
+Figure~S1 (residual diagnostic plots and Q--Q normality test);
+Figure~S2 (SHAP beeswarm plot, full 11-feature, $n = 140$ distribution);
+Table~S7 (VH-NN hyperparameter summary);
+Table~S8 (sensitivity analysis: A2 GBM+DFT performance on experimentally
+measured entries only, $n = 57$);
+Table~S9 (DFT geometry validation: computed vs.\ experimental DOTA--metal
+bond lengths for Ga$^{3+}$, Lu$^{3+}$, Y$^{3+}$;\cite{Kim2026molpharm}
+mean deviation $0.02$--$0.05$~\AA);
+Table~S10 (cross-study DFT--experiment validation: $E_\mathrm{int}$ from
+Kim et al.\cite{Kim2026molpharm} vs.\ $\log K_1$ (this work), $n = 14$
+metal--chelator pairs, two chelators, Spearman $\rho = 0.81$ for DOTA series);
+Code~S1 (\texttt{analysis\_main.py}: full Python analysis pipeline with
+\texttt{requirements.txt}; seeds $= 7$; reproduces all main-text figures and tables).
+\end{suppinfo}
+
+\bibliography{myref}
+
+\end{document}

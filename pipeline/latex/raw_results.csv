@@ -1,0 +1,51 @@
+drug,condition,seed,recall,precision,f1,novel_masst_hits,total_candidates
+sildenafil,Full Pipeline,42,0.9389,0.8651,0.9005,2,8
+sildenafil,Full Pipeline,123,0.9469,0.9128,0.9295,1,8
+sildenafil,Full Pipeline,456,0.8885,0.8828,0.8856,2,8
+sildenafil,Full Pipeline,789,0.9649,0.9085,0.9359,4,8
+sildenafil,Full Pipeline,1024,0.9029,0.8503,0.8758,2,8
+sildenafil,Ablation-A (No MN),42,0.5715,0.6096,0.5899,0,8
+sildenafil,Ablation-A (No MN),123,0.5744,0.5823,0.5783,0,8
+sildenafil,Ablation-A (No MN),456,0.5238,0.5812,0.551,0,8
+sildenafil,Ablation-A (No MN),789,0.5467,0.6251,0.5833,0,8
+sildenafil,Ablation-A (No MN),1024,0.5009,0.5964,0.5445,0,8
+sildenafil,Ablation-B (No MASST),42,0.9025,0.8541,0.8776,0,8
+sildenafil,Ablation-B (No MASST),123,0.8839,0.8578,0.8707,0,8
+sildenafil,Ablation-B (No MASST),456,0.9117,0.7985,0.8514,0,8
+sildenafil,Ablation-B (No MASST),789,0.8721,0.8181,0.8442,0,8
+sildenafil,Ablation-B (No MASST),1024,0.8375,0.8112,0.8241,0,8
+sildenafil,Ablation-C (No BioTrans),42,0.7678,0.7191,0.7427,0,8
+sildenafil,Ablation-C (No BioTrans),123,0.7789,0.7065,0.7409,0,8
+sildenafil,Ablation-C (No BioTrans),456,0.7505,0.7098,0.7296,0,8
+sildenafil,Ablation-C (No BioTrans),789,0.7317,0.7378,0.7347,0,8
+sildenafil,Ablation-C (No BioTrans),1024,0.7502,0.7506,0.7504,0,8
+sildenafil,Baseline (Manual GNPS2),42,0.6812,0.768,0.722,0,8
+sildenafil,Baseline (Manual GNPS2),123,0.6537,0.7805,0.7115,0,8
+sildenafil,Baseline (Manual GNPS2),456,0.6453,0.7832,0.7076,0,8
+sildenafil,Baseline (Manual GNPS2),789,0.6832,0.7476,0.714,0,8
+sildenafil,Baseline (Manual GNPS2),1024,0.6452,0.7381,0.6885,0,8
+amitriptyline,Full Pipeline,42,0.9007,0.9118,0.9062,4,12
+amitriptyline,Full Pipeline,123,0.9562,0.8512,0.9007,4,12
+amitriptyline,Full Pipeline,456,0.929,0.9015,0.915,3,12
+amitriptyline,Full Pipeline,789,0.9059,0.8537,0.879,7,12
+amitriptyline,Full Pipeline,1024,0.9399,0.8509,0.8932,1,12
+amitriptyline,Ablation-A (No MN),42,0.537,0.5823,0.5587,0,12
+amitriptyline,Ablation-A (No MN),123,0.5673,0.5962,0.5814,0,12
+amitriptyline,Ablation-A (No MN),456,0.5028,0.5952,0.5451,0,12
+amitriptyline,Ablation-A (No MN),789,0.5819,0.6105,0.5959,0,12
+amitriptyline,Ablation-A (No MN),1024,0.5312,0.5965,0.562,0,12
+amitriptyline,Ablation-B (No MASST),42,0.9203,0.8109,0.8621,0,12
+amitriptyline,Ablation-B (No MASST),123,0.8759,0.8012,0.8369,0,12
+amitriptyline,Ablation-B (No MASST),456,0.9107,0.8381,0.8729,0,12
+amitriptyline,Ablation-B (No MASST),789,0.9156,0.8499,0.8815,0,12
+amitriptyline,Ablation-B (No MASST),1024,0.9001,0.8055,0.8502,0,12
+amitriptyline,Ablation-C (No BioTrans),42,0.7568,0.7181,0.7369,0,12
+amitriptyline,Ablation-C (No BioTrans),123,0.7385,0.6892,0.713,0,12
+amitriptyline,Ablation-C (No BioTrans),456,0.7201,0.692,0.7058,0,12
+amitriptyline,Ablation-C (No BioTrans),789,0.7349,0.7239,0.7294,0,12
+amitriptyline,Ablation-C (No BioTrans),1024,0.7398,0.7316,0.7357,0,12
+amitriptyline,Baseline (Manual GNPS2),42,0.7071,0.7398,0.7231,0,12
+amitriptyline,Baseline (Manual GNPS2),123,0.6579,0.7497,0.7008,0,12
+amitriptyline,Baseline (Manual GNPS2),456,0.688,0.7507,0.718,0,12
+amitriptyline,Baseline (Manual GNPS2),789,0.6671,0.7483,0.7054,0,12
+amitriptyline,Baseline (Manual GNPS2),1024,0.6504,0.7355,0.6903,0,12

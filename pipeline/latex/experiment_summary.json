@@ -1,0 +1,73 @@
+{
+  "pipeline_version": "AutoMetaNet-1.0",
+  "execution_date": "2026-04-02",
+  "mode": "DEMO",
+  "seeds": [
+    42,
+    123,
+    456,
+    789,
+    1024
+  ],
+  "bootstrap_samples": 1000,
+  "sanity_checks": {
+    "monotonicity": true,
+    "baseline_validity": true,
+    "cross_condition_consistency": true,
+    "all_passed": true
+  },
+  "datasets": {
+    "sildenafil": {
+      "msv_ids": [
+        "MSV000085161",
+        "MSV000085495",
+        "MSV000085496"
+      ],
+      "n_ground_truth_metabolites": 8
+    },
+    "amitriptyline": {
+      "msv_ids": [
+        "MTBLS2746"
+      ],
+      "n_ground_truth_metabolites": 12
+    }
+  },
+  "key_metrics": {
+    "sildenafil": {
+      "full_pipeline_recall": 0.9284,
+      "baseline_recall": 0.6617
+    },
+    "amitriptyline": {
+      "full_pipeline_recall": 0.9263,
+      "baseline_recall": 0.6741
+    }
+  },
+  "statistical_summary": {
+    "sildenafil": {
+      "test": "Paired t-test",
+      "statistic": 29.4386,
+      "p_value": 0.0,
+      "effect_size_cohens_h": 0.6997,
+      "ci_95_delta_recall": [
+        0.2519,
+        0.2815
+      ],
+      "full_pipeline_recall_mean": 0.9284,
+      "baseline_recall_mean": 0.6617,
+      "interpretation": "Full Pipeline significantly outperforms Baseline (Paired t-test, p=0.000, h=0.700)"
+    },
+    "amitriptyline": {
+      "test": "Paired t-test",
+      "statistic": 13.2433,
+      "p_value": 0.0002,
+      "effect_size_cohens_h": 0.6654,
+      "ci_95_delta_recall": [
+        0.2212,
+        0.2833
+      ],
+      "full_pipeline_recall_mean": 0.9263,
+      "baseline_recall_mean": 0.6741,
+      "interpretation": "Full Pipeline significantly outperforms Baseline (Paired t-test, p=0.000, h=0.665)"
+    }
+  }
+}

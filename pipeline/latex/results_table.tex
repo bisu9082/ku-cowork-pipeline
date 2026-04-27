@@ -1,0 +1,23 @@
+\begin{table}[htbp]
+\centering
+\caption{Ablation study results: mean $\pm$ SD of Recall, Precision, and F$_1$ across five random seeds (n=5). Full Pipeline vs. Baseline comparison: Sildenafil $p=0.0$, Cohen's $h=0.6997$; Amitriptyline $p=0.0002$, $h=0.6654$.}
+\label{tab:ablation}
+\begin{tabular}{llccc}
+\toprule
+Drug & Condition & Recall & Precision & F$_1$ \\
+\midrule
+\multirow{5}{*}{Sildenafil} & \textbf{Full Pipeline} & \textbf{0.928$\pm$0.032} & \textbf{0.884$\pm$0.027} & \textbf{0.905$\pm$0.026} \\
+ & Ablation-A (No MN) & 0.543$\pm$0.031 & 0.599$\pm$0.019 & 0.569$\pm$0.020 \\
+ & Ablation-B (No MASST) & 0.882$\pm$0.029 & 0.828$\pm$0.027 & 0.854$\pm$0.021 \\
+ & Ablation-C (No BioTrans) & 0.756$\pm$0.018 & 0.725$\pm$0.019 & 0.740$\pm$0.008 \\
+ & Baseline (Manual GNPS2) & 0.662$\pm$0.019 & 0.763$\pm$0.020 & 0.709$\pm$0.012 \\
+\midrule
+\multirow{5}{*}{Amitriptyline} & \textbf{Full Pipeline} & \textbf{0.926$\pm$0.023} & \textbf{0.874$\pm$0.030} & \textbf{0.899$\pm$0.014} \\
+ & Ablation-A (No MN) & 0.544$\pm$0.031 & 0.596$\pm$0.010 & 0.569$\pm$0.020 \\
+ & Ablation-B (No MASST) & 0.905$\pm$0.018 & 0.821$\pm$0.022 & 0.861$\pm$0.018 \\
+ & Ablation-C (No BioTrans) & 0.738$\pm$0.013 & 0.711$\pm$0.019 & 0.724$\pm$0.014 \\
+ & Baseline (Manual GNPS2) & 0.674$\pm$0.023 & 0.745$\pm$0.007 & 0.708$\pm$0.013 \\
+\midrule
+\bottomrule
+\end{tabular}
+\end{table}

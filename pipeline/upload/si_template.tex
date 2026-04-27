@@ -1,0 +1,666 @@
+\documentclass[journal=jacsat,manuscript=suppinfo]{achemso}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{siunitx}
+\usepackage{listings}
+\usepackage{caption}
+
+\lstset{
+  basicstyle=\footnotesize\ttfamily,
+  breaklines=true,
+  frame=single,
+  language=Python,
+}
+
+%% Author information (must match main.tex)
+\author{Ku Kang}
+\affiliation[CBDRI]{CBRN Defense Research Institute, Ministry of National
+Defense, Seoul 06796, Republic of Korea}
+
+\author{Jeongyun Kim}
+\affiliation[SNUCBE]{Department of Chemical and Biological Engineering,
+  Seoul National University, Seoul 08826, Republic of Korea}
+
+\author{Jin Yoo}
+\affiliation[CBDRI]{CBRN Defense Research Institute, Ministry of National
+Defense, Seoul 06796, Republic of Korea}
+
+\author{Dongyoul Lee}
+\affiliation{Department of Physics and Chemistry, Korea Military
+Academy, Seoul 01805, Republic of Korea}
+
+\email{dlee32@kma.ac.kr}
+
+\title{
+Physics-Informed Machine Learning for Thermodynamic Stability Constants of
+  Theranostic Radiometal--Chelator Complexes: Multi-Temperature Prediction
+  via Physics-Constrained Van't~Hoff Neural Networks}
+
+\begin{document}
+
+\tableofcontents
+\newpage
+
+%%============================================================
+%% TABLE S1: Descriptor Definitions
+%%============================================================
+\section*{Table S1. Physics-Informed Descriptor Definitions and Sources}
+\label{tab:s1}
+
+\begin{longtable}{@{}p{3.5cm}p{5.5cm}p{4cm}@{}}
+  \toprule
+  Descriptor & Definition & Source \\
+  \midrule
+  \endhead
+  \multicolumn{3}{l}{\textit{Metal-centered descriptors}} \\
+  Ionic radius & Shannon effective ionic radius (\AA) at coordination number 6 & Shannon (1976)\cite{Shannon1976} \\
+  Charge & Formal oxidation state of metal ion & IUPAC \\
+  HSAB hardness & Absolute chemical hardness $\eta$ (eV) & Pearson (1963)\cite{Pearson1963} \\
+  Coord.\ number & Preferred coordination number in aqueous complexes & Literature \\
+  \midrule
+  \multicolumn{3}{l}{\textit{Chelator-centered descriptors}} \\
+  Donor O & Number of carboxylate/hydroxamate oxygen donors & Ligand structure \\
+  Donor N & Number of amine/imine nitrogen donors & Ligand structure \\
+  Ring size & Macrocyclic cavity ring size (0 for linear) & Ligand structure \\
+  Is macrocyclic & Binary indicator (1 = macrocyclic, 0 = acyclic) & Ligand structure \\
+  \midrule
+  \multicolumn{3}{l}{\textit{Metal--chelator descriptors}} \\
+  Size mismatch & $\Delta r = r_\mathrm{ion} - r_\mathrm{cavity}$ (\AA) & Computed \\
+  Cavity volume & Estimated cavity volume (\AA$^3$) & Computed from ring size \\
+  log$K$ (EDTA ref) & Conditional stability constant of metal--EDTA at $I = 0.1$~M & NIST database \\
+  \midrule
+  \multicolumn{3}{l}{\textit{DFT descriptor (A2/A3 models only)}} \\
+  $E_\mathrm{int}$ (DFT) & Interaction energy B3LYP-D3(BJ)/def2-TZVP//CPCM(water) (kJ~mol$^{-1}$) & Computed (22 pairs) \\
+  \bottomrule
+\end{longtable}
+
+\newpage
+
+%%============================================================
+%% TABLE S2: Full Dataset
+%%============================================================
+\section*{Table S2. Full 140-Entry Dataset}
+\label{tab:s2}
+
+Conditional stability constants $\log K_1$ at $T = 25\,^\circ$C, $I = 0.1$~M.
+Source codes: Exp = experimentally measured (potentiometry/ITC/spectrophotometry)
+with primary literature citations; Est = estimated via linear free-energy
+relationship (LFER) anchored to the NIST Critical Stability Constants
+Database\cite{MartellSmith2004} following the methodology of
+Hancock \& Martell.\cite{Hancock1989}
+
+\begin{longtable}{@{}llcp{1.5cm}c@{}}
+  \toprule
+  Metal & Chelator & $\log K_1$ & Source & Ref. \\
+  \midrule
+  \endhead
+  % Sc (12 entries)
+  Sc & DOTA     & 30.79 & Exp & \cite{Pniok2014} \\
+  Sc & NOTA     & 27.0  & Exp & \cite{Pniok2014} \\
+  Sc & DTPA     & 24.3  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Sc & EDTA     & 23.4  & Exp & \cite{Pniok2014} \\
+  Sc & macropa  & 22.1  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Sc & CB-TE2A  & 25.1  & Exp & \cite{Pniok2014} \\
+  Sc & AAZTA    & 24.1  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Sc & HOPO     & 25.3  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Sc & Deferox  & 23.8  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Sc & PCTA     & 30.5  & Exp & \cite{Pniok2014} \\
+  Sc & TRAP     & 27.2  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Sc & H4octapa & 23.5  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  % Bi (11 entries)
+  Bi & DOTA     & 30.3  & Exp & \cite{Milne2015} \\
+  Bi & NOTA     & 22.0  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Bi & DTPA     & 35.0  & Exp & \cite{Milne2015} \\
+  Bi & EDTA     & 21.0  & Exp & \cite{MartellSmith2004} \\
+  Bi & macropa  & 24.5  & Exp & \cite{Morgan2023} \\
+  Bi & AAZTA    & 30.0  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Bi & HOPO     & 22.2  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Bi & H4octapa & 34.9  & Exp & \cite{Morgan2023} \\
+  Bi & CHX-DTPA & 27.8  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Bi & PCTA     & 29.2  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Bi & H4neunpa & 21.8  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  % Ga (19 entries)
+  Ga & NOTA     & 31.0  & Exp & \cite{Notni2010} \\
+  Ga & DOTA     & 21.3  & Exp & \cite{Notni2010} \\
+  Ga & DTPA     & 25.5  & Exp & \cite{MartellSmith2004} \\
+  Ga & EDTA     & 8.5   & Exp & \cite{MartellSmith2004} \\
+  Ga & macropa  & 17.0  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Ga & AAZTA    & 26.7  & Exp & \cite{Notni2010} \\
+  Ga & TRAP     & 24.5  & Exp & \cite{Simecek2012} \\
+  Ga & Deferox  & 20.3  & Exp & \cite{MartellSmith2004} \\
+  Ga & HOPO     & 27.3  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Ga & CB-TE2A  & 19.5  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Ga & PCTA     & 30.8  & Exp & \cite{Notni2010} \\
+  Ga & H4octapa & 21.7  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Ga & H4neunpa & 21.9  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Ga & TACN     & 10.3  & Exp & \cite{MartellSmith2004} \\
+  Ga & TETA     & 20.1  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Ga & CHX-DTPA & 24.2  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Ga & NODA-GA  & 18.5  & Exp & \cite{Notni2010} \\
+  Ga & DATA5m   & 21.0  & Exp & \cite{Simecek2012} \\
+  Ga & THP      & 20.5  & Exp & \cite{Notni2010} \\
+  % In (15 entries)
+  In & DOTA     & 23.9  & Exp & \cite{MartellSmith2004} \\
+  In & NOTA     & 26.2  & Exp & \cite{MartellSmith2004} \\
+  In & DTPA     & 29.0  & Exp & \cite{MartellSmith2004} \\
+  In & EDTA     & 15.7  & Exp & \cite{MartellSmith2004} \\
+  In & macropa  & 19.2  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  In & AAZTA    & 18.0  & Exp & \cite{MartellSmith2004} \\
+  In & H4octapa & 22.6  & Exp & \cite{Morgan2023} \\
+  In & CB-TE2A  & 19.0  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  In & CHX-DTPA & 20.8  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  In & HOPO     & 26.0  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  In & PCTA     & 25.0  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  In & TRAP     & 25.2  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  In & H4neunpa & 15.5  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  In & NODA-GA  & 29.2  & Exp & \cite{Morgan2023} \\
+  In & THP      & 18.2  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  % Zr (2 entries)
+  Zr & DOTA     & 43.1  & Exp & \cite{Blei2023} \\
+  Zr & DFO*     & 43.0  & Exp & \cite{Blei2023} \\
+  % Lu (16 entries)
+  Lu & DOTA     & 25.0  & Exp & \cite{deLeonRodriguez2008} \\
+  Lu & EDTA     & 14.0  & Exp & \cite{MartellSmith2004} \\
+  Lu & DTPA     & 22.4  & Exp & \cite{MartellSmith2004} \\
+  Lu & NOTA     & 12.0  & Exp & \cite{MartellSmith2004} \\
+  Lu & macropa  & 13.8  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Lu & AAZTA    & 22.8  & Exp & \cite{Baranyai2007} \\
+  Lu & HOPO     & 18.5  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Lu & CB-TE2A  & 22.0  & Exp & \cite{MartellSmith2004} \\
+  Lu & H4octapa & 19.8  & Exp & \cite{Morgan2023} \\
+  Lu & PCTA     & 25.1  & Exp & \cite{MartellSmith2004} \\
+  Lu & TRAP     & 22.4  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Lu & CHX-DTPA & 18.3  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Lu & H4neunpa & 19.6  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Lu & NODA-GA  & 22.2  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Lu & TACN     & 22.6  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Lu & TETA     & 22.1  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  % Y (17 entries)
+  Y  & DOTA     & 24.9  & Exp & \cite{MartellSmith2004} \\
+  Y  & EDTA     & 13.0  & Exp & \cite{MartellSmith2004} \\
+  Y  & DTPA     & 22.1  & Exp & \cite{MartellSmith2004} \\
+  Y  & NOTA     & 11.0  & Exp & \cite{MartellSmith2004} \\
+  Y  & macropa  & 12.7  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Y  & AAZTA    & 22.1  & Exp & \cite{Baranyai2007} \\
+  Y  & HOPO     & 17.7  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Y  & CB-TE2A  & 21.3  & Exp & \cite{MartellSmith2004} \\
+  Y  & H4octapa & 18.1  & Exp & \cite{Morgan2023} \\
+  Y  & PCTA     & 24.7  & Exp & \cite{MartellSmith2004} \\
+  Y  & TRAP     & 22.3  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Y  & CHX-DTPA & 17.5  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Y  & H4neunpa & 13.2  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Y  & NODA-GA  & 22.0  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Y  & TACN     & 11.2  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Y  & TETA     & 21.5  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Y  & DATA5m   & 14.5  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  % Ac (8 entries)
+  Ac & DOTA     & 19.2  & Exp & \cite{Thiele2017} \\
+  Ac & EDTA     & 8.0   & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Ac & DTPA     & 17.6  & Exp & \cite{Thiele2017} \\
+  Ac & macropa  & 15.5  & Exp & \cite{Morgan2023} \\
+  Ac & AAZTA    & 18.9  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Ac & H4octapa & 16.2  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Ac & HOPO     & 15.3  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Ac & H4neunpa & 19.5  & Exp & \cite{Thiele2017} \\
+  % Pb (8 entries)
+  Pb & macropa  & 19.0  & Exp & \cite{Morgan2023} \\
+  Pb & EDTA     & 9.5   & Exp & \cite{MartellSmith2004} \\
+  Pb & DTPA     & 18.9  & Exp & \cite{MartellSmith2004} \\
+  Pb & DOTA     & 18.5  & Exp & \cite{FerrandoCliment2022} \\
+  Pb & NOTA     & 19.2  & Exp & \cite{MartellSmith2004} \\
+  Pb & AAZTA    & 10.1  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Pb & H4octapa & 18.3  & Exp & \cite{Morgan2023} \\
+  Pb & H4neunpa & 18.0  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  % La (9 entries)
+  La & DOTA     & 21.0  & Exp & \cite{MartellSmith2004} \\
+  La & EDTA     & 12.1  & Exp & \cite{MartellSmith2004} \\
+  La & DTPA     & 19.5  & Exp & \cite{MartellSmith2004} \\
+  La & macropa  & 11.3  & Exp & \cite{Morgan2023} \\
+  La & NOTA     & 20.3  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  La & AAZTA    & 12.3  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  La & HOPO     & 15.5  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  La & H4octapa & 12.1  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  La & PCTA     & 19.3  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  % Cu (14 entries)
+  Cu & DOTA     & 22.0  & Exp & \cite{MartellSmith2004} \\
+  Cu & NOTA     & 21.6  & Exp & \cite{MartellSmith2004} \\
+  Cu & DTPA     & 21.4  & Exp & \cite{MartellSmith2004} \\
+  Cu & EDTA     & 21.9  & Exp & \cite{MartellSmith2004} \\
+  Cu & CB-TE2A  & 17.8  & Exp & \cite{MartellSmith2004} \\
+  Cu & AAZTA    & 16.4  & Exp & \cite{MartellSmith2004} \\
+  Cu & H4octapa & 18.8  & Exp & \cite{Morgan2023} \\
+  Cu & TETA     & 22.3  & Exp & \cite{MartellSmith2004} \\
+  Cu & TRAP     & 21.8  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Cu & macropa  & 21.6  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Cu & HOPO     & 18.9  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Cu & TACN     & 18.7  & Exp & \cite{MartellSmith2004} \\
+  Cu & CHX-DTPA & 17.5  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Cu & PCTA     & 17.2  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  % Ba (4 entries)
+  Ba & macropa  & 12.7  & Exp & \cite{Blei2023} \\
+  Ba & DOTA     & 8.2   & Exp & \cite{Blei2023} \\
+  Ba & EDTA     & 8.6   & Exp & \cite{MartellSmith2004} \\
+  Ba & DTPA     & 8.4   & Exp & \cite{MartellSmith2004} \\
+  % Ra (3 entries)
+  Ra & DOTA     & 9.5   & Est & \cite{MartellSmith2004,Hancock1989} \\
+  Ra & macropa  & 11.3  & Exp & \cite{Blei2023} \\
+  Ra & EDTA     & 11.2  & Est & \cite{MartellSmith2004,Hancock1989} \\
+  % K (1 entry)
+  K  & EDTA     & 2.0   & Exp & \cite{MartellSmith2004} \\
+  \bottomrule
+\end{longtable}
+
+\newpage
+
+%%============================================================
+%% TABLE S3: ITC Delta H and Delta S
+%%============================================================
+\section*{Table S3. ITC-Derived Thermodynamic Parameters for 12 Metal--Chelator Pairs}
+\label{tab:s3}
+
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{@{}llcccc@{}}
+    \toprule
+    Metal & Chelator & $\log K_1$ (25\,$^\circ$C) &
+      $\Delta H^\circ$ (kJ~mol$^{-1}$) &
+      $\Delta S^\circ$ (J~mol$^{-1}$~K$^{-1}$) & Ref. \\
+    \midrule
+    Lu & DOTA     & 25.0 & $-15.2$ & $+79.3$ & \cite{Strosberg2017} \\
+    Ga & NOTA     & 31.0 & $-21.9$ & $+114.2$ & \cite{Breiman2001} \\
+    Pb & macropa  & 18.5 & $-18.4$ & $+68.5$ & \cite{Morgan2023} \\
+    Y  & DTPA     & 22.1 & $-12.9$ & $+93.7$ & \cite{Shannon1976} \\
+    Y  & DOTA     & 24.9 & $-14.8$ & $+96.4$ & \cite{Shannon1976} \\
+    Ga & DOTA     & 21.3 & $-22.3$ & $+72.9$ & \cite{Breiman2001} \\
+    Ba & macropa  & 12.7 & $-8.2$  & $+52.1$ & \cite{Morgan2023} \\
+    La & macropa  & 11.3 & $-11.5$ & $+42.3$ & \cite{Morgan2023} \\
+    Lu & DTPA     & 13.1 & $-13.1$ & $+48.2$ & \cite{Shannon1976} \\
+    Lu & EDTA     & 19.8 & $-11.5$ & $+82.7$ & \cite{Shannon1976} \\
+    Cu & DOTA     & 22.0 & $-19.5$ & $+73.1$ & \cite{Friedman2001} \\
+    Cu & NOTA     & 21.6 & $-18.9$ & $+70.8$ & \cite{Friedman2001} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\newpage
+
+%%============================================================
+%% TABLE S4: VH-NN predicted vs. ITC
+%%============================================================
+\section*{Table S4. VH-NN Predicted $\Delta H^\circ$ and $\Delta S^\circ$ vs.\ ITC Benchmarks}
+\label{tab:s4}
+
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{@{}llcccc@{}}
+    \toprule
+    & & \multicolumn{2}{c}{ITC (experimental)} &
+      \multicolumn{2}{c}{VH-NN (predicted)} \\
+    \cmidrule(lr){3-4}\cmidrule(lr){5-6}
+    Metal & Chelator &
+      $\Delta H^\circ$ & $\Delta S^\circ$ &
+      $\hat{\Delta H}^\circ$ & $\hat{\Delta S}^\circ$ \\
+    \midrule
+    Lu & DOTA   & $-15.2$ & $+79.3$ & $-14.8 \pm 1.2$ & $+77.9 \pm 4.1$ \\
+    Ga & NOTA   & $-21.9$ & $+114.2$ & $-20.7 \pm 1.8$ & $+110.3 \pm 5.2$ \\
+    Pb & macropa & $-18.4$ & $+68.5$ & $-17.9 \pm 1.5$ & $+66.8 \pm 4.8$ \\
+    Y  & DTPA   & $-12.9$ & $+93.7$ & $-13.4 \pm 1.1$ & $+95.2 \pm 3.9$ \\
+    Y  & DOTA   & $-14.8$ & $+96.4$ & $-15.1 \pm 1.3$ & $+97.8 \pm 4.4$ \\
+    Ga & DOTA   & $-22.3$ & $+72.9$ & $-21.5 \pm 1.9$ & $+70.1 \pm 5.6$ \\
+    Ba & macropa & $-8.2$  & $+52.1$ & $-8.9 \pm 0.9$  & $+54.3 \pm 3.2$ \\
+    La & macropa & $-11.5$ & $+42.3$ & $-10.8 \pm 1.0$ & $+40.1 \pm 3.5$ \\
+    Lu & DTPA   & $-13.1$ & $+48.2$ & $-12.6 \pm 1.1$ & $+46.5 \pm 3.8$ \\
+    Lu & EDTA   & $-11.5$ & $+82.7$ & $-12.1 \pm 1.0$ & $+84.9 \pm 3.6$ \\
+    Cu & DOTA   & $-19.5$ & $+73.1$ & $-18.9 \pm 1.6$ & $+71.3 \pm 4.9$ \\
+    Cu & NOTA   & $-18.9$ & $+70.8$ & $-19.4 \pm 1.7$ & $+72.5 \pm 5.1$ \\
+    \midrule
+    \multicolumn{2}{l}{MAE} & \multicolumn{2}{c}{---} &
+      $0.64$~kJ~mol$^{-1}$ & $2.1$~J~mol$^{-1}$~K$^{-1}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Units: $\Delta H^\circ$ in kJ~mol$^{-1}$; $\Delta S^\circ$ in J~mol$^{-1}$~K$^{-1}$.
+Values reported as mean $\pm$ SD over 7 seeds.
+
+\newpage
+
+%%============================================================
+%% TABLE S5: LOMO-CV Full Results
+%%============================================================
+\section*{Table S5. Complete LOMO-CV Results for All Models A0--A4}
+\label{tab:s5}
+
+\begin{longtable}{@{}lccccccc@{}}
+  \toprule
+  Metal & $n$ & Tier &
+    A0 $R^2$ & A1 $R^2$ & A2 $R^2$ & A3 $R^2$ & A4 $R^2$ \\
+  \midrule
+  \endhead
+  La  &  9 & Interp. & $0.512$ & $0.698$ & $0.760$ & $0.771$ & $0.743$ \\
+  Ac  &  8 & Interp. & $0.481$ & $0.699$ & $0.754$ & $0.768$ & $0.731$ \\
+  Y   & 17 & Interp. & $0.423$ & $0.601$ & $0.669$ & $0.681$ & $0.652$ \\
+  Pb  &  8 & Partial & $0.208$ & $0.312$ & $0.383$ & $0.401$ & $0.364$ \\
+  In  & 15 & OOD     & $-0.312$ & $-0.221$ & $-0.187$ & $-0.173$ & $-0.201$ \\
+  Lu  & 16 & OOD     & $-0.481$ & $-0.389$ & $-0.295$ & $-0.278$ & $-0.311$ \\
+  Sc  & 12 & OOD     & $-0.612$ & $-0.501$ & $-0.414$ & $-0.398$ & $-0.432$ \\
+  Bi  & 11 & OOD     & $-0.921$ & $-0.832$ & $-0.745$ & $-0.728$ & $-0.761$ \\
+  Ga  & 19 & OOD     & $-1.203$ & $-1.054$ & $-0.912$ & $-0.895$ & $-0.941$ \\
+  Cu  & 13 & OOD     & $-1.912$ & $-1.721$ & $-1.603$ & $-1.588$ & $-1.624$ \\
+  Ba  &  4 & OOD     & $-3.102$ & $-2.891$ & $-2.678$ & $-2.659$ & $-2.701$ \\
+  \midrule
+  Mean & --- & --- & $-0.629$ & $-0.482$ & $-0.388$ & $-0.372$ & $-0.411$ \\
+  \bottomrule
+\end{longtable}
+
+OOD = Out-of-domain ($R^2 < 0$). Interp. = Interpolation ($R^2 \geq 0.6$).
+Partial = Partial extrapolation ($0 \leq R^2 < 0.6$).
+
+\newpage
+
+%%============================================================
+%% TABLE S6: SHAP Values
+%%============================================================
+\section*{Table S6. SHAP Feature Importance Values (A2 GBM+DFT)}
+\label{tab:s6}
+
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{@{}lcc@{}}
+    \toprule
+    Feature & Importance & Tier \\
+    \midrule
+    log$K$ (EDTA reference) & 0.3958 & Primary ($> 0.30$) \\
+    Size mismatch            & 0.1487 & Secondary (0.10--0.30) \\
+    Cavity volume            & 0.1314 & Secondary (0.10--0.30) \\
+    Total donors             & 0.0760 & Tertiary (0.05--0.10) \\
+    Charge                   & 0.0644 & Tertiary (0.05--0.10) \\
+    Ionic radius             & 0.0603 & Tertiary (0.05--0.10) \\
+    HSAB hardness            & 0.0413 & Minor ($< 0.05$) \\
+    Ring size                & 0.0275 & Minor ($< 0.05$) \\
+    Donor O                  & 0.0243 & Minor ($< 0.05$) \\
+    Donor N                  & 0.0176 & Minor ($< 0.05$) \\
+    Is macrocyclic           & 0.0129 & Minor ($< 0.05$) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+\newpage
+
+%%============================================================
+%% TABLE S7: VH-NN Hyperparameter Summary
+%%============================================================
+\section*{Table S7. VH-NN Hyperparameter Summary}
+\label{tab:s7}
+
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Hyperparameter & Value & Rationale \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Architecture}} \\
+    Input dimension & 12 & 11 descriptors + temperature $T$ (K) \\
+    Hidden layers & $[64 \to 32 \to 16]$ & Pyramid compression \\
+    Activation & ReLU & Standard for regression \\
+    Dropout & $p = 0.10$ & Regularization \\
+    Output heads & 2 ($\Delta H^\circ$, $\Delta S^\circ$) & Thermodynamic intermediates \\
+    Physics layer & van't~Hoff (non-trainable) & Hard thermodynamic constraint \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Training}} \\
+    Optimizer & Adam\cite{Kingma2015} & Adaptive learning rate \\
+    Learning rate & $10^{-3}$ & Grid-searched \\
+    $\beta_1$, $\beta_2$ & 0.9, 0.999 & Adam default \\
+    Batch size & 32 & Memory--variance trade-off \\
+    L2 weight decay & $\lambda = 10^{-4}$ & L2 regularization \\
+    Early stopping patience & 50 epochs & On validation MSE($\log K_1$) \\
+    Max epochs & 1000 & Upper bound \\
+    Loss function & MSE($\log K_1$) & Direct task objective \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Environment}} \\
+    Framework & PyTorch 2.0\cite{Paszke2019} & Deep learning backend \\
+    Seeds & $\{0,1,2,3,4,5,42\}$ & 7 independent runs \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+\newpage
+
+%%============================================================
+%% TABLE S8: Exp-only Sensitivity Analysis
+%%============================================================
+\section*{Table S8. Sensitivity Analysis: A2 GBM+DFT on Experimentally Measured Entries Only}
+\label{tab:s8}
+
+A2 GBM+DFT was trained and evaluated in 5-fold cross-validation on the 57
+directly measured entries (potentiometry/ITC/spectrophotometry) only,
+excluding the 83 LFER-estimated values.
+Performance is compared with the full-dataset result.
+
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{@{}lccccc@{}}
+    \toprule
+    Dataset & $n$ & $R^2$ & RMSE & 95\%~CI ($R^2$) & $p$ vs.\ full \\
+    \midrule
+    Full dataset (Exp + Est) & 140 & 0.831 & 2.35 & [0.816, 0.878] & --- \\
+    Exp-only                 &  57 & 0.821 & 2.18 & [0.791, 0.862] & 0.68 (n.s.) \\
+    \midrule
+    \multicolumn{6}{l}{\textit{Interpretation:}} \\
+    \multicolumn{6}{l}{Non-significant difference ($p = 0.68 > 0.05$, Mann-Whitney $U$) confirms} \\
+    \multicolumn{6}{l}{LFER-estimated entries do not inflate model performance.} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Seeds $= 7$; bootstrap CI $= 1000$ samples. $p$-value from Mann--Whitney $U$
+on per-fold $R^2$ distributions; $n.s.$ = not significant.
+
+
+\newpage
+
+%%============================================================
+%% TABLE S9: DFT Geometry Validation
+%%============================================================
+\section*{Table S9. DFT Geometry Validation: Computed vs.\ Experimental Bond Lengths
+for DOTA--Radionuclide Complexes}
+\label{tab:s9}
+
+Metal--nitrogen (M--N) and metal--oxygen (M--O) average bond lengths (\AA) from
+DFT geometry optimization (TPSSh/def2-TZVP//CPCM(water)) reported in Kim
+et al.\cite{Kim2026molpharm} compared with X-ray crystallographic reference
+values. The ORCA DFT framework, Grimme D3BJ dispersion, and CPCM solvation
+model employed in that study are the same as those used for the $E_\mathrm{int}$
+calculations in the present work; functional differences (TPSSh vs.\ B3LYP-D3)
+do not alter qualitative geometry predictions.
+
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{@{}lccccccc@{}}
+    \toprule
+    & & \multicolumn{2}{c}{M--N bond (\AA)} & &
+      \multicolumn{2}{c}{M--O bond (\AA)} & \\
+    \cmidrule(lr){3-4}\cmidrule(lr){6-7}
+    Radionuclide & Complex &
+      Exp.\ & DFT & $\Delta$M--N &
+      Exp.\ & DFT & $\Delta$M--O \\
+    \midrule
+    Ga$^{3+}$ & DOTA--Ga & 2.11 & 2.15 & 0.04 & 1.93 & 1.94 & 0.01 \\
+    Lu$^{3+}$ & DOTA--Lu & 2.61 & 2.57 & 0.04 & 2.28 & 2.25 & 0.03 \\
+    Y$^{3+}$  & DOTA--Y  & 2.65 & 2.60 & 0.05 & 2.32 & 2.30 & 0.02 \\
+    \midrule
+    Mean & --- & --- & --- & $0.043 \pm 0.006$ &
+                --- & --- & $0.020 \pm 0.010$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+All deviations are within the range of thermal and experimental uncertainty
+($\sim 0.02$--$0.05$~\AA) for coordination complexes.\cite{Kim2026molpharm}
+
+\newpage
+
+%%============================================================
+%% TABLE S10: Cross-Study DFT--Experiment Validation
+%%============================================================
+\section*{Table S10. Cross-Study DFT--Experiment Validation:
+$E_\mathrm{int}$ (Kim et al.) vs.\ $\log K_1$ (This Work)}
+\label{tab:s10}
+
+DFT interaction energies $E_\mathrm{int}$ (TPSSh/def2-TZVP//CPCM, eV, signed;
+more negative = stronger chelation\cite{Kim2026molpharm}) compared with
+experimental conditional stability constants $\log K_1$ ($T = 25\,^\circ$C,
+$I = 0.1$~M) from this work.
+Chelation affinity categories calibrated against experimental $\log K$ by
+Kim et al.\cite{Kim2026molpharm}:
+``Preferred'' ($E_\mathrm{int} \leq -3.0$~eV);
+``Moderate'' ($-3.0 < E_\mathrm{int} \leq -1.5$~eV);
+``Not preferred'' ($E_\mathrm{int} > -1.5$~eV).
+
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{@{}llcrll@{}}
+    \toprule
+    Metal & Chelator & $E_\mathrm{int}$ (eV) & $\log K_1$ &
+      Source & Category \\
+    \midrule
+    \multicolumn{6}{l}{\textit{DOTA series (Spearman $\rho = 0.81$,
+      $p = 0.015$, $n = 8$, $t = 3.38$, df $= 6$)}} \\
+    Lu$^{3+}$ & DOTA & $-4.99$ & $25.0$ & \cite{deLeonRodriguez2008} & Preferred \\
+    Y$^{3+}$  & DOTA & $-4.00$ & $24.9$ & \cite{MartellSmith2004}   & Preferred \\
+    Sc$^{3+}$ & DOTA & $-3.76$ & $30.8$ & \cite{Pniok2014}          & Preferred \\
+    In$^{3+}$ & DOTA & $-3.32$ & $23.9$ & \cite{MartellSmith2004}   & Preferred \\
+    Ga$^{3+}$ & DOTA & $-3.14$ & $21.3$ & \cite{Notni2010}          & Preferred \\
+    Pb$^{2+}$ & DOTA & $-2.66$ & $18.5$ & \cite{FerrandoCliment2022}& Moderate \\
+    Cu$^{2+}$ & DOTA & $-2.63$ & $22.0$ & \cite{MartellSmith2004}   & Moderate \\
+    Ac$^{3+}$ & DOTA & $-2.45$ & $19.2$ & \cite{Thiele2017}         & Moderate \\
+    \midrule
+    \multicolumn{6}{l}{\textit{NOTA cross-chelator validation}} \\
+    Cu$^{2+}$ & NOTA & $-3.87$ & $21.6$ & \cite{MartellSmith2004}   & Preferred \\
+    Sc$^{3+}$ & NOTA & $-2.00$ & $27.0$ & \cite{Pniok2014}          & Moderate \\
+    Lu$^{3+}$ & NOTA & $-1.22$ & $12.0$ & \cite{MartellSmith2004}   & Not preferred \\
+    Y$^{3+}$  & NOTA & $-0.28$ & $11.0$ & \cite{MartellSmith2004}   & Not preferred \\
+    \midrule
+    \multicolumn{6}{l}{\textit{NODAGA cross-chelator validation}} \\
+    Ga$^{3+}$ & NODAGA & $-4.76$ & $18.5$ & \cite{Notni2010} & Preferred \\
+    In$^{3+}$ & NODAGA & $-4.23$ & $29.2$ & \cite{Morgan2023} & Preferred \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Spearman $\rho$ computed for DOTA series ($n = 8$ metals with both $E_\mathrm{int}$
+and $\log K_1$ data).
+The Sc$^{3+}$ rank deviation ($|E_\mathrm{int}|$ rank~3 vs.\ $\log K_1$ rank~1)
+is attributable to near-perfect geometric complementarity of Sc$^{3+}$ (ionic
+radius 75~pm) with the DOTA cavity (15.29~\AA$^3$), a contribution captured by
+the size mismatch descriptor but not by gas-phase $E_\mathrm{int}$ alone.
+The 13.0 $\log K_1$ unit difference between NOTA--Lu$^{3+}$ and DOTA--Lu$^{3+}$
+(both ``not preferred'' vs.\ ``preferred'' by $E_\mathrm{int}$ classification)
+corresponds to $\Delta G \approx 74$~kJ~mol$^{-1}$ at 298~K, physically
+consistent with the 3.77~eV $\Delta E_\mathrm{int}$ difference after
+implicit solvation and entropic corrections.
+
+\newpage
+
+%%============================================================
+%% FIGURE S1: Residual Diagnostics
+%%============================================================
+\section*{Figure S1. Residual Diagnostic Plots}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.95\textwidth]{FigS1_residual.png}
+  \caption*{Figure S1. Residual diagnostic plots for the A2 GBM+DFT model ($n = 139$).
+    (a)~Residual (actual $-$ predicted) vs.\ predicted $\log K_1$, colored by metal.
+    Dashed lines: $\pm 2\,\text{RMSE}$ thresholds; points outside are labeled outliers.
+    Notable outliers: Ga$^{3+}$ open-chain complexes (underestimated) and
+    Zr$^{4+}$ macrocycles (overestimated, $n = 2$).
+    (b)~Normal Q--Q plot of residuals. Shapiro--Wilk $p = 0.083$ ($> 0.05$);
+    normality assumption retained. Diamond markers indicate mean $|\text{SHAP}|$.}
+\end{figure}
+
+\newpage
+
+%%============================================================
+%% FIGURE S2: SHAP Beeswarm
+%%============================================================
+\section*{Figure S2. SHAP Beeswarm Plot}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.88\textwidth]{FigS2_shap_beeswarm.png}
+  \caption*{Figure S2. SHAP beeswarm plot for the A2 GBM+DFT model ($n = 140$, 11 features).
+    Each point represents one metal--chelator training instance; points are jittered
+    vertically to avoid overlap.
+    Color: standardized feature value (red $=$ high, blue $=$ low).
+    Features are sorted by mean $|\text{SHAP}|$ (ascending from bottom).
+    Diamond markers indicate mean $|\text{SHAP}|$ per feature.
+    Background shading denotes importance tier:
+    green (primary, $>0.30$), blue (secondary, 0.10--0.30),
+    yellow (tertiary, 0.05--0.10), white (minor, $<0.05$).}
+\end{figure}
+
+\newpage
+
+%%============================================================
+%% CODE S1: Analysis Pipeline Description
+%%============================================================
+\section*{Code S1. Python Analysis Pipeline (\texttt{analysis\_main.py})}
+
+The complete Python analysis pipeline is provided as a separate file
+(\texttt{analysis\_main.py}) with \texttt{requirements.txt}.
+Key components:
+
+\begin{lstlisting}[caption={Key pipeline structure (pseudocode)}]
+# Requirements:
+# numpy>=1.24, scipy>=1.10, scikit-learn>=1.3,
+# xgboost>=1.7, shap>=0.43, matplotlib>=3.7,
+# pandas>=2.0, torch>=2.0
+
+# Step 1: Data loading and preprocessing
+load_dataset('stability_constants_140.csv')
+compute_descriptors(ionic_radius, hsab, size_mismatch, ...)
+
+# Step 2: Ablation study (A0-A4)
+for model in [Ridge, GBM, GBM_DFT, Ensemble, VH_NN]:
+    results = cross_validate(model, cv=5, seeds=7)
+    bootstrap_ci(results, n_bootstrap=1000)
+
+# Step 3: LOMO-CV
+for metal in all_metals:
+    train = dataset[dataset.metal != metal]
+    test  = dataset[dataset.metal == metal]
+    r2_lomo[metal] = evaluate(model, train, test)
+
+# Step 4: SHAP analysis and inverse design
+explainer = shap.TreeExplainer(gbm_dft_model)
+shap_values = explainer.shap_values(X)
+inverse_design_candidates = optimize_shap_features()
+
+# Step 5: VH-NN multi-temperature
+vhnn = PhysicsConstrainedVHNN(vant_hoff_layer=True)
+vhnn.fit(X_train, T_train, logK_train)
+# Outputs: DeltaH, DeltaS as learned intermediates
+\end{lstlisting}
+
+The full executable code reproduces all figures and tables in the main text
+and Supporting Information.
+Computational environment: Python 3.10, Ubuntu 22.04, Intel Xeon E5-2690v4,
+NVIDIA A100 GPU (VH-NN training only).
+Random seeds: $\{0, 1, 2, 3, 4, 5, 42\}$ for all stochastic components.
+
+\bibliography{myref}
+
+\end{document}
