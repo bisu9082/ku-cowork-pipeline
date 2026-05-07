@@ -2,8 +2,8 @@
   "_meta": {
     "version": "1.0",
     "description": "Ku 박사 자기인용 데이터베이스 — 논문 자동화 파이프라인 Self-Citation 시스템",
-    "last_updated": "2026-04-12",
-    "total_published": 28,
+    "last_updated": "2026-05-07",
+    "total_published": 29,
     "note": "2+ topic overlap시 자동 인용 후보 표시. 프롬프트에서 ku_publications.json 로드 후 주제 매칭 수행"
   },
   "publications": [
@@ -237,6 +237,27 @@
       "topics": ["DFT", "kMC", "nitriding", "Fe-Cr alloy", "multiscale modeling", "computational materials"],
       "keywords": ["DFT", "kMC", "nitriding", "Fe-Cr", "multiscale", "Acta Materialia"],
       "citation_hint": "DFT+kMC 멀티스케일 / 질화 / Fe-Cr 합금 논문시 인용"
+    },
+    {
+      "id": "J20-2026",
+      "bibtex_key": "urine",
+      "authors": ["Yoo", "Kim Y.", "Ku (co-author, 3rd)", "Ahn", "Bang", "Koo (corresponding)", "Park T.H. (corresponding)"],
+      "year": 2026,
+      "title": "Urine-Based Noninvasive Detection of Prostate Cancer Using Human Olfactory Receptor-Embedded Nanodiscs",
+      "journal": "ACS Sensors",
+      "doi": "10.1021/acssensors.6c00794",
+      "status": "ASAP (Accepted 2026-04-22)",
+      "key_results": {
+        "n_samples": 73,
+        "accuracy": 0.890,
+        "AUC": 0.964,
+        "key_receptors": ["OR2W1", "OR51E1", "OR51E2"],
+        "n_OR": 6,
+        "classifier": "Random Forest"
+      },
+      "topics": ["olfactory receptor", "nanodisc", "prostate cancer", "VOC detection", "fluorescence quenching", "machine learning", "random forest", "urine biomarker", "biosensor", "cancer diagnostics", "OR-embedded nanodisc", "tryptophan fluorescence"],
+      "keywords": ["olfactory receptor", "nanodisc", "prostate cancer", "VOC", "fluorescence quenching", "random forest", "urine", "noninvasive diagnosis"],
+      "citation_hint": "후각수용체/나노디스크 기반 센서 / VOC 바이오마커 / 암 비침습진단 / ML 기반 생체센서 논문시 인용"
     }
   ],
   "under_review": {
@@ -260,7 +281,7 @@
   },
   "topic_index": {
     "CWA_detection": ["J1-2025", "J2-2025", "J3-2026", "J6-2026", "J7-2026", "J8-2025", "J9-2025", "J10-2026", "J12-2025"],
-    "machine_learning": ["J1-2025", "J8-2025", "J9-2025", "J10-2026", "J16-2025"],
+    "machine_learning": ["J1-2025", "J8-2025", "J9-2025", "J10-2026", "J16-2025", "J20-2026"],
     "colorimetric_sensor": ["J1-2025", "J2-2025", "J3-2026", "J8-2025"],
     "CBRN_defense": ["J1-2025", "J2-2025", "J3-2026", "J4-2026", "J5-2026", "J6-2026", "J7-2026", "J8-2025", "J11-2025", "J13-2025", "J14-2025", "J16-2025"],
     "radionuclide_radiation": ["J4-2026", "J5-2026", "J13-2025", "J14-2025", "J15-2025"],
@@ -269,8 +290,11 @@
     "aluminum_materials": ["J17-2025", "J18-2024", "J19-2019"],
     "UAV_autonomous": ["J7-2026"],
     "nerve_agent": ["J1-2025", "J2-2025", "J3-2026", "J9-2025", "J12-2025"],
-    "biosensor_immunoassay": ["J10-2026"],
-    "environmental_monitoring": ["J15-2025"]
+    "biosensor_immunoassay": ["J10-2026", "J20-2026"],
+    "environmental_monitoring": ["J15-2025"],
+    "olfactory_receptor_nanodisc": ["J20-2026"],
+    "cancer_biomarker_diagnostics": ["J20-2026"],
+    "VOC_detection": ["J20-2026"]
   },
   "self_citation_rules": {
     "min_topic_overlap": 2,
