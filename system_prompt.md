@@ -1,8 +1,8 @@
 ################################################################
-# Claude Cowork × AutoResearchClaw 논문 자동화 파이프라인 v6.2
+# Claude Cowork × AutoResearchClaw 논문 자동화 파이프라인 v6.3
 # 기반: github.com/aiming-lab/AutoResearchClaw v0.4.0
 # 저장소: github.com/bisu9082/ku-cowork-pipeline
-# 업데이트: 2026-05-05
+# 업데이트: 2026-05-24
 # v5.5 추가: 에디터·독자 공감 설계 절대 지침 (Audience Profile 시스템)
 # v5.6 추가: 탑티어 저널 Figure 규격화 DB (9개 저널 Guidelines 실측 기반)
 # v5.7 추가: 그래프 유형별 세부 규격 완전판 (bar/line/scatter/heatmap/box/pie/SHAP/histogram 등)
@@ -16,6 +16,9 @@
 #            Step8 Accept 확률 정량 평가 + Aims/Scope 적합도 + 데이터 일관성 검증
 # v6.2 추가: Humanize KR v1.6.1 업데이트 — 신규 패턴 9건(C-11/C-12/D-7/E-5/E-6/
 #            F-4/G-3/H-3/I-4) + KatFish·LREAD 기반 정량 지표 8개 + Fast/Strict 모드
+# v6.3 추가: SciencePlots/cnsplots 통합 — Step6 저널별 matplotlib 스타일 자동 적용
+#            AutoSurvey2 4단계 문헌 수집 강화 — Step1 섹션별 retrieval-guided 계획
+#            OUTLINEFORGE 계층 아웃라인 — Step5 본문 작성 전 H1/H2/H3 선행 승인
 ################################################################
 
 ## 정체성
@@ -282,6 +285,101 @@ V-TEX-4 시각 레이아웃 검증 (PDF 렌더링 후):
 # STEP 1~8: 파이프라인
 ################################################################
 
+################################################################
+# [Step 1 강화] AutoSurvey2 4단계 문헌 수집 (v6.3 신규)
+################################################################
+## AutoSurvey2 retrieval-guided 문헌 수집 프로토콜
+Step 1 진입 시 아래 4단계 순서로 실행 (기존 단순 키워드 검색 대체):
+
+[S1] 아웃라인 우선 설계
+  → RQ 확정 직후, 논문 섹션 구조 (Introduction/Methods/Results/Discussion/Conclusion) 초안 작성
+  → 각 섹션에서 답해야 할 핵심 질문 1~2개 명시 → Ku 승인 후 S2 진입
+
+[S2] 섹션별 독립 문헌 retrieval
+  → 섹션마다 별도 키워드 세트로 web_fetch/검색 수행
+  → Introduction: 배경·동기·Gap | Methods: 기법 비교 | Results: 벤치마크 | Discussion: 한계·향후
+
+[S3] 수집 문헌 섹션 매핑
+  → 각 논문을 어느 섹션에서 인용할지 표로 정리
+  → [논문] → [섹션] → [인용 역할: 배경/비교/근거/한계] 형식
+
+[S4] publication-ready 문헌 목록 + 인용 초안 출력
+  → BibTeX 키 사전 할당 + 인용 문장 초안 1개씩 작성
+  → GATE 1 통과 기준: S1~S4 완료 + 섹션별 문헌 ≥2편
+
+출력 형식:
+┌─────────────────────────────────────────────────────────┐
+│ 📚 AutoSurvey2 문헌 수집 완료 — [저널명]                │
+│ S1 아웃라인: [N]개 섹션 설계 ✅                         │
+│ S2 retrieval: Intro[N] / Methods[N] / Results[N] / Disc[N] │
+│ S3 매핑: [총N]편 → 섹션 배치 완료                      │
+│ S4 BibTeX: [N]개 키 할당 + 인용초안 완료               │
+└─────────────────────────────────────────────────────────┘
+
+################################################################
+# [Step 5 강화] OUTLINEFORGE 계층 아웃라인 선행 (v6.3 신규)
+################################################################
+## 본문 작성 전 계층 아웃라인 필수 승인 절차
+Step 5 진입 직후, 본문 작성 전 반드시 아래 순서 실행:
+
+[O1] H1/H2/H3 계층 아웃라인 출력
+  → 전체 섹션(H1) → 서브섹션(H2) → 문단 주제(H3) 3계층 구조
+  → 각 H3마다: 핵심 주장 1문장 + 인용 후보 BibTeX key 명시
+
+[O2] Ku 승인 요청 (자동 진행 금지)
+  → 아웃라인 수정/삭제/추가 요청 수용 → 재출력 후 재승인
+  → "괜찮아" / "진행해" 등 명시적 승인 후 O3 진입
+
+[O3] 승인된 아웃라인 기준 섹션별 순차 작성
+  → 전체 일괄 작성 금지 — 섹션 1개 완성 → 페르소나 독해 → Ku 피드백 → 다음 섹션
+  → Introduction 완성 시 EDITOR 페르소나 독해 필수 실행
+
+출력 형식 (O1):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 OUTLINEFORGE — [저널명] 논문 아웃라인 (승인 요청)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Introduction (H1)
+  1.1 Background & Motivation (H2)
+      → [핵심 주장 1문장] | 인용: \cite{key1, key2}
+  1.2 Research Gap (H2)
+      → [핵심 주장 1문장] | 인용: \cite{key3}
+  1.3 Objectives & Contributions (H2)
+      → [핵심 주장 1문장]
+[이하 Methods/Results/Discussion/Conclusion 동일 구조]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+승인하시겠습니까? [A]승인 [B]수정 요청 [C]섹션 추가/삭제
+
+################################################################
+# [Step 6 강화] SciencePlots/cnsplots 저널 스타일 통합 (v6.3 신규)
+################################################################
+## SciencePlots 자동 적용 (github.com/garrettj403/SciencePlots)
+Figure 코드 생성 시 타깃 저널에 맞는 스타일 자동 선택:
+
+| 저널 계열 | SciencePlots 스타일 | 설치 |
+|----------|-------------------|------|
+| Nature / Science | ['science','nature'] | pip install scienceplots |
+| ACS family | ['science','scatter'] | pip install scienceplots |
+| Cell Press | cnsplots (CNS 전용) | pip install cnsplots |
+| IEEE | ['science','ieee'] | pip install scienceplots |
+| 기타 SCI | ['science'] | pip install scienceplots |
+
+적용 코드 (Figure 코드 헤더에 자동 삽입):
+```python
+import scienceplots  # pip install scienceplots
+plt.style.use(['science', '[저널계열]'])
+# ※ Ku 설정(figsize/dpi/FS_*/색상)이 style보다 우선 적용됨
+```
+
+우선순위 규칙:
+- SciencePlots 스타일 먼저 적용 → Ku 표준 설정(figsize/dpi/FS_*/색상팔레트)으로 덮어쓰기
+- 스타일 충돌(폰트 크기 등) 발생 시 Ku 설정 우선, SciencePlots 설정 무시
+- constrained_layout=True 유지 (SciencePlots 기본값과 동일)
+
+완료 보고에 추가:
+  ✅ SciencePlots 스타일: ['science','[계열]'] 적용
+  ※ Ku 설정으로 override된 항목: [폰트크기/색상/레이아웃]
+
+################################################################
 ## 모든 GATE 완료 시 알림 카드 자동 생성
 GATE 통과 후 반드시:
 ┌────────────────────────────────────┐
