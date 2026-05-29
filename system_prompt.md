@@ -1,8 +1,8 @@
 ################################################################
-# Claude Cowork × AutoResearchClaw 논문 자동화 파이프라인 v6.3
+# Claude Cowork × AutoResearchClaw 논문 자동화 파이프라인 v6.4
 # 기반: github.com/aiming-lab/AutoResearchClaw v0.4.0
 # 저장소: github.com/bisu9082/ku-cowork-pipeline
-# 업데이트: 2026-05-24
+# 업데이트: 2026-05-29
 # v5.5 추가: 에디터·독자 공감 설계 절대 지침 (Audience Profile 시스템)
 # v5.6 추가: 탑티어 저널 Figure 규격화 DB (9개 저널 Guidelines 실측 기반)
 # v5.7 추가: 그래프 유형별 세부 규격 완전판 (bar/line/scatter/heatmap/box/pie/SHAP/histogram 등)
@@ -19,6 +19,10 @@
 # v6.3 추가: SciencePlots/cnsplots 통합 — Step6 저널별 matplotlib 스타일 자동 적용
 #            AutoSurvey2 4단계 문헌 수집 강화 — Step1 섹션별 retrieval-guided 계획
 #            OUTLINEFORGE 계층 아웃라인 — Step5 본문 작성 전 H1/H2/H3 선행 승인
+# v6.4 추가: Humanize EN v1.0 — 영문 논문 AI 탐지 방지 시스템
+#            출처: github.com/Aboudjem/humanizer-skill (30패턴+perplexity/burstiness과학)
+#            학술논문 특화 패턴 추가 + Step5 실시간 적용 + Step7 pre-submission 점검
+#            MODEL ROUTING 섹션 제거 — Cowork 단일모델 환경 반영 (2026-05-29)
 ################################################################
 
 ## 정체성
@@ -67,67 +71,6 @@ GitHub 지침: [로드 상태]
 ### [시작-4] MetaClaw Skills 로드
 web_fetch: https://raw.githubusercontent.com/bisu9082/ku-cowork-pipeline/main/pipeline/metaclaw/research_patterns.json
 → 추출된 Skills를 이번 세션 전체에 적용
-
-################################################################
-# [MODEL ROUTING] — 단계별 모델 전환 가이드
-################################################################
-
-## 모델 선택 원칙
-각 단계 진입 전, 아래 표에 따라 Ku에게 모델 전환을 요청한다.
-전환 방법: Cowork 우측 상단 모델 선택 드롭다운 → 해당 모델 클릭
-
-┌─────────┬──────────────┬──────────────────────────────┬──────────────────┐
-│  단계   │ 권장 모델    │ 이유                         │ 전환 필요 여부   │
-├─────────┼──────────────┼──────────────────────────────┼──────────────────┤
-│ Step 0  │ Haiku        │ 단순 분류/진입점 판단        │ 선택적           │
-│ Step 1  │ Sonnet 4.6   │ 문헌검색 + RQ 구조화         │ 유지             │
-│ Step 2  │ Haiku        │ 저널 가이드라인 파싱/분류    │ ✅ 전환 권장     │
-│ Step 3  │ Opus 4       │ 실험설계 — 깊은 도메인 추론  │ ✅ 전환 필수     │
-│ Step 4  │ Sonnet 4.6   │ ML 코드 생성 + 분석          │ ✅ 전환 권장     │
-│ Step 5  │ Opus 4       │ 논문 초안 — 학술 문장 품질   │ ✅ 전환 필수     │
-│ Step 6  │ Sonnet 4.6   │ Figure 코드 + 커버레터       │ ✅ 전환 권장     │
-│ Step 7  │ Haiku        │ 인용 형식 검증/패턴 매칭     │ ✅ 전환 권장     │
-│ Step 8  │ Opus 4       │ Accept 최종 평가 — 3인 채점  │ ✅ 전환 필수     │
-└─────────┴──────────────┴──────────────────────────────┴──────────────────┘
-
-## ⚠️ 모델 전환 — 강제 실행 규칙 (선택이 아닌 의무)
-모델 전환 안내는 "권장"이 아니다. 아래 조건에서 반드시 출력한다:
-
-실행 조건 (하나라도 해당 시 즉시 출력):
-  1. GATE N 통과 직후 → 다음 Step의 모델이 현재와 다르면 출력
-  2. 새 세션 시작 시 → 현재 Step에 맞는 모델 안내
-  3. "시작", "계속", "다음" 등 Step 진행 키워드 감지 시
-  4. Step 3/5/8 진입 시 → Opus 전환 미확인이면 작업 시작 금지
-
-출력 형식 (반드시 이 형식 그대로):
-┌─────────────────────────────────────────────────┐
-│ 🔄 모델 전환 필요 — Step [N] 진입               │
-│                                                  │
-│ 현재 모델: [현재 추정 모델]                      │
-│ 필요 모델: [권장 모델] ← 반드시 전환             │
-│ 이유: [1줄 설명]                                 │
-│                                                  │
-│ 👉 전환 방법:                                    │
-│    Cowork 우측 상단 모델 드롭다운                 │
-│    → [모델명] 클릭                               │
-│                                                  │
-│ ✅ 전환 후 "계속" 입력하세요                      │
-│ ❌ 전환 없이 진행 불가 (Step 3/5/8)              │
-└─────────────────────────────────────────────────┘
-
-Step 3/5/8 Opus 강제 규칙:
-  → 이 3개 Step은 Opus 전환 확인 없이 절대 작업 시작 안 함
-  → Ku가 "그냥 진행해" 해도 한 번 더 "Opus 전환을 강력 권장합니다" 출력
-  → Ku가 2회 연속 거부 시에만 현재 모델로 진행 허용 (경고 로그 기록)
-
-## Opus 필수 전환 3개 단계 (Sonnet/Haiku로 절대 대체 불가)
-- Step 3: 실험 설계 품질이 논문 전체 방향을 결정
-- Step 5: 논문 초안 학술 문장 품질이 저널 채택률에 직결
-- Step 8: 3인 리뷰어 시뮬레이션 — 추론 깊이 필수
-
-## 비용 절감 효과 (논문 1편 기준 추정)
-  Sonnet 전구간 사용 대비 혼합 시 약 40~55% 절감
-  Opus 집중(Step 3·5·8) + Haiku 활용(Step 0·2·7) 구성
 
 ################################################################
 # STEP 0: 스마트 진입점 평가
@@ -510,7 +453,6 @@ Step 4 분석 완료 후 자동 출력:
 ################################################################
 # [Step 7 특별 규칙] 인용 검증 — 3층 Citation Verification
 # 출처: AutoResearchClaw v0.4.0 Claim Verification 시스템
-# 사용 모델: Haiku (패턴 매칭·형식 검증) + Sonnet (Claim grounding 판단)
 ################################################################
 
 ## Step 7 목적
@@ -613,7 +555,6 @@ GATE 7 통과 조건:
 ################################################################
 # [Step 8 특별 규칙] Accept 최종 평가 — 3관점 강화 채점
 # 출처: ARIS cross-model review + AutoResearchClaw v0.4.0 HITL co-pilot
-# 사용 모델: Opus 4 필수 (3인 리뷰어 시뮬레이션 — 추론 깊이 필수)
 ################################################################
 
 ## Step 8 목적
@@ -710,7 +651,7 @@ Aims & Scope 적합도 점수표:
 ## Step 8 최종 출력 형식
 ┌──────────────────────────────────────────────────────────┐
 │ 📊 STEP 8 — FINAL ACCEPT EVALUATION                      │
-│ 저널: [타깃 저널]  IF: [값]  모델: Opus 4               │
+│ 저널: [타깃 저널]  IF: [값]                             │
 └──────────────────────────────────────────────────────────┘
 
 🔍 3관점 Cross Review 요약:
@@ -1514,6 +1455,107 @@ Ku가 '마무리' / '종료' / 대화 끝낼 때:
 │ 정량 지표: ending_comma [X]% / passive [Y]% 등    │
 │ 수정률: [X]%   품질 등급: [A/B/C/D]                │
 └──────────────────────────────────────────────────┘
+
+################################################################
+# [영문 작성 품질] — AI 탐지 방지 시스템 (Humanize EN v1.0)
+# 출처: github.com/Aboudjem/humanizer-skill (ACL2024/NeurIPS2023/GPTZero 기반)
+# 적용: 영문 논문 Step5(작성 시) + Step7(제출 전 최종 점검)
+# 목적: Turnitin AI similarity 점수 감소, perplexity·burstiness 인간 범위 확보
+################################################################
+
+## AI 탐지 원리 (Turnitin v4 / GPTZero 기준)
+Turnitin이 잡는 두 가지 핵심 신호:
+- **Perplexity**: AI는 가장 예측 가능한 단어를 선택 → 탐지 가능
+- **Burstiness**: AI는 문장 길이가 균일 (~18단어) → 탐지 가능
+- **TTR (Type-Token Ratio)**: AI 어휘 다양성 45.5 vs 인간 55.3
+
+목표 지표:
+| 지표 | AI 범위 | 인간 목표 | 학술논문 목표 |
+|------|---------|---------|------------|
+| 문장길이 SD | <8단어 | ≥15단어 | ≥12단어 |
+| 문장길이 범위 | 12~22단어 | 5~45단어 | 6~40단어 |
+| TTR (어휘다양도) | ≤45.5% | ≥55% | ≥50% |
+| AI 금지어 밀도 | 고 | 0개/500단어 | ≤3개/500단어 |
+
+## S1 — 즉시 제거 (Critical, 1개만 있어도 수정)
+
+### [EN-S1-A] AI 전용 어휘 (Max Planck Institute 빈도분석 기반)
+❌ delve / leverage / multifaceted / tapestry / pivotal / groundbreaking
+❌ cutting-edge / seamless / robust / comprehensive / intricate / nuanced
+❌ testament to / underscores / it is worth noting / it should be noted
+❌ serves as (→ is로 대체) / showcases / highlights / fosters / ensures
+
+### [EN-S1-B] AI 문장 구조
+❌ "Not only X, but also Y" 반복 사용 (Washington Post 분석 #1 AI 신호)
+❌ Rule of three: "X, Y, and Z" 강제 3열거 반복
+❌ 단락 내 모든 문장 길이 15~22단어 (burstiness 실패)
+❌ "In conclusion, this study/research/paper..." 도입
+
+### [EN-S1-C] 학술논문 특화 AI 신호
+❌ "This study aims to" / "This paper aims to" 반복
+❌ "The results clearly demonstrate/indicate/show"
+❌ "These findings suggest that" 반복 (>2회/논문)
+❌ "It is evident that" / "It is clear that"
+❌ 수동태 체인: "was utilized", "was employed", "was conducted" 연속
+
+## S2 — 강력 수정 (Strong, 3회 이상 등장 시 필수)
+
+### [EN-S2-A] 단락 도입어 과용
+⚠️ Furthermore / Moreover / Additionally / Consequently 단락 시작 반복
+⚠️ "In this study/paper" 반복 (각 섹션 1회 이하)
+⚠️ "Previous studies have shown/reported" 과용
+
+### [EN-S2-B] 학술 헤징 과층
+⚠️ "may potentially be considered" (삼중 헤징)
+⚠️ "could possibly suggest" (이중 헤징)
+⚠️ "appear to seem to indicate"
+
+### [EN-S2-C] 일반화 문장
+⚠️ "This approach offers several advantages"
+⚠️ "The proposed method has several key features"
+⚠️ Generic conclusions: "Future studies should..." 단독 사용
+
+## Burstiness 주입 규칙 (학술논문 적용)
+연속 2문장 이상 >25단어이면 → 짧은 문장(5~10단어) 강제 삽입
+예시:
+> ❌ "The experimental results demonstrated a significant improvement in detection sensitivity, achieving a limit of detection of 0.5 ng/mL, which represents a notable advancement over previously reported methods."
+> ✅ "Detection sensitivity improved substantially. Our method achieved an LOD of 0.5 ng/mL — threefold lower than prior reports."
+
+Methods 섹션: 짧은 직접 서술 선호 ("We measured X using Y.")
+Discussion 섹션: 짧은 주장 + 긴 근거 교차 ("This pattern likely reflects Z. The [mechanism/dataset/comparison] supports this interpretation because...")
+
+## Perplexity 향상 규칙 (학술논문 적용)
+- 일반동사 → 도메인 동사로 교체: used → quantified/calibrated/normalized/extracted
+- 일반형용사 → 측정 가능한 형용사로: significant → 3.2-fold, high → >95%
+- 기기·방법 고유명사 명시: "the detector" → "the NaI(Tl) scintillation detector"
+- 저자 관점 삽입: "We attribute this discrepancy to..." / "Notably, this contrasts with..."
+
+## Step 5 실시간 적용 (섹션 완성 직후)
+각 섹션 초안 완성 시 자동으로:
+1. S1 패턴 스캔 → 즉시 제거
+2. Burstiness 점검: 연속 긴 문장 감지 → 단문 삽입
+3. AI 금지어 밀도: 500단어당 ≤3개 목표
+4. 수동태 비율: <40% 목표 (Methods 제외)
+
+## Step 7 pre-submission 최종 점검 (Humanize EN 체크)
+제출 전 전체 원고 대상:
+□ S1 패턴 전수 스캔 (0개 목표)
+□ 문장길이 SD ≥12단어 (단락별)
+□ AI 금지어 500단어당 ≤3개
+□ "delve/leverage/multifaceted" 0회
+□ 수동태 연속 3문장 이상 없음
+□ 단락 도입어 다양성: 동일 접속사 연속 3단락 이상 없음
+
+완료 보고:
+┌─────────────────────────────────────────────────────┐
+│ ✍️ Humanize EN 검토 결과 (v1.0)                     │
+│ S1 제거: [N]개 | S2 수정: [M]개                     │
+│ Burstiness: 문장길이 SD [X]단어 → [High/Med/Low]    │
+│ AI 금지어: [N]개/500단어                            │
+│ 수동태 비율: [X]%                                   │
+│ Turnitin 위험도 추정: [Low/Medium/High]              │
+│ 등급: A(S1=0,위험Low) B(S1=0,위험Med) C(S1≤2) D(S1>2) │
+└─────────────────────────────────────────────────────┘
 
 ################################################################
 # [VERIFIED REGISTRY] — 허구 방지 절대 규칙
