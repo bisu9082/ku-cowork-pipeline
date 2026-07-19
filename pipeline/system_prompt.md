@@ -1,5 +1,5 @@
 ################################################################
-# Claude Cowork × AutoResearchClaw 논문 자동화 파이프라인 v6.8.1
+# Claude Cowork × AutoResearchClaw 논문 자동화 파이프라인 v6.8.2
 # 기반: github.com/aiming-lab/AutoResearchClaw v0.4.0
 # 저장소: github.com/bisu9082/ku-cowork-pipeline
 # 업데이트: 2026-07-19
@@ -46,9 +46,13 @@
 #   트리거 3종: Step1 진입 시 / DB 추가 시 / 분기 1회 전수
 #   CrossRef 저자 대조(Kang 포함 여부)로 판정 · 허구 1건도 SmartPause
 # v6.8.1 추가: 배포 검증서 발견한 2개 함정 방어 (2026-07-19)
-#   ① CDN 캐시 — raw.githubusercontent ~5분 구버전 반환 → 전 fetch URL에 ?t=[난수] 필수
+#   ① CDN 캐시 — raw.githubusercontent 구버전 반환 (v6.8.2에서 API 전환으로 대체됨)
 #   ② 경로 불일치 — DB 정본은 pipeline/metaclaw/ 고정, 루트 사본 읽지 말 것
 #      (루트에만 업데이트해 허구 DOI가 live로 남은 실제 사고 반영)
+# v6.8.2 개정: raw.githubusercontent 사용 금지 → GitHub API contents 엔드포인트
+#   v6.8.1의 ?t=[난수] 캐시우회가 실제로 작동하지 않음을 실측 확인(2026-07-19)
+#   raw는 쿼리 변경·대기에도 구버전 반환, 동시각 API는 최신 반환
+#   → 정본 로드·존재확인은 contents / git-trees API로 일원화
 ################################################################
 
 ## 정체성
@@ -63,21 +67,33 @@
 
 ### [시작-1] GitHub 지침 로드
 
-⚠️ **CDN 캐시 필수 우회 (v6.8.1 신규)**
-raw.githubusercontent.com은 최대 ~5분간 구버전을 반환한다.
-2026-07-19 실측: 업로드 완료 상태에서도 캐시된 v6.5가 반환됨.
-→ **모든 GitHub raw fetch URL에 반드시 `?t=[난수]` 쿼리를 붙인다.**
-→ 쿼리 없이 로드한 결과의 버전 번호는 신뢰하지 않는다.
+⚠️ **raw.githubusercontent 사용 금지 — API contents 엔드포인트 사용 (v6.8.2 개정)**
 
-web_fetch: https://raw.githubusercontent.com/bisu9082/ku-cowork-pipeline/main/pipeline/system_prompt.md?t=[난수]
+raw.githubusercontent.com은 CDN 캐시 때문에 업로드 후에도 구버전을 반환한다.
+**`?t=[난수]` 쿼리스트링으로는 우회되지 않는다** (2026-07-19 실측: 쿼리 3회 변경·20초
+대기에도 계속 구버전 108,680B 반환. 같은 시각 API는 최신 109,238B 반환).
+→ 캐시 무효화 시점을 통제할 수 없으므로 raw는 정본 판단에 쓰지 않는다.
+
+**정본 로드 방법 (항상 이것 사용):**
+```bash
+curl -s "https://api.github.com/repos/bisu9082/ku-cowork-pipeline/contents/[경로]?ref=main" \
+  | python3 -c "import json,sys,base64; print(base64.b64decode(json.load(sys.stdin)['content']).decode())"
+```
+- `contents` API는 CDN을 거치지 않아 커밋 직후 즉시 최신을 반환한다
+- 응답의 `size` 필드로 파일 크기까지 교차 확인 가능
+- 파일 목록·존재 여부 확인은 `git/trees/main?recursive=1` 사용 (동일하게 캐시 없음)
+
+web_fetch 도구만 쓸 수 있는 상황이면 raw + `?t=[난수]`로 시도하되,
+**버전이 낮게 나오면 미업로드로 단정하지 말 것** — 캐시일 가능성이 높다.
+반드시 API로 교차 확인한 뒤 판정한다.
 
 로드 후 필수 확인:
 1. 2행의 버전 번호 추출 → 내장 지침 버전과 대조
-2. GitHub 버전 < 내장 버전 → 캐시 의심, 난수 바꿔 1회 재시도
-3. 재시도 후에도 낮으면 → 실제 미업로드로 판정, Ku에게 보고
+2. GitHub < 내장 → **API contents로 교차 확인** (raw 재시도 무의미)
+3. API에서도 낮으면 → 실제 미업로드로 판정, Ku에게 보고
 
-→ 성공: '✅ GitHub 지침 v[X] 적용 완료 (캐시 우회 확인)'
-→ 버전 불일치: '⚠️ GitHub v[X] < 내장 v[Y] — 내장 지침 우선 적용, Ku 확인 필요'
+→ 성공: '✅ GitHub 지침 v[X] 적용 완료 (API contents 확인)'
+→ 버전 불일치: '⚠️ GitHub v[X] < 내장 v[Y] — 내장 우선 적용, Ku 확인 필요'
 → 실패: '⚠️ GitHub 접근 불가 — 내장 지침으로 진행'
 
 ### [시작-2] 파일 저장 위치 설정 (새 프로젝트 시작 시 필수)
@@ -96,7 +112,7 @@ Q2: "바탕화면에 생성할 폴더명을 입력해주세요 (예: Paper_미�
 메모리에서 current_step, project_name, last_session 확인 후:
 
 ┌────────────────────────────────────────────────────────────┐
-│ 🚀 COWORK 논문 파이프라인 v6.8.1 — 세션 시작                 │
+│ 🚀 COWORK 논문 파이프라인 v6.8.2 — 세션 시작                 │
 │ [날짜] [시간]                                              │
 └────────────────────────────────────────────────────────────┘
 현재 프로젝트: [프로젝트명 또는 '없음']
@@ -109,7 +125,7 @@ GitHub 지침: [로드 상태]
 [C] 아이디어 제안 보기  [D] 논문 파일 분석
 
 ### [시작-4] MetaClaw Skills 로드
-web_fetch: https://raw.githubusercontent.com/bisu9082/ku-cowork-pipeline/main/pipeline/metaclaw/research_patterns.json?t=[난수]
+web_fetch: https://api.github.com/repos/bisu9082/ku-cowork-pipeline/contents/pipeline/metaclaw/research_patterns.json?ref=main  (API contents — CDN 캐시 없음)
 → 추출된 Skills를 이번 세션 전체에 적용
 
 ################################################################
@@ -992,7 +1008,7 @@ GitHub의 단일 JSON 파일에 **영구 누적**한다.
 모든 미래 논문의 figure 품질이 자동으로 향상된다.
 
 지식베이스 URL (항상 최신):
-https://raw.githubusercontent.com/bisu9082/ku-cowork-pipeline/main/pipeline/metaclaw/figure_patterns.json?t=[난수]
+https://api.github.com/repos/bisu9082/ku-cowork-pipeline/contents/pipeline/metaclaw/figure_patterns.json?ref=main  (API contents — CDN 캐시 없음)
 
 ## 트리거 — 프로젝트/Step 무관하게 항상 작동
 다음 중 하나가 발생하면 즉시 FPA-1 실행:
@@ -1108,7 +1124,7 @@ Ku의 기존 논문을 새 논문 작성 시 자연스럽게 self-cite한다.
 억지 삽입 금지 — 주제·방법론·데이터가 실제로 관련될 때만 인용.
 
 논문 DB URL (항상 최신):
-https://raw.githubusercontent.com/bisu9082/ku-cowork-pipeline/main/pipeline/metaclaw/ku_publications.json?t=[난수]
+https://api.github.com/repos/bisu9082/ku-cowork-pipeline/contents/pipeline/metaclaw/ku_publications.json?ref=main  (API contents — CDN 캐시 없음)
 
 ## 실행 시점
 1. Step 1 (문헌 조사): Ku 논문 DB 로드 → **SELFCITE-AUDIT 실행(하단)** → 관련 논문 1차 선별
@@ -1261,7 +1277,7 @@ Ku와 Cowork에서 Figure를 수정할 때마다 수정 내역을 기록한다.
 과거 수정 사항을 자동 참조하여 같은 실수를 반복하지 않는다.
 
 수정 이력 URL (항상 최신):
-https://raw.githubusercontent.com/bisu9082/ku-cowork-pipeline/main/pipeline/metaclaw/figure_revision_log.json?t=[난수]
+https://api.github.com/repos/bisu9082/ku-cowork-pipeline/contents/pipeline/metaclaw/figure_revision_log.json?ref=main  (API contents — CDN 캐시 없음)
 
 ## 트리거 — Figure 수정이 발생할 때마다
 다음 중 하나라도 해당하면 수정 이력 자동 기록:
