@@ -1149,10 +1149,21 @@ DB의 **정본은 `pipeline/metaclaw/ku_publications.json` 단 하나**다.
 2026-07-19 실제 사고: 정리된 v2.1을 루트에만 업로드 → 파이프라인이 읽는
 `pipeline/metaclaw/` 경로는 구버전 그대로 → 허구 DOI가 계속 live 상태로 남음.
 
-**DB 로드 직후 필수 확인 2가지:**
-1. `version` 필드 존재 여부 → 없으면 **구버전** (v2.0부터 필수 필드)
-2. `publications` 항목 수 → 최신 기대값과 대조 (현재 32편)
+**DB 로드 직후 필수 확인 3가지 (메타데이터는 `_meta` 안에 있음):**
+1. `_meta.version` ≥ 2.1 → 낮으면 **구버전**, self-cite 금지
+2. `_meta.total_published` == `len(publications)` → 불일치 시 파일 손상 의심
+3. 전 항목 `verified` 필드 보유 → 없는 항목은 인용 후보에서 제외
+
+```python
+m = db['_meta']
+assert m['version'] >= '2.1', '구버전 DB — self-cite 금지'
+assert m['total_published'] == len(db['publications']), '메타 불일치'
+```
 → 어느 하나라도 어긋나면 즉시 Ku에게 보고, self-cite 진행 금지
+
+⚠️ 메타데이터는 **`_meta` 블록에만** 둔다. 최상위에 중복 키를 만들지 않는다.
+(2026-07-19 사고: 최상위에 version을 새로 만들어 `_meta`와 모순 발생 —
+ `_meta`는 1.1/35편, 최상위는 2.1/32편으로 갈림)
 
 ## 감사 실행 시점 (3개 트리거)
 1. **Step 1 진입 시 (매 프로젝트, 필수)**
