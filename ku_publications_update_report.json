@@ -1,0 +1,438 @@
+{
+  "added": [
+    {
+      "id": "J46-2026",
+      "doi": "10.1016/j.jhazmat.2026.143199",
+      "title": "Open-set combustion-fingerprint classification with out-of-distribution alerting for environmental fire-hazard screening"
+    },
+    {
+      "id": "J47-2026",
+      "doi": "10.3389/fneur.2026.1903374",
+      "title": "Convergent 3–6 kHz cochlear vulnerability in aircrew: matching threshold sound conditioning targets to operational flight profiles"
+    },
+    {
+      "id": "J48-2026",
+      "doi": "10.1039/d6an00467a",
+      "title": "A chemometrically validated, field-portable wet-chemical protocol for rapid triage of 15 white powder substances"
+    }
+  ],
+  "updated": [
+    {
+      "id": "J21-2019",
+      "doi": "10.1016/j.actamat.2019.05.039",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "topics",
+        "volume"
+      ]
+    },
+    {
+      "id": "J27-2025",
+      "doi": "10.2514/1.C038574",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "pages",
+        "topics"
+      ]
+    },
+    {
+      "id": "J26-2025",
+      "doi": "10.1177/15485129251333468",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "pages"
+      ]
+    },
+    {
+      "id": "J31-2026",
+      "doi": "10.3390/molecules31111884",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "topics",
+        "volume"
+      ]
+    },
+    {
+      "id": "J32-2026",
+      "doi": "10.1016/j.ecoenv.2026.120283",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "topics",
+        "volume"
+      ]
+    },
+    {
+      "id": "J23-2025",
+      "doi": "10.1016/j.jenvrad.2025.107725",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "keywords",
+        "local_source",
+        "local_source_file",
+        "topics",
+        "volume"
+      ]
+    },
+    {
+      "id": "J28-2026",
+      "doi": "10.1016/j.jhazmat.2025.140703",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "topics",
+        "volume"
+      ]
+    },
+    {
+      "id": "J2-2025",
+      "doi": "10.1007/s44397-025-00032-y",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "topics"
+      ]
+    },
+    {
+      "id": "J29-2026",
+      "doi": "10.1016/j.snb.2026.139706",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "topics",
+        "volume"
+      ]
+    },
+    {
+      "id": "J31-2026",
+      "doi": "10.3390/molecules31111884",
+      "changed": [
+        "bibtex_key",
+        "local_source_file"
+      ]
+    },
+    {
+      "id": "J24-2025",
+      "doi": "10.1016/j.radphyschem.2025.113089",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "topics",
+        "volume"
+      ]
+    },
+    {
+      "id": "J22-2024",
+      "doi": "10.1016/j.matchemphys.2023.128727",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "topics",
+        "volume"
+      ]
+    },
+    {
+      "id": "J34-2025",
+      "doi": "10.1016/j.chemolab.2025.105365",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "pages",
+        "topics",
+        "volume"
+      ]
+    },
+    {
+      "id": "J33-2026",
+      "doi": "10.1016/j.psep.2026.108691",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "topics",
+        "volume"
+      ]
+    },
+    {
+      "id": "J35-2025",
+      "doi": "10.1016/j.comtox.2025.100363",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "topics",
+        "volume"
+      ]
+    },
+    {
+      "id": "J30-2026",
+      "doi": "10.1007/s44397-026-00038-0",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "topics",
+        "volume"
+      ]
+    },
+    {
+      "id": "J38-2026",
+      "doi": "10.1016/j.pnucene.2026.106446",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "keywords",
+        "local_source",
+        "local_source_file",
+        "topics"
+      ]
+    },
+    {
+      "id": "J25-2025",
+      "doi": "10.1016/j.nexres.2025.100688",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "keywords",
+        "local_source",
+        "local_source_file",
+        "topics",
+        "volume"
+      ]
+    },
+    {
+      "id": "J36-2026",
+      "doi": "10.3390/molecules31132227",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "topics"
+      ]
+    },
+    {
+      "id": "J37-2026",
+      "doi": "10.1080/10426507.2026.2699217",
+      "changed": [
+        "bibtex_key",
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "pages",
+        "topics"
+      ]
+    },
+    {
+      "id": "J20-2026",
+      "doi": "10.1021/acssensors.6c00794",
+      "changed": [
+        "citation_hint",
+        "local_source",
+        "local_source_file",
+        "pages",
+        "topics",
+        "volume"
+      ]
+    }
+  ],
+  "skipped": [],
+  "source": "C:\\Users\\kkaan\\Desktop\\my paper",
+  "source_files_scanned": 25,
+  "structured_entries_found": 24,
+  "pdf_only_candidates": [
+    {
+      "year": null,
+      "title_from_filename": "01_MaterialsChemistryPhysics",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\01_MaterialsChemistryPhysics.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "02_JournalOfAircraft",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\02_JournalOfAircraft.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "03_Analyst",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\03_Analyst.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "04_PhosphorusSulfurSilicon",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\04_PhosphorusSulfurSilicon.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "05_EcotoxEnvironSafety",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\05_EcotoxEnvironSafety.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "06_Molecules",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\06_Molecules.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "07_ProgressNuclearEnergy",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\07_ProgressNuclearEnergy.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "08_ProcessSafetyEnvironProt",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\08_ProcessSafetyEnvironProt.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "09_AppliedRadiationIsotopes",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\09_AppliedRadiationIsotopes.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "10_SensorsActuatorsB",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\10_SensorsActuatorsB.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "11_JournalHazardousMaterials",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\11_JournalHazardousMaterials.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "12_RadiationPhysicsChemistry",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\12_RadiationPhysicsChemistry.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "13_ComputationalToxicology",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\13_ComputationalToxicology.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "14_JEnvironmentalRadioactivity",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\14_JEnvironmentalRadioactivity.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": null,
+      "title_from_filename": "15_ChemometricsIntellLabSyst",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\15_ChemometricsIntellLabSyst.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": 2023,
+      "title_from_filename": "미래 한반도 화학무기 사용에 대비한 검증 역량 발전에 대한 소고(임단용_ 강승민_ 강구_ 강창우)(313~340)",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\202306 미래 한반도 화학무기 사용에 대비한 검증 역량 발전에 대한 소고(임단용_ 강승민_ 강구_ 강창우)(313~340).pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": 2024,
+      "title_from_filename": "To elucidate the effect of alloying elements for enhanced nitriding of aluminum",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\202402 To elucidate the effect of alloying elements for enhanced nitriding of aluminum.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": 2025,
+      "title_from_filename": "Environmental drivers of Be-7 and K-40 deposition in South Korea",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\202505 Environmental drivers of Be-7 and K-40 deposition in South Korea.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": 2025,
+      "title_from_filename": "Rethinking dosimeter assignment for military radiation safety",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\202505 Rethinking dosimeter assignment for military radiation safety.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": 2025,
+      "title_from_filename": "Hybrid QSAR modeling of LD50 in organophosphorus nerve agents",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\202506 Hybrid QSAR modeling of LD50 in organophosphorus nerve agents.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": 2025,
+      "title_from_filename": "Radiation-induced degradation of butyl rubber",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\202506 Radiation-induced degradation of butyl rubber.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": 2025,
+      "title_from_filename": "군 방사선 작업 종사자의 직군별 피폭선량 평가 및 안전관리 최적화 연구(신명식_ 지호섭_ 박정미_ 최경준_ 강구)(p591~620)",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\202506 군 방사선 작업 종사자의 직군별 피폭선량 평가 및 안전관리 최적화 연구(신명식_ 지호섭_ 박정미_ 최경준_ 강구)(p591~620).pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": 2025,
+      "title_from_filename": "도쿄(東京) 사린 테러 30주년_비국가 행위자의 화생방 테러 위협 변화에 대한 고찰(지호섭_ 김대수_ 강구_ 강창우)(p353~384)",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\202506 도쿄(東京) 사린 테러 30주년_비국가 행위자의 화생방 테러 위협 변화에 대한 고찰(지호섭_ 김대수_ 강구_ 강창우)(p353~384).pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": 2025,
+      "title_from_filename": "gamma ray and thermal neutron shielding of fe-based bilayer composites with a boron enriched matrix and tungsten surface coatings",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\202511 gamma ray and thermal neutron shielding of fe-based bilayer composites with a boron enriched matrix and tungsten surface coatings.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": 2026,
+      "title_from_filename": "Feasibility study of electron beam irradiation for decontamination of chemical and biological warfare agent simulants Dosimetric and operational evaluation",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\202603 Feasibility study of electron beam irradiation for decontamination of chemical and biological warfare agent simulants Dosimetric and operational evaluation.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": 2026,
+      "title_from_filename": "rational-selection-of-chelators-for-theranostic-radionuclides-insights-from-ab-initio-computational-modeling (1)",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\202603 rational-selection-of-chelators-for-theranostic-radionuclides-insights-from-ab-initio-computational-modeling (1).pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    },
+    {
+      "year": 2026,
+      "title_from_filename": "Orthogonal Multimodal Sensing and AI Fusion for the",
+      "source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\202608 Orthogonal Multimodal Sensing and AI Fusion for the.pdf",
+      "note": "PDF-only candidate; not inserted into publications without BibTeX/DOI metadata."
+    }
+  ],
+  "output": "pipeline\\metaclaw\\ku_publications.json"
+}

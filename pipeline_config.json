@@ -1,0 +1,17 @@
+{
+  "project_name": "daejangeum",
+  "target_journal": "Nature Communications",
+  "current_step": 8,
+  "completed_steps": [],
+  "save_root": "workspace",
+  "pipeline_version": "AutoResearchClaw v6.2 GPT Edition",
+  "paths": {
+    "system_prompt": "pipeline/system_prompt.md",
+    "system_prompt_gpt": "pipeline/system_prompt_gpt.md",
+    "ku_publications": "pipeline/metaclaw/ku_publications.json",
+    "figure_patterns": "pipeline/metaclaw/figure_patterns.json",
+    "figure_revision_log": "pipeline/metaclaw/figure_revision_log.json",
+    "provenance_audit_policy": "pipeline/metaclaw/provenance_audit_policy.md",
+    "provenance_audit_runner": "scripts/run_provenance_audit.py"
+  }
+}

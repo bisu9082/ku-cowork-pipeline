@@ -1,13 +1,55 @@
-# ku-cowork-pipeline
+# AutoResearchClaw Pipeline Adapter
 
-Claude Cowork 기반 논문 자동화 파이프라인 (AutoResearchClaw v0.3.1 기반)
+This repository now contains the local AutoResearchClaw v6.2 / MetaClaw assets and a small command-line adapter for using them in this project.
 
-## 저장소 구조
-- `pipeline/system_prompt.md` — Cowork 시스템 프롬프트 (메인)
-- `pipeline/figure_rules.md` — matplotlib Nature급 스타일 규칙
-- `metaclaw/research_patterns.json` — 연구 패턴 데이터베이스
-- `journal_requirements/` — 저널별 제출 요건
+## Layout
 
-## Cowork 사용법
-세션 시작 시 아래 URL을 web_fetch로 로드:
-https://raw.githubusercontent.com/bisu9082/ku-cowork-pipeline/main/pipeline/system_prompt.md
+- `pipeline/system_prompt_gpt.md`: compact GPT-oriented pipeline prompt.
+- `pipeline/system_prompt.md`: full original pipeline prompt.
+- `pipeline/metaclaw/ku_publications.json`: KU publication and self-citation database.
+- `pipeline/metaclaw/figure_patterns.json`: journal and chart-type figure rules.
+- `pipeline/metaclaw/figure_revision_log.json`: figure revision log data.
+- `pipeline/metaclaw/provenance_audit_policy.md`: audit-only provenance and disclosure gate.
+- `pipeline_config.json`: current project state and asset paths.
+- `workspace/Step0` to `workspace/Step8`: generated research outputs.
+- `scripts/pipeline_cli.py`: local helper for status, setup, citations, and figure rules.
+- `scripts/run_provenance_audit.py`: wrapper for `guillaumemeyer/watermarks-remover` audit mode.
+
+## Quick Start
+
+Use the bundled Codex Python runtime:
+
+```powershell
+& "C:\Users\kkaan\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" scripts\pipeline_cli.py status
+```
+
+Initialize the project workspace:
+
+```powershell
+& "C:\Users\kkaan\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" scripts\pipeline_cli.py init --name "My Research Project" --journal "ACS Sensors"
+```
+
+Find self-citation candidates:
+
+```powershell
+& "C:\Users\kkaan\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" scripts\pipeline_cli.py self-cite "machine learning" "colorimetric sensor" "CWA detection"
+```
+
+Check figure rules:
+
+```powershell
+& "C:\Users\kkaan\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" scripts\pipeline_cli.py figure --journal "ACS Sensors" --chart bar_chart
+```
+
+Run the provenance audit gate:
+
+```powershell
+git clone https://github.com/guillaumemeyer/watermarks-remover.git watermarks-remover
+& "C:\Users\kkaan\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" scripts\run_provenance_audit.py workspace\Step8 --watermarks-dir watermarks-remover --format json --out workspace\Step8\provenance_audit.json
+```
+
+The integration is audit-only. Use it to decide disclosure, provenance, and metadata-review actions; do not use it to remove or bypass provenance marks.
+
+## Operating Rule
+
+The pipeline is stateful. Update `pipeline_config.json` through `scripts/pipeline_cli.py step` after a step is completed, and keep generated outputs under `workspace/StepN/`.
