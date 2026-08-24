@@ -10,10 +10,12 @@ This repository now contains the local AutoResearchClaw v6.2 / MetaClaw assets a
 - `pipeline/metaclaw/figure_patterns.json`: journal and chart-type figure rules.
 - `pipeline/metaclaw/figure_revision_log.json`: figure revision log data.
 - `pipeline/metaclaw/provenance_audit_policy.md`: audit-only provenance and disclosure gate.
+- `pipeline/metaclaw/provenance_tools.json`: cross-tool provenance registry.
 - `pipeline_config.json`: current project state and asset paths.
 - `workspace/Step0` to `workspace/Step8`: generated research outputs.
 - `scripts/pipeline_cli.py`: local helper for status, setup, citations, and figure rules.
 - `scripts/run_provenance_audit.py`: wrapper for `guillaumemeyer/watermarks-remover` audit mode.
+- `scripts/run_cross_provenance_audit.py`: cross-audit wrapper combining executable audit with image/visible watermark review cues.
 
 ## Quick Start
 
@@ -49,6 +51,14 @@ git clone https://github.com/guillaumemeyer/watermarks-remover.git watermarks-re
 ```
 
 The integration is audit-only. Use it to decide disclosure, provenance, and metadata-review actions; do not use it to remove or bypass provenance marks.
+
+Run the cross-tool provenance gate:
+
+```powershell
+& "C:\Users\kkaan\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" scripts\run_cross_provenance_audit.py workspace\Step8 --watermarks-dir watermarks-remover --out workspace\Step8\cross_provenance_audit.json
+```
+
+Cross-tool mode registers `watermarks-remover`, `noai-watermark`, visible watermark review tools, and MarkScrub as audit/reference channels. Only `watermarks-remover` is executed automatically; image watermark and visible overlay tools are manual review references.
 
 ## Operating Rule
 

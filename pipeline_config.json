@@ -12,6 +12,8 @@
     "figure_patterns": "pipeline/metaclaw/figure_patterns.json",
     "figure_revision_log": "pipeline/metaclaw/figure_revision_log.json",
     "provenance_audit_policy": "pipeline/metaclaw/provenance_audit_policy.md",
-    "provenance_audit_runner": "scripts/run_provenance_audit.py"
+    "provenance_tools": "pipeline/metaclaw/provenance_tools.json",
+    "provenance_audit_runner": "scripts/run_provenance_audit.py",
+    "cross_provenance_audit_runner": "scripts/run_cross_provenance_audit.py"
   }
 }

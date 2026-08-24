@@ -1,0 +1,58 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "last_updated": "2026-08-24",
+    "purpose": "Cross-tool provenance audit registry for KU paper submission assets.",
+    "mode": "audit_only",
+    "rule": "Use tools to inspect, disclose, and document provenance. Do not use this registry to remove, hide, bypass, or launder AI provenance, C2PA, copyright, authorship, or platform marks."
+  },
+  "tools": [
+    {
+      "id": "watermarks-remover",
+      "name": "watermarks-remover",
+      "repository": "https://github.com/guillaumemeyer/watermarks-remover",
+      "pipeline_role": "primary_audit",
+      "supported_checks": [
+        "C2PA and Content Credentials presence",
+        "AI metadata markers",
+        "invisible Unicode carriers",
+        "document/container provenance markers",
+        "optional stylometry signal"
+      ],
+      "pipeline_action": "Run scripts/run_provenance_audit.py in audit-only mode and include the JSON/SARIF report in Step 7/8."
+    },
+    {
+      "id": "noai-watermark",
+      "name": "noai-watermark",
+      "repository": "https://github.com/mertizci/noai-watermark",
+      "pipeline_role": "image_watermark_research_reference",
+      "supported_checks": [
+        "SynthID/StableSignature/TreeRing-class image watermark robustness research",
+        "AI image metadata inspection",
+        "PNG/JPEG image provenance risk triage"
+      ],
+      "pipeline_action": "Do not auto-run removal. If figures are AI-generated or edited, record a manual vendor/oracle verification item and require disclosure/preservation decision."
+    },
+    {
+      "id": "ai-visible-watermark-remover",
+      "name": "AI visible watermark remover",
+      "repository": "https://github.com/geeksprep/ai-watermark-remover",
+      "pipeline_role": "visible_overlay_review_reference",
+      "supported_checks": [
+        "visible Gemini/Grok/Midjourney-style overlay awareness",
+        "manual visual inspection cue for submission images"
+      ],
+      "pipeline_action": "Do not auto-run removal. Use only as a reminder to inspect figures for visible platform overlays and resolve them through source-image replacement, licensing, disclosure, or journal-compliant figure regeneration."
+    },
+    {
+      "id": "markscrub",
+      "name": "MarkScrub",
+      "repository": null,
+      "pipeline_role": "watchlist_reference",
+      "supported_checks": [
+        "emerging text watermark discussion"
+      ],
+      "pipeline_action": "Track as a literature/news watchlist item only until a stable public repository and auditable scope are available."
+    }
+  ]
+}
