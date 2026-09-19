@@ -1,11 +1,11 @@
 {
   "_meta": {
-    "version": "2.2",
+    "version": "2.3",
     "description": "Ku 박사 자기인용 데이터베이스 — 논문 자동화 파이프라인 Self-Citation 시스템",
-    "last_updated": "2026-08-23",
-    "total_published": 35,
+    "last_updated": "2026-09-19",
+    "total_published": 36,
     "note": "2+ topic overlap시 자동 인용 후보 표시. 모든 항목 verified 필드 필수 — 없으면 self-cite 금지.",
-    "integrity_note": "v2.0: CrossRef 전수 검증. 허구 DOI 13건 삭제(J1/J3/J7/J8/J9/J10/J11/J14/J15/J16/J17/J18/J19 — 타인 논문 DOI 또는 미등록), J2·J6 DOI 정정, 신규 10편 추가. 모든 항목 verified 필드 보유. 백업: ku_publications_backup_v1.1.json | v2.1: doi.org 전수 리졸브 감사. 미등록 DOI(국내지 원문 인쇄값)는 doi_status=unregistered로 보존 — 인용 시 DOI 생략하고 서지정보 표기.",
+    "integrity_note": "v2.0: CrossRef 전수 검증. 허구 DOI 13건 삭제(J1/J3/J7/J8/J9/J10/J11/J14/J15/J16/J17/J18/J19 — 타인 논문 DOI 또는 미등록), J2·J6 DOI 정정, 신규 10편 추가. 모든 항목 verified 필드 보유. 백업: ku_publications_backup_v1.1.json | v2.1: doi.org 전수 리졸브 감사. 미등록 DOI(국내지 원문 인쇄값)는 doi_status=unregistered로 보존 — 인용 시 DOI 생략하고 서지정보 표기. | v2.3(2026-09-19): my paper 대조로 Chemosensors 리뷰 1편 추가(J49). CrossRef 저자대조+철회확인 완료. 백업 ku_publications_backup_v2.2.json",
     "canonical_path": "pipeline/metaclaw/ku_publications.json (정본 — 루트 사본 읽지 말 것)",
     "source_refresh": "Desktop/my paper BibTeX import",
     "doi_verification_status": "Local BibTeX DOI values imported; external DOI resolution not performed."
@@ -1157,6 +1157,26 @@
       "local_source": "Desktop/my paper",
       "local_source_file": "C:\\Users\\kkaan\\Desktop\\my paper\\acta.txt",
       "local_refresh_note": "Matched local BibTeX during 2026-08-23 refresh; existing verified metadata preserved."
+    },
+    {
+      "id": "J49-2026",
+      "year": 2026,
+      "title": "Orthogonal Multimodal Sensing and AI Fusion for the Recognition of Unknown Chemical Threats: A Critical Review",
+      "authors": "Kim MK, Kang K, Cho SH, Jang YJ, Kim S, Yoo J, Shin M, Kim S, Lee DH",
+      "journal": "Chemosensors",
+      "volume": "14",
+      "issue": "9",
+      "pages": "189",
+      "doi": "10.3390/chemosensors14090189",
+      "topics": [
+        "multimodal_sensing",
+        "CWA_detection",
+        "open_set_recognition",
+        "AI_fusion",
+        "critical_review"
+      ],
+      "verified": "CrossRef 2026-09-19",
+      "note": "미확인 위협 인식 — 직교 다중모달 + open-set. sensorreview·predictnov 계열 자기인용 후보"
     }
   ],
   "under_review": [
