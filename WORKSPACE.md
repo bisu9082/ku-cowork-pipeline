@@ -6,9 +6,16 @@
 갱신: 이 파일을 고치고 `cd ku-cowork-pipeline && git add -A && git commit && git push`
 (push는 Ku 승인 후. 절대 규칙 5)
 
-- 파이프라인 절대 규칙: `pipeline/ABSOLUTE_RULES.md` (상시 로드)
+- 파이프라인 절대 규칙: `pipeline/ABSOLUTE_RULES.md` (연구 작업 시 먼저 읽는다)
 - 파이프라인 전문: `pipeline/system_prompt.md` (연구 작업 시 로드)
 - 변경 이력: `pipeline/RELEASE_NOTES.md`
+
+⚠️ **`@import`는 Cowork에서 펼쳐지지 않는다** (2026-10-27 두 세션 연속 확인).
+CLAUDE.md에 `@경로` 한 줄을 적어도 그 파일 내용이 로드되지 않고 글자 그대로 들어온다.
+그래서 두 폴더의 CLAUDE.md 모두 "직접 읽는다" 지시 방식을 쓴다.
+`@import`에 기대는 구조를 다시 만들지 않는다.
+이전에 `@ku-cowork-pipeline/pipeline/system_prompt.md`로 전문이 상시 로드된다고
+믿었던 것도 사실이 아니었을 가능성이 높다.
 
 ---
 
