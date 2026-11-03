@@ -1,8 +1,8 @@
 ################################################################
-# Claude Code × AutoResearchClaw 논문 자동화 파이프라인 v7.3
+# Claude Code × AutoResearchClaw 논문 자동화 파이프라인 v7.4
 # 기반: github.com/aiming-lab/AutoResearchClaw v0.4.0
 # 저장소: github.com/bisu9082/ku-cowork-pipeline
-# 업데이트: 2026-10-27
+# 업데이트: 2026-11-03
 # 실행 환경: Claude Code (정본 로컬 clone: claude_research/ku-cowork-pipeline)
 # 버전별 변경 이력은 pipeline/RELEASE_NOTES.md에 둔다. 이 지침 본문에는 넣지 않는다.
 ################################################################
@@ -107,14 +107,15 @@ raw.githubusercontent.com은 CDN 캐시 때문에 정본 판단에 쓰지 않는
 ```json
 {"project": "", "target_journal": "", "track": "new|revision",
  "current_step": 0, "completed_steps": [], "gates": {}, "outputs": {},
- "models_used": [], "next_action": "", "pipeline_version": "", "date": ""}
+ "models_used": [], "next_action": "", "pipeline_version": "", "date": "",
+ "editor_log": []}
 ```
 
 ### [시작-3] 세션 시작 알림 카드 표시
 프로젝트 `pipeline_state.json`(없으면 HANDOVER.md)에서 current_step, project, date 확인 후:
 
 ┌────────────────────────────────────────────────────────────┐
-│ 🚀 논문 파이프라인 v7.3 · 세션 시작                        │
+│ 🚀 논문 파이프라인 v7.4 · 세션 시작                        │
 │ [날짜] [시간]                                              │
 └────────────────────────────────────────────────────────────┘
 현재 프로젝트: [프로젝트명 또는 '없음']
@@ -176,7 +177,7 @@ raw.githubusercontent.com은 CDN 캐시 때문에 정본 판단에 쓰지 않는
 - 단계 순서는 엄격히 준수 (GATE 통과 없이 건너뜀 불가)
 - 단, 롤백은 항상 허용 (e.g., Step 5 → Step 3으로 돌아가기)
 - 재작업 후 GATE 재통과 시 원래 단계 복귀 가능
-- 최종 GATE 8 (Accept 평가)은 3인 독립 채점 완료 후에만 ACCEPT 선언 가능
+- 최종 GATE 8 (Accept 평가)은 분야 전문가 5인 독립 채점 완료 후에만 ACCEPT 선언 가능
 
 ## SmartPause 시스템 (AutoResearchClaw v0.4.0)
 신뢰도 기반 자동 중단: Ku의 명시적 개입 없이 파이프라인이 스스로 판단하여 일시 정지:
@@ -523,8 +524,11 @@ GATE 통과 후 반드시:
 │ 🎨 FIGURE [N]/[전체N] 생성 완료        │
 │ 피드백을 주세요                        │
 └────────────────────────────────────────┘
-자동 품질 검사 5항목 결과 표시
+자동 품질 검사 5항목 결과 표시 (규격·형식)
+→ **[EDITOR-PASS] 5줄 카드 함께 출력** (내용·scope. v7.4 신규)
+   Figure 고유 질문 포함: 캡션만으로 이해되는가 / Table이어야 하지 않는가 / SI로 내릴 것인가
 → Ku 피드백 수령 → 수정 또는 다음 Figure
+※ Table도 같다. Table 1개 완성 시 같은 카드를 낸다
 
 ################################################################
 # [Step 4 특별 규칙] ML 및 통계 코드 + GitHub 안내
@@ -703,7 +707,7 @@ Step 4는 집필 전이므로 **원고가 없다.** 두 시점을 섞지 않는�
 
 | | Step 4 (산출물 축) | Step 8 Phase 0 (원고 축) |
 |---|---|---|
-| 시점 | REPRO-AUDIT 통과 직후, 결과 해석 전 | 3인 리뷰어 채점 전 |
+| 시점 | REPRO-AUDIT 통과 직후, 결과 해석 전 | 분야 전문가 5인 채점 전 |
 | 대상 | 분석 코드, `experiment_summary.json`, 실행 로그, 표·Figure 초안 | 원고 전문 + SI + Figure |
 | 세그먼트 | **S1·S2·S3·S4만** | S1~S6 전체 |
 | 컨텍스트 | 코드 패키지 전체 + REPRO-AUDIT 보고 | 원고 전문 |
@@ -794,7 +798,7 @@ Step 4 실행이면 S5·S6을 빼고 S1~S4만 구성한다 (위 실행 시점 �
 - **치명 1건이라도 있으면 다음 단계 진입 금지.** SmartPause 발동
 - 중대는 Ku 판단. 수정하거나 Discussion에 선제 반영한다
 - Step 4에서 치명이 나오면 Step 5(집필) 진입 금지
-- Step 8에서 치명이 나오면 Phase 2 채점으로 넘어가지 않는다
+- Step 8에서 치명이 나오면 Phase 1로 넘어가지 않는다 (Phase 0에서 멈춘다)
 
 ## [업로드 금지]
 미투고 원고, 심사 중 원고, 공저자가 있는 원고를 외부 리뷰 서비스에
@@ -1038,14 +1042,17 @@ GATE 7 통과 조건:
 - **AI 공시문 존재 + 실제 사용 내역과 일치 (v6.9)**
 
 ################################################################
-# [Step 8 특별 규칙] Accept 최종 평가: 3관점 강화 채점
+# [Step 8 특별 규칙] Accept 최종 평가: 3관점 + 분야 전문가 5인 채점
 # 출처: ARIS cross-model review + AutoResearchClaw v0.4.0 HITL co-pilot
+# v7.4: 리뷰어를 역할 기반 3인에서 저널 실데이터 기반 분야 전문가 5인으로 확장
 ################################################################
 
 ## Step 8 목적
 완성 논문을 실제 저널 리뷰 프로세스를 시뮬레이션하여
 Accept 가능성을 최종 판정한다.
-3개의 독립 관점(혁신자/실용주의자/비판자) × 3인 리뷰어로 강화된 채점.
+3개의 독립 관점(혁신자/실용주의자/비판자) + **분야 전문가 5인** 채점.
+
+채점은 **100점 환산**으로 통일한다. 리뷰어 수를 바꿔도 GATE 기준이 깨지지 않는다.
 
 ## Step 8 실행 순서
 
@@ -1093,37 +1100,65 @@ Step 4와 동일한 3관점을 논문 전체 수준에서 재적용.
 - 연구 범위를 과도하게 일반화한 주장은 없는가?
 - 데이터 출처·수집 방법의 편향 가능성은 없는가?
 
-### Phase 2: 3인 리뷰어 채점 (독립 수행)
+### Phase 2: 분야 전문가 5인 채점 (독립 수행, v7.4 개정)
 
-**[리뷰어 1: Associate Editor 시뮬레이션]**
-- Scope fit (저널 적합도): /10
-- Significance (중요성): /10
-- Novelty (신규성): /10
-- 판정: Accept / Minor Revision / Major Revision / Reject
-- 주요 코멘트 (3개):
+**리뷰어는 역할이 아니라 분야로 세운다.** 5인의 정체성은 [JP-2] 클러스터에서 가져온다.
+`<코드네임>/journal_profile.json`이 없으면 Phase 2 전에 [JP] 절차를 먼저 돌린다.
 
-**[리뷰어 2: Technical Expert 시뮬레이션]**
-- Methodology rigor (방법론 엄밀성): /10
-- Statistical validity (통계 타당성): /10
-- Reproducibility (재현성): /10
-- 판정: Accept / Minor Revision / Major Revision / Reject
-- 주요 코멘트 (3개):
+**리뷰어 구성 절차**
+1. journal_profile.json의 상위 5개 클러스터를 읽는다
+2. 클러스터마다 리뷰어 1명을 배정한다. 비중이 큰 클러스터일수록 **에디터가 실제로
+   리뷰어를 찾기 쉬운 분야**이므로 그 리뷰어의 판정에 가중을 두지 않되 코멘트는 먼저 읽는다
+3. 각 리뷰어의 **평가축 3개**는 그 클러스터의 `typical_methods`·`typical_questions`에서
+   도출한다. 아래 기본 축은 클러스터 정보가 없을 때만 쓴다
+4. **이름을 붙이지 않는다.** `R1 [클러스터명] ([N]%)` 형식으로만 표기한다.
+   이 표기는 아래 양식과 Phase 5 출력 형식에서 동일하게 쓴다
 
-**[리뷰어 3: Domain Specialist 시뮬레이션]**
-- Literature coverage (문헌 포괄성): /10
-- Interpretation accuracy (해석 정확성): /10
-- Practical impact (실용적 영향): /10
-- 판정: Accept / Minor Revision / Major Revision / Reject
-- 주요 코멘트 (3개):
+⛔ 실존 연구자 이름·소속·논문을 리뷰어에 귀속시키지 않는다. 절대 규칙 1 위반이다.
+해당 분야의 실제 논문을 **근거로 인용**하는 것은 되지만(예: "이 저널 최근 논문은 X를
+보고한다"), 그 저자가 이렇게 말할 것이라고 쓰지 않는다.
+
+**리뷰어 5인 양식** (각 30점, 합계 150점 → 100점 환산)
+환산식: `환산점 = round(합계 × 2 / 3)`. **반올림 후** GATE 기준과 비교한다
+(합계 133 → 89점 통과, 132 → 88점 미통과).
+```
+R1 [클러스터명] ([N]%)
+  분야 정체성: [이 클러스터가 다루는 질문 1문장]
+  축1 [클러스터 도출]: /10
+  축2 [클러스터 도출]: /10
+  축3 [클러스터 도출]: /10
+  판정: Accept / Minor Revision / Major Revision / Reject
+  코멘트 3개: [각 코멘트에 원고 위치를 붙인다]
+```
+
+**평가축 기본값** (클러스터에서 축을 못 뽑았을 때만)
+| 리뷰어 | 축1 | 축2 | 축3 |
+|---|---|---|---|
+| R1 분야 핵심 | Novelty | Significance | 분야 기여 |
+| R2 방법론·통계 | Methodology rigor | Statistical validity | Reproducibility |
+| R3 응용·실무 | Practical impact | 적용 범위 명확성 | 한계 서술 정직성 |
+| R4 인접분야 | 외부 독자 가독성 | 용어 정의 충실성 | 타 분야 전이 가능성 |
+| R5 회의적 외부자 | 대안 설명 배제 | 과잉일반화 여부 | 데이터 충분성 |
+
+R5는 **반드시 가장 비판적인 축**을 맡는다. 5인이 전원 우호적이면 채점이 작동하지 않은 것이다.
+
+**교차 입력**: Phase 0 PAT-REVIEW의 치명·중대 발견을 5인 전원에게 **입력으로 준다.**
+리뷰어가 같은 결함을 다시 찾느라 예산을 쓰지 않게 한다.
 
 ### Phase 3: Aims & Scope 적합도 평가 (정량)
 **목적**: 논문이 타깃 저널의 Aims & Scope에 실제로 부합하는지 수치로 평가
 
-실행 절차:
-1. 타깃 저널 Aims & Scope 페이지 web_fetch
-2. 저널이 명시한 핵심 키워드/주제 영역 추출
-3. 논문의 주제·방법론·응용 분야와 매칭 점수 산출
-4. 최근 3년 내 해당 저널 게재 논문 주제 분포와 비교
+**주도: EDITOR 페르소나.** 에디터는 리뷰어가 아니라 리뷰어를 배정하는 사람이므로
+Phase 2의 5인에 끼지 않고 이 Phase를 맡는다 (PERSONA SYSTEM 연계 참조).
+
+실행 절차 (v7.4: [JP] 산출물을 재사용한다. 같은 수집을 두 번 하지 않는다):
+1. `<코드네임>/journal_profile.json`을 읽는다. 없거나 90일 초과면 [JP] 절차 실행
+2. `aims_keywords`와 논문의 주제·방법론·응용 분야 매칭 점수 산출
+3. `clusters` 분포와 논문 위치 비교 → "최근 게재 경향 일치" 점수
+4. 겹침이 0%면 scope 이탈, 100%면 노블티 부족. 둘 다 감점이다
+5. **`pipeline_state.json`의 `editor_log`를 읽는다** (v7.4). 집필 내내 같은 `demand`가
+   3회 이상 반복됐는데 고쳐지지 않았으면 감점하고 그 사실을 판정문에 적는다.
+   항목 단위 재평가는 하지 않는다. 그건 [EDITOR-PASS]가 이미 했다
 
 Aims & Scope 적합도 점수표:
 | 항목 | 배점 | 평가 기준 |
@@ -1171,12 +1206,15 @@ Phase 4는 그 결과를 받아 불일치 0건을 확인하는 단계다. 수치
   [실용주의자B] 방법론: ★★★★★: [핵심 평가 1문장]
   [비판자C] 리스크: [Top 위험요소 1개]
 
-📋 3인 리뷰어 채점:
-  리뷰어 1 (Editor):    [점수]/30 → [판정]
-  리뷰어 2 (Technical): [점수]/30 → [판정]
-  리뷰어 3 (Domain):    [점수]/30 → [판정]
+📋 분야 전문가 5인 채점 (저널 프로파일: [crossref N편 / 2y] 또는 [기본값]):
+  R1 [클러스터명] ([N]%): [점수]/30 → [판정]
+  R2 [클러스터명] ([N]%): [점수]/30 → [판정]
+  R3 [클러스터명] ([N]%): [점수]/30 → [판정]
+  R4 [클러스터명] ([N]%): [점수]/30 → [판정]
+  R5 [클러스터명] ([N]%): [점수]/30 → [판정]
   ─────────────────────────────────────
-  합계: [점수]/90   평균: [점수]/30
+  합계: [점수]/150 → **환산 [점수]/100**
+  판정 분포: Accept [N] / Minor [N] / Major [N] / Reject [N]
 
 📐 Aims & Scope 적합도: [점수]/100
   주제 일치 [점]/30 · 방법론 [점]/20 · 독자관련성 [점]/20
@@ -1188,23 +1226,32 @@ Phase 4는 그 결과를 받아 불일치 0건을 확인하는 단계다. 수치
   → [일관성 통과 ✅ / 불일치 발견 ⛔ (항목 목록)]
 
 🎯 GATE 8 판정:
-  3인 채점 합계: [X]/90
+  5인 채점 환산: [X]/100
   Aims/Scope: [점수]/100
   데이터 일관성: [통과/미통과]
-  다수결 판정: [Accept / Minor / Major / Reject]
+  다수결 판정: [Accept / Minor / Major / Reject] (5인 중 [N]인)
 
 📊 Accept 확률 (정량 추정):
   ┌─────────────────────────────────────────┐
-  │  채점 기여  [X/90 × 0.5]  = [값]%       │
+  │  채점 기여  [X/100 × 0.5] = [값]%       │
   │  Scope 기여 [Y/100 × 0.3] = [값]%       │
   │  일관성     [통과=0.2, 미통과=0]  = [값]% │
   │  ─────────────────────────────────────  │
   │  🎯 추정 Accept 확률: [합계]%            │
-  │                                         │
-  │  ≥ 75%  → ACCEPT 권고                  │
-  │  55~74% → MINOR REVISION               │
-  │  35~54% → MAJOR REVISION               │
-  │  < 35%  → REJECT / 저널 전환 검토       │
+  └─────────────────────────────────────────┘
+
+  ⚠️ **GATE 8을 통과하지 못하면 밴드를 적용하지 않는다.**
+     확률값은 참고로 적되 ACCEPT 권고를 낼 수 없다. 판정은 REJECT / 저널 전환 검토다.
+     (GATE 미통과 상태로 확률이 75%를 넘는 일이 생긴다. 공식에 일관성 고정 20%와
+      Scope 최소 21%가 들어가기 때문이다. 확률이 GATE를 이기지 않는다.)
+
+  GATE 8 통과 시에만 아래 밴드를 적용한다.
+  통과 하한(채점 89 · Scope 70 · 일관성 통과)이 85.5%이므로 밴드는 그 위에서 나뉜다.
+  ┌─────────────────────────────────────────┐
+  │  ≥ 95%     → ACCEPT 권고                │
+  │  90~94%    → MINOR REVISION             │
+  │  85.5~89%  → MAJOR REVISION             │
+  │  GATE 미통과 → REJECT / 저널 전환 검토   │
   └─────────────────────────────────────────┘
 
 📌 필수 대응 코멘트 (상위 3개):
@@ -1212,15 +1259,17 @@ Phase 4는 그 결과를 받아 불일치 0건을 확인하는 단계다. 수치
   2. [두 번째 코멘트 + 권장 대응 방향]
   3. [세 번째 코멘트 + 권장 대응 방향]
 
-→ Accept 확률 75% 미만: 주요 수정 사항 → Step 5/6 롤백 여부 Ku 결정 요청
-→ Accept 확률 75% 이상: MetaClaw 트리거 B 자동 실행 (다음 연구 아이디어 제안)
+→ **GATE 8 미통과**: 미충족 항목을 명시하고 Step 5/6 롤백 여부 Ku 결정 요청
+→ **GATE 8 통과 + 95% 미만**: 밴드에 따른 수정 사항 제시
+→ **GATE 8 통과 + ACCEPT 권고(≥95%)**: MetaClaw 트리거 B 자동 실행 (다음 연구 아이디어 제안)
 
 GATE 8 통과 조건:
 - **Phase 0 PAT-REVIEW 치명 발견 0건** (중대는 Ku 판단)
-- 3인 리뷰어 합계 ≥ 80점
+- **5인 채점 환산 ≥ 89점/100** (v7.3까지의 80/90 = 88.9%를 환산한 값)
 - Aims & Scope 적합도 ≥ 70점
 - 데이터 일관성 불일치 0건
-- 다수결(2인 이상) Accept 판정
+- **5인 중 3인 이상 Accept 판정**
+- 저널 프로파일이 **기본값 대체**였으면 그 사실을 판정문에 명시 (GATE를 막지는 않는다)
 - 5층 Citation Verification (Step 7, Layer 0~4) 통과 확인
 - VerifiedRegistry 허구 항목 0건 확인
 
@@ -1363,8 +1412,11 @@ README_code.md / requirements.txt
 ## 저장 경로 구조 (v7.2: claude_research/CLAUDE.md 규칙과 일원화)
 SAVE_ROOT = claude_research/<코드네임>/
 ├── pipeline_state.json  [단계·GATE·산출물 경로·사용 모델]
+├── journal_profile.json [JP 수집본: Aims 키워드·클러스터 5개·비중 (v7.4)]
+│                        ※ editor_log는 pipeline_state.json 안에 둔다 (별도 파일 아님)
 ├── data/     [원데이터, raw_results.csv, 문헌 목록(Step1), 중간 산출물]
-├── code/     [analysis_main.py, requirements.txt, README_code.md, experiment_summary.json]
+├── code/     [analysis_main.py, requirements.txt, README_code.md, experiment_summary.json,
+│              repro_ledger.json (REPRO-AUDIT A6 검증 원장)]
 ├── figure/   [fig_0N_*.png, Figure 생성 코드]
 ├── latex/    [main.tex, myref.bib, SI.tex, cover_letter, 인용 검증 보고(Step7)]
 └── upload/   [최종 제출 패키지(Step8)]
@@ -1863,19 +1915,32 @@ Ku의 연구 분야는 다학제적(CBRN, 센서, 재료, 방사선, 보건 등)
 ## 실행 시점 및 방법
 
 ### Step 1 (문헌 조사·RQ 설계) 시
-- 타깃 저널 결정 직후 **에디터/독자 프로파일 카드** 작성 (아래 형식)
 - RQ 프레이밍을 독자 관심사 언어로 조정
+- ※ **에디터/독자 프로파일 카드는 Step 2**에서 만든다. 저널 선정이 Step 2이고
+  이 시스템의 트리거도 "Step 2 저널 선정 완료 시"다 (v7.4: 구 Step 1 표기 수정)
+
+### Step 2 (저널 선정 완료) 시
+- [JP] 저널 프로파일 수집 실행 → `journal_profile.json`
+- **에디터/독자 프로파일 카드** 작성 (아래 형식)
 
 ### Step 5 (논문 초안 작성) 시
 - Introduction: 독자 전공 맥락에서 갭을 설명 (Ku 전공 용어 단독 사용 금지)
 - Novelty 문장: 독자가 "이게 왜 새로운가"를 즉시 이해할 프레임으로 작성
 - Discussion: 독자 분야의 선행연구와 연결하여 기여 명확화
 - 분야 간 교량 표현 사용: "From the perspective of [독자 분야]..."
+- **섹션 1개 완성할 때마다 [EDITOR-PASS] 실행** (아래)
+
+### Step 6 (Figure·Table) 시
+- **Figure 1장 / Table 1개 완성할 때마다 [EDITOR-PASS] 실행** (아래)
 
 ### STEP R (리비전·리뷰 대응) 시
 - 리뷰어 전공 추정 → 반박/보완 논거를 그 전공 언어로 구성
 
-## 에디터·독자 프로파일 카드 (Step 1 필수 생성)
+## [EDITOR-PASS] 참조
+집필 중 항목 단위 에디터 평가는 **[PERSONA SYSTEM]의 [EDITOR-PASS]** 절에 있다.
+이 절(AUDIENCE PROFILE)은 독자 공감 설계를, 그쪽은 항목별 실시간 평가를 담당한다.
+
+## 에디터·독자 프로파일 카드 (Step 2 필수 생성)
 
 ┌──────────────────────────────────────────────────────────────┐
 │ 👥 AUDIENCE PROFILE: [저널명]                               │
@@ -1899,9 +1964,10 @@ Ku의 연구 분야는 다학제적(CBRN, 센서, 재료, 방사선, 보건 등)
 - ❌ 에디터가 생소한 전문용어 무설명 사용
 
 ################################################################
-# [PERSONA SYSTEM v1.0]: 저널 페르소나 동행 시스템
+# [PERSONA SYSTEM v2.0]: 저널 페르소나 동행 시스템
 # 트리거: Step 2 저널 선정 완료 시 자동 생성
 # 적용 범위: Step 2 선정 → Step 5 초안 → Step 7 검증 → Step 8 채점 전 과정
+# v2.0 (v7.4): 저널 유형 일반론이 아니라 해당 저널의 실제 게재 논문에서 페르소나를 도출
 ################################################################
 
 ## 핵심 개념
@@ -1909,7 +1975,50 @@ Ku의 연구 분야는 다학제적(CBRN, 센서, 재료, 방사선, 보건 등)
 두 페르소나를 자동 생성하여 논문 작성 전 과정에 동행시킨다.
 
 실존 인물 이름 직접 사용 금지: 저널·분야·편집위원회 공개 정보 기반 **합성 아키타입**으로 설계.
+이것은 절대 규칙 1(VerifiedRegistry)의 적용이다. 실존 연구자를 이름으로 세우면
+그 사람이 하지 않은 말을 지어내는 것이 된다. 사람 이름 대신 **분야·역할**로 세운다.
 페르소나는 Ku와 실시간으로 대화하며, 논문 초안을 함께 읽고 반응을 보여준다.
+
+## [JP] 저널 프로파일 수집 (v2.0 신규, 페르소나 생성 전 선행)
+페르소나를 저널 유형 일반론으로 세우지 않는다. **그 저널이 실제로 싣는 논문**에서 뽑는다.
+산출물은 `<코드네임>/journal_profile.json`에 저장하고 Step 8 Phase 2·3이 **재사용**한다.
+같은 저널을 다시 쓸 때는 90일 이내면 재수집하지 않는다.
+
+**JP-1: 원자료 수집**
+1. 저널 Aims & Scope 페이지 web_fetch → 명시 키워드·주제 영역 추출
+2. 최근 **2년** 게재 논문 메타데이터를 CrossRef에서 받는다
+   ```
+   https://api.crossref.org/journals/[ISSN]/works
+     ?filter=from-pub-date:[YYYY-MM-DD],type:journal-article
+     &select=title,abstract,subject,published,DOI
+     &rows=100
+   ```
+3. 표본이 **50편 미만**이면 기간을 3년으로 넓힌다. 그래도 미달이면 그 사실을 보고하고
+   저널 홈페이지 최근 호 목차로 대체한다
+4. 셋 다 실패하면 아래 [저널 유형별 기본값] 표를 쓰되 **"실데이터 미확보"를 명시**한다.
+   도구가 없다는 이유로 확보한 척하지 않는다
+
+**JP-2: 클러스터 추출**
+수집한 제목·초록을 세 축으로 묶는다.
+- 연구 주제 (무엇을 다루는가)
+- 방법론 (어떻게 다루는가)
+- 응용 영역 (어디에 쓰는가)
+
+**상위 5개 클러스터**와 각 비중(%)을 뽑는다. 이 다섯이 Step 8 Phase 2의 리뷰어 5인이 된다.
+클러스터가 5개가 안 나오면 나온 만큼만 쓰고 모자란 수를 보고한다. 억지로 쪼개지 않는다.
+
+**JP-3: 페르소나 구성**
+- **에디터**: Aims/Scope 문구 + 클러스터 분포 + 최근 게재 경향에서 구성.
+  "이 저널은 최근 2년간 [클러스터1] 비중이 [N]%이고 [클러스터5]는 [M]%다"가 판단 근거가 된다
+- **과학자**: 비중 1위 클러스터를 대표하는 아키타입
+
+journal_profile.json 형식:
+```json
+{"journal": "", "issn": "", "collected": "YYYY-MM-DD", "n_papers": 0,
+ "window": "2y|3y", "source": "crossref|homepage|fallback",
+ "aims_keywords": [], "clusters": [{"name":"","axis":"주제|방법론|응용","share":0.0,
+ "typical_methods":[], "typical_questions":[]}]}
+```
 
 ## 페르소나 2층 구조
 
@@ -1918,11 +2027,16 @@ Ku의 연구 분야는 다학제적(CBRN, 센서, 재료, 방사선, 보건 등)
 
 에디터가 중점적으로 보는 것:
 - Abstract 첫 2문장에서 Significance가 분명한가?
-- 이 주제가 최근 3년 내 저널에 게재된 논문과 차별되는가?
+- 이 주제가 **JP-2 클러스터 분포**와 어떻게 겹치고 어떻게 다른가?
+  (겹침이 0이면 scope 이탈, 100%면 노블티 부족. 둘 다 desk reject 사유다)
 - 방법론이 해당 저널 독자 수준에 맞게 설명됐는가?
-- 리뷰어를 배정할 전문가가 이 분야에 존재하는가?
+- **리뷰어를 배정할 전문가가 이 저널 저자 풀에 존재하는가?**
+  JP-2 클러스터 중 어디에도 안 걸리면 에디터가 리뷰어를 못 찾는다
 
-에디터 판단 기준 (저널 유형별):
+### [저널 유형별 기본값] (JP 실패 시에만 사용)
+아래 표는 **실데이터를 못 구했을 때의 대체값**이다. JP-1이 성공했으면 이 표가 아니라
+수집한 클러스터 분포를 따른다. 이 표를 썼으면 페르소나 카드에 "기본값 사용"을 적는다.
+
 | 저널 유형 | 에디터 우선순위 |
 |----------|--------------|
 | Nature family | Broad impact > Novelty > Rigor (impact first) |
@@ -2010,6 +2124,62 @@ Ku의 연구 분야는 다학제적(CBRN, 센서, 재료, 방사선, 보건 등)
 | Results | 수치 없는 정성 서술 / 통계 미기재 |
 | Discussion | 한계점 없음 / 과장된 일반화 |
 
+## [EDITOR-PASS] 집필 중 에디터 항목 평가 (v7.4 신규, Step 5~7)
+
+**왜 넣는가.** Step 8 채점은 원고가 완성된 뒤다. 거기서 scope 이탈이 나오면 되돌릴 게
+많다. 에디터는 항목이 만들어질 때마다 본다. **일찍 잡으면 싸다.**
+
+### 트리거 단위
+| 단계 | 평가 단위 | 시점 |
+|---|---|---|
+| Step 5 | 섹션 1개 (Intro / Methods / Results / Discussion / Conclusion / Abstract) | 초안 완성 직후, Humanize 실시간 점검과 같은 자리 |
+| Step 6 | **Figure 1장 / Table 1개** | 생성 직후. 기존 "Figure 1장씩" 규칙에 붙인다 |
+| Step 7 | 인용 검증 통과본 전체 | Layer 4 통과 후 1회 |
+
+### 평가 3축 (항목마다 동일하다. 바꾸지 않는다)
+1. **전달** 이 항목만 본 독자가 무엇을 얻는가
+2. **적합** `journal_profile.json` 클러스터와 어떤 관계인가
+3. **위험** 이 항목이 desk reject 사유가 되는가
+
+### Figure·Table 고유 질문 (Step 6에서만 추가)
+- **캡션만 읽고 이해되는가.** 저널 독자는 본문보다 그림을 먼저 본다
+- 이 Table은 Figure여야 하지 않는가. 반대도 묻는다
+- 본문에 있어야 하는가, SI로 내려야 하는가
+
+### 출력 카드 (5줄 고정)
+길게 쓰지 않는다. 항목마다 긴 평가를 내면 집필이 멈춘다.
+```
+🎬 EDITOR [항목명]
+  전달: [1문장]
+  적합: [클러스터명] [부합 / 이탈] · [근거 1구]
+  위험: [없음 / 사유 1구]
+  요구: [고칠 것 1개 또는 "없음"]
+```
+
+### 멈춤 조건
+- `위험`에 **desk reject 사유**가 적히면 그 항목에서 멈추고 Ku 확인을 받는다
+- 그 외에는 멈추지 않는다. **이것은 GATE가 아니라 집필 중 피드백이다**
+
+### 누적 기록
+각 카드를 `pipeline_state.json`의 `editor_log`에 쌓는다.
+```json
+{"step":5,"item":"Results","verdict":"부합","risk":null,
+ "demand":"3.2절 수치가 Abstract 주장보다 약함","date":"YYYY-MM-DD"}
+```
+**Step 8 Phase 3에서 EDITOR가 이 로그를 읽는다.** 같은 `demand`가 3회 이상 반복됐는데
+고쳐지지 않았으면 Phase 3 점수에서 감점하고 그 사실을 판정문에 적는다.
+
+### 중복 방지 (축이 다르다)
+| 절차 | 보는 것 |
+|---|---|
+| Humanize 실시간 (Step 5) | 문체 |
+| FIGURE RULES (Step 6) | 규격·형식 |
+| **EDITOR-PASS** | **내용이 저널 독자와 scope에 맞는가** |
+| Step 8 Phase 3 | 완성본 전수 + `editor_log` 누적 |
+
+같은 항목에서 셋이 함께 돌지만 묻는 것이 다르다. 겹치면 EDITOR-PASS가 양보한다.
+문체 지적은 Humanize가, 규격 지적은 FIGURE RULES가 한다. 에디터는 내용만 말한다.
+
 ## 페르소나 단계별 역할
 
 ### Step 5 (초안 작성): 실시간 동행
@@ -2022,9 +2192,12 @@ Ku의 연구 분야는 다학제적(CBRN, 센서, 재료, 방사선, 보건 등)
 - "이 분야 전문가라면 이 논문을 인용했을까?" 판단
 - 누락된 핵심 문헌 지적 (분야 내 필수 인용 관행 기반)
 
-### Step 8 (최종 채점): 페르소나 채점 통합
-- 3인 리뷰어 중 리뷰어 1(에디터 시뮬레이션)을 EDITOR 페르소나로 대체
-- 리뷰어 2(기술 전문가 시뮬레이션)를 SCIENTIST 페르소나로 대체
+### Step 8 (최종 채점): 페르소나 채점 통합 (v7.4 개정)
+- **EDITOR 페르소나는 Phase 3(Aims & Scope 적합도)을 주도한다.** 리뷰어 5인에 끼지 않는다.
+  에디터는 리뷰어가 아니라 리뷰어를 배정하는 사람이다
+- **SCIENTIST 페르소나는 Phase 2의 R1(비중 1위 클러스터)로 들어간다.** JP-3에서 이미
+  1위 클러스터 아키타입으로 구성했으므로 같은 인물이다. 따로 만들지 않는다
+- R2~R5는 journal_profile.json의 2~5위 클러스터에서 새로 세운다
 - 페르소나 일관성 유지 (Step 2에서 생성된 카드 기준 그대로 적용)
 
 ## 페르소나 대화 모드 (선택 기능)
@@ -2299,7 +2472,10 @@ Ku 승인 후 commit·push한다.
 └──────────────────────────────────────────────────┘
 
 ################################################################
-# [영문 작성 품질]: AI 문체 점검 시스템 (Humanize EN v4.0)
+# [영문 작성 품질]: AI 문체 점검 시스템 (Humanize EN v5.0)
+# v5.0 추가 (v7.4): Wikipedia Signs of AI writing 직접 반영 → [EN-S1-F]
+#   지금까지 2차 가공본(Aboudjem·matsuikentaro1·academic-humanizer)만 인용했다.
+#   그 공통 상류인 WikiProject AI Cleanup 1차 목록을 넣는다.
 # 출처: github.com/Aboudjem/humanizer-skill (ACL2024/NeurIPS2023/GPTZero 기반)
 # v2.0 추가: Imbad0202/academic-research-skills v3.7.0 Writing Quality Check 통합
 #   → em dash 0회(v7.2) / throat-clearing opener / synonym cycling / 구조 패턴 4종
@@ -2389,6 +2565,54 @@ Ku 승인 후 commit·push한다.
 ❌ **필러 전환어**: "Importantly,", "Interestingly,", "Notably,",
    "It bears mentioning that" 문장 시작 → 삭제, 내용으로 중요성 전달
    (인용·데이터가 바로 뒤따르는 `Notably,`는 G-4에 따라 허용)
+
+### [EN-S1-F] Wikipedia Signs of AI writing 기반 (v5.0 신규)
+# 출처: en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing
+#       (WikiProject AI Cleanup 유지보수 1차 목록) · blader/humanizer 26패턴 MIT
+# ※ 지금까지 인용한 humanizer repo들의 공통 상류다. 2차 가공본 대신 원본을 쓴다.
+# ※ blader/humanizer의 입장도 Ku 절대 규칙 3과 같다:
+#   "Getting past AI detectors is not a goal, and detectors still flag most of its output."
+
+❌ **Not X but Y 구문** (Wikipedia 1순위 텔. 기존 EN-S1-B의 "Not only...but also"와 다름)
+   "This is not merely a technical improvement, it is a paradigm shift"
+   "The model does not just classify. It explains."
+   → 주장을 직접 쓴다. 부정을 거쳐 긍정에 도달하지 않는다
+
+❌ **없는 반론 세우기**: "A tempting approach would be to...", "One might argue that..."
+   아무도 제기하지 않은 반론을 세우고 반박하는 구조
+   → 실제 선행연구가 그 주장을 했으면 **인용과 함께** 쓰고, 아니면 삭제
+   (절대 규칙 1: 가상의 반대자를 만들지 않는다)
+
+❌ **빌린 권위**: "Experts believe...", "It is widely accepted that...",
+   "Numerous studies have shown..." (인용 없음), 권위를 꾸미려는 인용 나열
+   → 특정 문헌을 지목하고 그 문헌이 **실제로 말한 것**을 쓴다. 못 지목하면 주장을 버린다
+   ⚠️ 이것은 문체 문제가 아니라 **VerifiedRegistry 위반**이다. S1 중에서도 최우선
+   ※ [EN-S2-A]의 `"Previous studies have shown" 과용`과 등급이 갈린다. 기준은 인용 유무다.
+     **인용이 없으면 S1-F(즉시 제거), 인용이 있는데 반복되면 S2-A(3회 이상 시 수정).**
+
+❌ **문서 자체를 서술**: "This section describes...", "The table below compares...",
+   "In this paragraph, we will..." → 문서가 아니라 **대상**을 서술한다
+   ✅ 예외: `Table 2 lists the measured LOD values.` 같은 표준 상호참조는 허용한다.
+      금지 대상은 독자가 보면 아는 것을 설명하는 문장이다
+
+❌ **제목을 첫 문장에서 반복**: `## Limitations` 바로 밑에 "This study has limitations."
+   → 제목이 할 일을 본문에서 다시 하지 않는다
+
+❌ **심오한 척하는 격언**: "At its core, what matters is...", "X is the language of Y"
+   → 구체적 주장으로 교체. 못 바꾸면 그 문장은 내용이 없는 것이므로 삭제
+
+❌ **is·are·has 회피**: "features", "boasts", "stands as", "constitutes"
+   → `is`, `has`로 쓴다. 학술 문장에서 이 회피는 길이만 늘린다
+   (`serves as`는 [EN-S1-A]에 이미 있다. 중복 등재하지 않는다)
+
+❌ **장식용 볼드·제목** (논문 본문 한정): 본문 중 강조 볼드,
+   제목에 콜론으로 멋 부리기(`Beyond Detection: A New Paradigm for...`)
+   → 저널 양식이 요구하지 않는 볼드는 제거. 제목은 내용을 말한다
+   ✅ 예외: 저널이 요구하는 구조화 초록 라벨(`Background:`, `Methods:`)은 유지
+
+**미채택 기록**: `lakshitha-dev/ai-humanizer-skill`은 GPTZero·Turnitin·Pangram 통과를
+명시적 목표로 한다. **절대 규칙 3(워터마크 제거·회피 처리 금지)과 정면 충돌하므로
+채택하지 않는다.** 이 지침의 목표는 탐지기 회피가 아니라 리뷰어가 읽기 좋은 글이다.
 
 ## S2: 강력 수정 (Strong, 3회 이상 등장 시 필수)
 
@@ -2514,11 +2738,14 @@ AI는 같은 개념을 의미 없이 교체하며 어휘 다양성을 흉내낸�
 → 끊겼으면 복구한다. 이 점검 없이 교정 완료 선언 금지.
 
 ### [G-4] 보존 목록: AI 텔로 신고하지 말 것
+# v7.4: EN-S1-F 적용 시 아래 두 가지를 과잉교정하지 않는다.
+#  - 표준 상호참조(`Table 2 lists...`, `Figure 3 shows...`)는 문서 서술이 아니다
+#  - 저널 요구 구조화 초록 라벨(`Background:`, `Methods:`)의 볼드는 장식이 아니다
 ✅ 전환구 `Notably,` `Furthermore,` `In contrast,`: **클러스터로 과용될 때만** 문제
 ✅ 인용이 붙은 귀속구 `Prior studies have shown that...` `Evidence suggests that...`
 ✅ 의문형 도입 `Who selects into...` `What predicts...`
 ✅ `Additionally`: **단락당 1회까지 허용**
-✅ 기능 부사(G-5 EN-AC-5 참조)
+✅ 기능 부사([EN-AC-5] 참조. G-5라는 가드는 없다)
 ⚠️ 기존 EN-S1-E가 `Notably,` 문두를 금지하나, **인용·데이터가 뒤따르면 허용**한다.
    무근거 강조일 때만 제거. (v3.0 규칙의 완화: 과잉교정 사례 반영)
 
@@ -2537,7 +2764,8 @@ Discussion 섹션: 짧은 주장 + 긴 근거 교차 ("This pattern likely refle
 - 일반형용사 → 측정 가능한 형용사로: significant → 3.2-fold, high → >95%
 - 기기·방법 고유명사 명시: "the detector" → "the NaI(Tl) scintillation detector"
 - 저자 관점 삽입: "We attribute this discrepancy to..." / "This contrasts with prior reports of..."
-  (※ 문두 "Notably,"는 EN-S1-E 필러 전환어: 사용 금지)
+  (※ 문두 "Notably,"는 EN-S1-E 필러 전환어. 단 인용·데이터가 바로 뒤따르면
+     [G-4] 보존 목록에 따라 1회 허용한다. 무조건 금지가 아니다)
 
 ## Claim↔Evidence 동사 보정 (v3.0 신규, academic-humanizer)
 AI puffery 제거와 학술 정직성을 동시에 달성하는 핵심 규칙.
@@ -2583,6 +2811,8 @@ VerifiedRegistry와 연동: 데이터가 뒷받침하지 않는 강도의 주장
 5. [v3.0] RLHF 보이스 스캔(EN-S1-D): 불필요 균형/과잉구조/공손헤징/완충오프너 제거
 6. [v3.0] Claim↔Evidence: 데이터보다 강한 동사·근거없는 크기표현 → 수치 귀속
 7. [v3.0] 보호 목록 대조: 교정이 학술 정밀성 훼손하지 않는지 확인(훼손 시 원문 유지)
+8. **[v7.4] [EDITOR-PASS] 실행** → 5줄 카드 출력 + `editor_log` 기록.
+   Humanize는 문체를, 에디터는 내용·scope를 본다. 둘을 섞지 않는다
 
 ################################################################
 ## [EN-SCORE] AI-tell 정량 점수 (v4.0 신규): 주관 판정 대체
@@ -2617,7 +2847,7 @@ node /tmp/hs/cli/index.js scan  [디렉터리] --fail-above 40
 v6.6에서 확인한 대로 순수 규칙은 학습형 분류기를 무력화하지 못한다.
 → 목적은 여전히 **리뷰어가 읽을 때의 자연스러움**이며, 점수는 그 대리 지표다.
 
-## Step 7 pre-submission 최종 점검 (Humanize EN v4.0 체크)
+## Step 7 pre-submission 최종 점검 (Humanize EN v5.0 체크)
 제출 전 전체 원고 대상:
 □ S1 패턴 전수 스캔 (0개 목표)
 □ 문장길이 SD ≥12단어 (단락별)
@@ -2631,6 +2861,8 @@ v6.6에서 확인한 대로 순수 규칙은 학습형 분류기를 무력화하
 □ [WQ-4] Rule of Three 동일 섹션 ≤2회 / 단락 길이 다양성 확인
 □ [S1-D] RLHF 보이스 0개 (불필요 균형/과잉구조/공손헤징/완충오프너/무내용 마무리)
 □ [S1-E] "In recent years" 오프너·과장구문·분사구 꼬리·필러전환 0개
+□ [S1-F] Not X but Y·없는 반론·빌린 권위·문서 자체 서술·제목 반복·격언·장식 볼드 0개
+   ※ 빌린 권위는 인용 없음 = S1-F 즉시 제거, 인용 있는 반복 = S2-A
 □ [Claim↔Evidence] 데이터보다 강한 동사 0개 / 크기 형용사 수치 귀속 완료
 □ [보호목록] 과잉교정으로 인한 정밀성 훼손 0건 (근거헤징·수동태·기호·인용 보존)
 □ [EN-AC-1~6] LLM 어휘선택·압축표현·환언반복·무내용 평가문·장식부사·서식
@@ -2642,10 +2874,11 @@ v6.6에서 확인한 대로 순수 규칙은 학습형 분류기를 무력화하
 
 완료 보고:
 ┌─────────────────────────────────────────────────────┐
-│ ✍️ Humanize EN 검토 결과 (v4.0)                     │
+│ ✍️ Humanize EN 검토 결과 (v5.0)                     │
 │ S1 제거: [N]개 | S2 수정: [M]개                     │
 │ [S1-D] RLHF 보이스 제거: [N]개                      │
 │ [S1-E] 신규 텔(오프너/구문/분사구/필러): [N]개       │
+│ [S1-F] Wikipedia 텔(NotXbutY/빌린권위/문서서술): [N]개│
 │ [Claim↔Evidence] 동사 하향: [N]개 / 크기표현 수치화: [M]개 │
 │ Burstiness: 문장길이 SD [X]단어 → [High/Med/Low]    │
 │ AI 금지어: [N]개/500단어                            │
