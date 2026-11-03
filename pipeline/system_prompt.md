@@ -1986,20 +1986,40 @@ Ku의 연구 분야는 다학제적(CBRN, 센서, 재료, 방사선, 보건 등)
 
 **JP-1: 원자료 수집**
 1. 저널 Aims & Scope 페이지 web_fetch → 명시 키워드·주제 영역 추출
-2. 최근 **2년** 게재 논문 메타데이터를 CrossRef에서 받는다
+2. **ISSN을 조회로 확정한다. 기억에서 꺼내 쓰지 않는다** (절대 규칙: ID 역검증)
+   ```
+   https://api.crossref.org/journals?query=[저널명]&rows=2
+   ```
+   ⚠️ **틀린 ISSN은 오류가 아니라 빈 결과를 돌려준다.** 0편이 나오면 ISSN부터 의심한다.
+   저널이 없다고 단정하지 않는다 (2026-11-03 실측: `0003-2700`이 빈 응답)
+3. 최근 **2년** 게재 논문을 받는다. **초록 있는 것을 우선 수집한다**
    ```
    https://api.crossref.org/journals/[ISSN]/works
-     ?filter=from-pub-date:[YYYY-MM-DD],type:journal-article
-     &select=title,abstract,subject,published,DOI
+     ?filter=from-pub-date:[YYYY-MM-DD],type:journal-article,has-abstract:true
+     &select=title,abstract,published,DOI
      &rows=100
    ```
-3. 표본이 **50편 미만**이면 기간을 3년으로 넓힌다. 그래도 미달이면 그 사실을 보고하고
+4. `has-abstract:true` 결과가 **50편 미만이면 그 필터를 빼고** 제목만으로 수집한다.
+   그때는 **클러스터 근거가 제목뿐임을 페르소나 카드에 명시**한다
+5. 그래도 50편 미만이면 기간을 3년으로 넓힌다. 그래도 미달이면 그 사실을 보고하고
    저널 홈페이지 최근 호 목차로 대체한다
-4. 셋 다 실패하면 아래 [저널 유형별 기본값] 표를 쓰되 **"실데이터 미확보"를 명시**한다.
+6. 넷 다 실패하면 아래 [저널 유형별 기본값] 표를 쓰되 **"실데이터 미확보"를 명시**한다.
    도구가 없다는 이유로 확보한 척하지 않는다
 
+**JP-1 실측 함정 (2026-11-03 ACS Sensors로 확인)**
+- **CrossRef 초록 수록률이 낮다.** ACS Sensors 최근 2년 1,903편 중 초록 있는 것
+  **457편(24%)**뿐이다. 저널마다 다르므로 수집 전에 `has-abstract:true`로 건수를 세어
+  확인한다. 초록이 있다고 가정하고 설계하지 않는다
+- **`subject` 필드는 대개 비어 있다.** 주제 축을 `subject`에 의존하지 않는다.
+  제목과 초록에서 뽑는다
+- **front matter가 `type:journal-article`을 통과한다.** "Issue Publication Information",
+  "Masthead", "Editorial Board" 같은 것이 섞인다. `has-abstract:true`가 대부분 걸러내지만
+  남으면 제목으로 제외한다. `Correction to`, `Retraction of`, `Expression of Concern`도 뺀다
+- `rows` 최대는 **100**이다. 더 필요하면 cursor 페이징을 쓴다
+
 **JP-2: 클러스터 추출**
-수집한 제목·초록을 세 축으로 묶는다.
+수집한 제목(초록이 있으면 초록도)을 세 축으로 묶는다.
+**초록이 24%만 있는 저널이 흔하므로 제목만으로도 묶이는 축을 쓴다.**
 - 연구 주제 (무엇을 다루는가)
 - 방법론 (어떻게 다루는가)
 - 응용 영역 (어디에 쓰는가)
@@ -2016,6 +2036,7 @@ journal_profile.json 형식:
 ```json
 {"journal": "", "issn": "", "collected": "YYYY-MM-DD", "n_papers": 0,
  "window": "2y|3y", "source": "crossref|homepage|fallback",
+ "abstract_coverage": 0.0, "basis": "title+abstract|title_only",
  "aims_keywords": [], "clusters": [{"name":"","axis":"주제|방법론|응용","share":0.0,
  "typical_methods":[], "typical_questions":[]}]}
 ```
