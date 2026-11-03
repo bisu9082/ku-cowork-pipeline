@@ -113,7 +113,12 @@ GitHub: github.com/bisu9082/ku2ndbarin (private)
 
 - ⚠️ `## 메모리 카드 (전문)` 섹션은 Claude 메모리 추출본이다. **지우지 않는다.**
 - ⚠️ 대시보드(`90-Dashboards/`)는 Dataview가 자동 생성한다. **직접 고치지 않는다.**
-- ⚠️ `build_vault.py`를 **재실행하지 않는다. 노트를 덮어쓴다.**
+- ⚠️ `전체 프로젝트.md`는 Dataview가 아니라 **고정 목록**이다. 프로젝트가 늘거나 줄면
+  **`_tools/build_project_index.py`를 돌린다** (v7.4 신설). 이 스크립트는 `01-Projects`를
+  읽기만 하고 대시보드 파일 하나만 쓴다. `build_vault.py`와 달리 노트를 건드리지 않는다.
+  `--dry`로 먼저 확인할 수 있다
+- ⚠️ `build_vault.py`(`claude_research/Claude outputs/`)를 **재실행하지 않는다.
+  노트를 덮어쓴다.**
   예외: `90-Dashboards/전체 프로젝트.md`는 고정 목록이라 프로젝트가 늘거나 줄면
   갱신이 필요하다. 그때만 레지스트리를 고치고, "핵심 메모"가 쌓인 노트를 제외하도록
   손본 뒤, **Ku 승인을 받고** 돌린다. 기본은 재실행 금지다.
@@ -121,8 +126,21 @@ GitHub: github.com/bisu9082/ku2ndbarin (private)
 
 ### 브리핑
 
-브리핑 생성기는 `claude_research/Claude outputs/daily_brief.py`다.
+### 볼트 자동화 스크립트 (정본은 `볼트/_tools/`)
+
+| 스크립트 | 하는 일 |
+|---|---|
+| `_tools/daily_brief.py` | 아침 브리핑 생성. `--save` 파일 저장, `--mail` 메일까지 |
+| `_tools/inbox_commands.py` | 브리핑 메일 답장으로 볼트 노트 정정 |
+| `_tools/journal_scan.py` | 저널 결정 메일 스캔 |
+
+**맥미니 cron이 매일 07:00에 `~/second-brain/_tools/daily_brief.py --mail`을 돌린다.**
 "오늘 브리핑" 요청을 받으면 이것을 실행한다.
+
+⚠️ `claude_research/Claude outputs/`에 **구버전 `daily_brief.py`(6.5KB, 2026-10-17)가
+남아 있다.** 운영본은 볼트 쪽(15.8KB)이다. 그 폴더는 투고 패키지·Figure가 뒤섞인
+스크래치이므로 거기 있는 스크립트를 정본으로 쓰지 않는다.
+`build_vault.py`와 `add_deadlines.py`·`update_status.py`도 같은 폴더에 있다.
 
 ---
 
