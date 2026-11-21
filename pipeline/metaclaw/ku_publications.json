@@ -1,11 +1,11 @@
 {
   "_meta": {
-    "version": "2.5",
+    "version": "2.6",
     "description": "Ku 박사 자기인용 데이터베이스 — 논문 자동화 파이프라인 Self-Citation 시스템",
-    "last_updated": "2026-11-07",
-    "total_published": 42,
+    "last_updated": "2026-11-21",
+    "total_published": 51,
     "note": "2+ topic overlap시 자동 인용 후보 표시. 모든 항목 verified 필드 필수 — 없으면 self-cite 금지.",
-    "integrity_note": "v2.0: CrossRef 전수 검증. 허구 DOI 13건 삭제(J1/J3/J7/J8/J9/J10/J11/J14/J15/J16/J17/J18/J19 — 타인 논문 DOI 또는 미등록), J2·J6 DOI 정정, 신규 10편 추가. 모든 항목 verified 필드 보유. 백업: ku_publications_backup_v1.1.json | v2.1: doi.org 전수 리졸브 감사. 미등록 DOI(국내지 원문 인쇄값)는 doi_status=unregistered로 보존 — 인용 시 DOI 생략하고 서지정보 표기. | v2.3(2026-09-19): my paper 대조로 Chemosensors 리뷰 1편 추가(J49). CrossRef 저자대조+철회확인 완료. 백업 ku_publications_backup_v2.2.json | 2026-11-06: J39-2026 (JER 300:108185) 추가, CrossRef 저자 대조 통과 | v2.4(2026-11-07): J5·J4·J13 제목이 약칭 플레이스홀더였음 — CrossRef 실제 제목으로 교체, volume/page 보강. DOI는 전부 정상이었으나 제목 불일치는 '실제 DOI + 허구 제목'이라는 전형적 조작 패턴과 동일하게 보이므로 자기인용 시 치명적. 신규 항목 추가 시 제목은 반드시 CrossRef 원문으로 적는다. | v2.5(2026-11-07): Desktop/my paper 폴더 .bib 전수 대조로 누락 5편 추가 (J50 pectin/JER, J51 TrAC, J52 JECE, J53 Nonproliferation Review, J54 JLP). 전부 CrossRef 저자 Kang 대조. 주의: J50은 볼트에 '심사중(pectinrev)'으로 남아 있었으나 실제 게재 완료 — 볼트 status 갱신 필요.",
+    "integrity_note": "v2.0: CrossRef 전수 검증. 허구 DOI 13건 삭제(J1/J3/J7/J8/J9/J10/J11/J14/J15/J16/J17/J18/J19 — 타인 논문 DOI 또는 미등록), J2·J6 DOI 정정, 신규 10편 추가. 모든 항목 verified 필드 보유. 백업: ku_publications_backup_v1.1.json | v2.1: doi.org 전수 리졸브 감사. 미등록 DOI(국내지 원문 인쇄값)는 doi_status=unregistered로 보존 — 인용 시 DOI 생략하고 서지정보 표기. | v2.3(2026-09-19): my paper 대조로 Chemosensors 리뷰 1편 추가(J49). CrossRef 저자대조+철회확인 완료. 백업 ku_publications_backup_v2.2.json | 2026-11-06: J39-2026 (JER 300:108185) 추가, CrossRef 저자 대조 통과 | v2.4(2026-11-07): J5·J4·J13 제목이 약칭 플레이스홀더였음 — CrossRef 실제 제목으로 교체, volume/page 보강. DOI는 전부 정상이었으나 제목 불일치는 '실제 DOI + 허구 제목'이라는 전형적 조작 패턴과 동일하게 보이므로 자기인용 시 치명적. 신규 항목 추가 시 제목은 반드시 CrossRef 원문으로 적는다. | v2.5(2026-11-07): Desktop/my paper 폴더 .bib 전수 대조로 누락 5편 추가 (J50 pectin/JER, J51 TrAC, J52 JECE, J53 Nonproliferation Review, J54 JLP). 전부 CrossRef 저자 Kang 대조. 주의: J50은 볼트에 '심사중(pectinrev)'으로 남아 있었으나 실제 게재 완료 — 볼트 status 갱신 필요. | v2.6(2026-11-21): Desktop/my paper PDF 51건 전수 대조로 누락 9편 추가(J55~J63). 전건 CrossRef DOI 리졸브 + 저자 Ku Kang 대조 통과. 백업 ku_publications_backup_v2.5_20261121.json. ⚠️미등록 1건: '화학테러 경찰 대응체계 AcciMap'(국내지)은 CrossRef 미검색 — 보류.",
     "canonical_path": "pipeline/metaclaw/ku_publications.json (정본 — 루트 사본 읽지 말 것)",
     "source_refresh": "Desktop/my paper BibTeX import",
     "doi_verification_status": "Local BibTeX DOI values imported; external DOI resolution not performed."
@@ -1304,6 +1304,182 @@
       ],
       "citation_hint": "몬테카를로 편익분석 논의 시",
       "verified": "CrossRef 2026-11-07: DOI 리졸브 + title/journal/volume/page + 저자 Ku Kang 대조 완료 (출처: Desktop/my paper .bib)"
+    },
+    {
+      "id": "J55-2026",
+      "bibtex_key": "kim2026j55",
+      "authors": "Kim S, Yoo J, Kang K, Lee D, Park G, Kim Y, Jang YJ",
+      "year": 2026,
+      "title": "Rapid LC-MS/MS Confirmatory Identification of Ricin and Abrin via Proteospecific Tryptic Peptides Under Organisation for the Prohibition of Chemical Weapons (OPCW)-Compliant Conditions",
+      "journal": "Analytical Letters",
+      "volume": "59",
+      "pages": "3218-3230",
+      "doi": "10.1080/00032719.2026.2651253",
+      "topics": [
+        "ricin",
+        "abrin",
+        "LC-MS/MS",
+        "proteotypic peptide",
+        "OPCW",
+        "biotoxin"
+      ],
+      "citation_hint": "리신·아브린 확인분석 논의 시",
+      "verified": "CrossRef 2026-11-21: DOI 리졸브 + title/journal/volume/page + 저자 Ku Kang 대조 완료 (출처: Desktop/my paper PDF)"
+    },
+    {
+      "id": "J56-2026",
+      "bibtex_key": "kim2026j56",
+      "authors": "Kim J, Kang K, Yoo J",
+      "year": 2026,
+      "title": "Benchmarking TAS2R Subtype-Selectivity Prediction under Scaffold-Aware Evaluation: A Controlled Analysis of Receptor Representations",
+      "journal": "Journal of Chemical Information and Modeling",
+      "volume": "66",
+      "pages": "13570-13585",
+      "doi": "10.1021/acs.jcim.6c02473",
+      "topics": [
+        "TAS2R",
+        "scaffold-aware evaluation",
+        "benchmark",
+        "receptor representation",
+        "GPCR"
+      ],
+      "citation_hint": "스캐폴드 인지 평가·벤치마크 설계 논의 시",
+      "verified": "CrossRef 2026-11-21: DOI 리졸브 + title/journal/volume/page + 저자 Ku Kang 대조 완료 (출처: Desktop/my paper PDF)"
+    },
+    {
+      "id": "J57-2026",
+      "bibtex_key": "kim2026j57",
+      "authors": "Kim J, Han NY, Muzammal A, Ahn JH, Im C, Kim S, Eom S, Kang CM, Kang K, Lee YJ, Lee KC, K. Schultz M, Lee D",
+      "year": 2026,
+      "title": "Comparative Evaluation of Chelator‐Conjugated Peptides for Lead‐Labeled SSTR2‐Targeted Theranostics: Integrated Computational Modeling and Preclinical Validation",
+      "journal": "Advanced Science",
+      "volume": "",
+      "pages": "",
+      "doi": "10.1002/advs.78419",
+      "topics": [
+        "SSTR2",
+        "chelator",
+        "Pb-212",
+        "theranostics",
+        "peptide"
+      ],
+      "citation_hint": "테라노스틱 킬레이터 비교 논의 시",
+      "verified": "CrossRef 2026-11-21: DOI 리졸브 + title/journal/volume/page + 저자 Ku Kang 대조 완료 (출처: Desktop/my paper PDF)"
+    },
+    {
+      "id": "J58-2026",
+      "bibtex_key": "kim2026j58",
+      "authors": "Kim J, Yoo J, Lee D, Kang K",
+      "year": 2026,
+      "title": "Benchmarking Affinity-Based Docking for Irreversible Acetylcholinesterase Inhibitors: A Physics-Informed Reactivity Framework for Stereoselective Potency Prioritization",
+      "journal": "ACS Omega",
+      "volume": "11",
+      "pages": "62050-62059",
+      "doi": "10.1021/acsomega.6c08355",
+      "topics": [
+        "covalent docking",
+        "acetylcholinesterase",
+        "irreversible inhibitor",
+        "benchmark",
+        "reactivity"
+      ],
+      "citation_hint": "공유결합 도킹·비가역 저해 논의 시",
+      "verified": "CrossRef 2026-11-21: DOI 리졸브 + title/journal/volume/page + 저자 Ku Kang 대조 완료 (출처: Desktop/my paper PDF)"
+    },
+    {
+      "id": "J59-2026",
+      "bibtex_key": "kang2026j59",
+      "authors": "Kang K, Cho SH, Lee D",
+      "year": 2026,
+      "title": "Reagent-level variables as control dimensions in reaction development",
+      "journal": "Reaction Chemistry & Engineering",
+      "volume": "",
+      "pages": "",
+      "doi": "10.1039/d6re00272b",
+      "topics": [
+        "reaction development",
+        "reagent-level variables",
+        "process control"
+      ],
+      "citation_hint": "반응 개발 변수 설계 논의 시",
+      "verified": "CrossRef 2026-11-21: DOI 리졸브 + title/journal/volume/page + 저자 Ku Kang 대조 완료 (출처: Desktop/my paper PDF)"
+    },
+    {
+      "id": "J60-2026",
+      "bibtex_key": "cha2026j60",
+      "authors": "Cha J, Shin M, Kang K",
+      "year": 2026,
+      "title": "Information, Not Execution: Generative AI, the Two Barriers to CBRN Terrorism, and the Limits of Arms Control",
+      "journal": "Studies in Conflict & Terrorism",
+      "volume": "",
+      "pages": "1-22",
+      "doi": "10.1080/1057610x.2026.2749822",
+      "topics": [
+        "generative AI",
+        "CBRN terrorism",
+        "arms control",
+        "dual-use"
+      ],
+      "citation_hint": "생성형 AI·CBRN 위협 논의 시",
+      "verified": "CrossRef 2026-11-21: DOI 리졸브 + title/journal/volume/page + 저자 Ku Kang 대조 완료 (출처: Desktop/my paper PDF)"
+    },
+    {
+      "id": "J61-2027",
+      "bibtex_key": "you2027j61",
+      "authors": "You H, Bak W, Choi G, Shin M, Yoo J, Kim M, Kim J, Kang K",
+      "year": 2027,
+      "title": "Site-specific field comparison of in situ NaI(Tl) gamma-ray spectrometry for ambient dose equivalent rate estimation and 137Cs spectral screening",
+      "journal": "Applied Radiation and Isotopes",
+      "volume": "240",
+      "pages": "113084",
+      "doi": "10.1016/j.apradiso.2026.113084",
+      "topics": [
+        "in situ gamma spectrometry",
+        "NaI(Tl)",
+        "ambient dose equivalent",
+        "Cs-137",
+        "field comparison"
+      ],
+      "citation_hint": "현장 감마분광·선량률 평가 논의 시",
+      "verified": "CrossRef 2026-11-21: DOI 리졸브 + title/journal/volume/page + 저자 Ku Kang 대조 완료 (출처: Desktop/my paper PDF)"
+    },
+    {
+      "id": "J62-2027",
+      "bibtex_key": "choi2027j62",
+      "authors": "Choi W, Shin M, Kang K",
+      "year": 2027,
+      "title": "Adaptive radiation surveying with residual Gaussian process regression: Trade-offs between survey effort and Hot-zone detection, with field validation",
+      "journal": "Annals of Nuclear Energy",
+      "volume": "243",
+      "pages": "113032",
+      "doi": "10.1016/j.anucene.2026.113032",
+      "topics": [
+        "Gaussian process regression",
+        "adaptive survey",
+        "radiological mapping",
+        "hot-zone"
+      ],
+      "citation_hint": "적응형 방사선 탐사·GPR 논의 시",
+      "verified": "CrossRef 2026-11-21: DOI 리졸브 + title/journal/volume/page + 저자 Ku Kang 대조 완료 (출처: Desktop/my paper PDF)"
+    },
+    {
+      "id": "J63-2027",
+      "bibtex_key": "you2027j63",
+      "authors": "You H, Shin M, Bak W, Choi G, Yoo J, Kim J, Kang K",
+      "year": 2027,
+      "title": "High dose-rate response and individual correction of commercial electronic personal dosimeters for nuclear emergency radiation protection",
+      "journal": "Nuclear Engineering and Technology",
+      "volume": "59",
+      "pages": "104811",
+      "doi": "10.1016/j.net.2026.104811",
+      "topics": [
+        "electronic personal dosimeter",
+        "high dose rate",
+        "individual correction",
+        "emergency radiation protection"
+      ],
+      "citation_hint": "EPD 고선량률 보정 논의 시",
+      "verified": "CrossRef 2026-11-21: DOI 리졸브 + title/journal/volume/page + 저자 Ku Kang 대조 완료 (출처: Desktop/my paper PDF)"
     }
   ],
   "under_review": [

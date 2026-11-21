@@ -2,6 +2,63 @@
 
 ---
 
+## v7.5: 2026-11-21
+
+에디터를 1인에서 3인 합의 체제로 바꾸고, 자기인용 DB를 실제 보유 논문과 다시 맞췄다.
+
+### 1. EDITOR BOARD — 에디터 3인 합의 체제 (신규)
+
+v7.4의 단일 EDITOR를 3인으로 확장했다. **역할을 임의로 나누지 않았다.
+원고를 죽이는 경로 셋에 하나씩 붙였고, 각 경로는 실제 손실에 대응한다.**
+
+| | 역할 | 대응하는 실제 손실 |
+|---|---|---|
+| E1 | 편집장 — 스코프·데스크 | ES&T `limited scientific significance` · PSEP 데스크 · JCCM `focus too narrow` · JRR `not appropriate` · ENVPOL · JCIM |
+| E2 | 부편집장 — 심사 운영 | Analyst 리뷰어 2인 모두 `significance Moderate — not suitable` |
+| E3 | 제작·윤리 — 무결성 | mdpisensors 수치 조작 적발 · chelator2 재현불가 폐기 · 자기인용 허구 13건 |
+
+- **세션마다 1회** 현재 단계 기준 평가 → [시작-5] 신설
+- 셋이 **독립 판정** 후 **디스커션으로 다음 행동 1개 합의.** 평가만 내고 끝내지 않는다
+- 2:1은 다수를 따르되 소수의견 보존. 3인 분산은 SmartPause
+- **E1 단독 거부권** — 스코프 이탈은 되돌릴 수 없다. 리뷰어 지적은 리비전으로 고치지만
+  데스크 리젝은 원고를 다시 쓰게 만든다
+- 섹션·그림 단위는 **E3 단독**이 기본. 매번 3인을 부르면 집필이 멈춘다
+- `editor_board.json` 신설. `editor_log` 스키마 확장(3인 판정·합의·소수의견·다음 행동)
+- **3인 합의가 Ku 승인을 대체하지 않는다**
+
+⚠️ 세 사람 판정이 늘 같으면 페르소나가 부실한 것이다. `journal_profile.json`을 다시 본다.
+
+### 2. Layer 0에 reference-verifier 추가
+
+`the-aurora-lab/reference-verifier` (MIT, pip). CrossRef·OpenAlex·DBLP·arXiv·PubMed 조회,
+**종료코드 1**이라 GATE에 건다.
+
+넣은 이유는 측정된 수치다. held-out 246건 벤치마크에서 **날조 54/54 적발, 잘못된 DOI 30/30 적발,
+flag 정밀도 98.8%.** 그리고 **`WRONG DOI`를 독립 범주로 분류한다** — DOI는 리졸브되는데 다른
+논문을 가리키는 경우. 2026-07-19 허구 자기인용 13건이 정확히 이 유형이었다.
+
+한계도 적었다. 철회 확인은 무료 코어에 없으므로 **Layer 4를 유지**한다. 목적이 존재 확인이라
+연도·venue·저자목록 오류는 범위 밖이다. 외부 전송은 제목·제1저자·연도·식별자뿐이고
+원고 본문은 나가지 않지만, 공저자 원고에서는 Ku가 판단한다.
+
+### 3. 자기인용 DB v2.5 → v2.6 (42 → 51편)
+
+`Desktop/my paper` PDF 51건과 전수 대조해 **누락 9편**을 찾았다. 전건 CrossRef DOI 리졸브 +
+저자 Ku Kang 대조 통과.
+
+J55 Analytical Letters 59:3218-3230 · J56 JCIM 66:13570-13585 · J57 Advanced Science ·
+J58 ACS Omega 11:62050-62059 · J59 React. Chem. Eng. · J60 Studies in Conflict & Terrorism ·
+J61 Appl. Radiat. Isot. 240:113084 · J62 Ann. Nucl. Energy 243:113032 ·
+J63 Nucl. Eng. Technol. 59:104811
+
+부수 교정: 저널명 HTML 엔티티(`&amp;`) 2곳. 백업 `ku_publications_backup_v2.5_20261121.json`.
+보류 1건 — 국내지 '화학테러 경찰 대응체계 AcciMap'은 CrossRef 미검색.
+
+⚠️ **J58·J60·J61·J62·J63은 볼트 노트가 아직 "심사중"이거나 "APC 대기"로 남아 있다.**
+실제로는 권·페이지까지 나왔다. 볼트 갱신이 필요하다.
+
+---
+
 ## v7.4: 2026-11-03
 
 Step 8 평가를 저널 실데이터 기반으로 바꾸고, Humanize EN에 1차 출처를 넣었다.
